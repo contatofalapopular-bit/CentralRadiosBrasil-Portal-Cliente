@@ -1,0 +1,10 @@
+{
+  "name": "Portal do Cliente — Central Rádios Brasil",
+  "short_name": "Portal CRB",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#050d1d",
+  "theme_color": "#07142b",
+  "lang": "pt-BR",
+  "description": "Área segura para clientes da Central Rádios Brasil."
+}

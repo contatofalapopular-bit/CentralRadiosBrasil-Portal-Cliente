@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#07142b">
+  <meta name="description" content="Área segura para clientes da Central Rádios Brasil acompanharem contratos, faturas e o conteúdo de seus sites.">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://broken-bar-45e2.contatofalapopular.workers.dev; img-src 'self' data: https:; media-src https:; style-src 'self'; script-src 'self'; font-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'">
+  <title>Portal do Cliente — Central Rádios Brasil</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="manifest" href="manifest.webmanifest">
+</head>
+<body>
+  <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+
+  <section id="login-view" class="auth-shell">
+    <div class="brand-card" aria-hidden="true">
+      <div class="brand-mark">CRB</div>
+      <span>Central Rádios Brasil</span>
+      <h1>Seu projeto em um só lugar.</h1>
+      <p>Acompanhe o contrato, as faturas e atualize o conteúdo autorizado do site da sua rádio.</p>
+    </div>
+    <main class="login-card" id="conteudo">
+      <span class="eyebrow">Área segura</span>
+      <h2>Portal do Cliente</h2>
+      <p class="muted">Entre com o e-mail cadastrado e a senha fornecida pela Central.</p>
+      <form id="login-form" novalidate>
+        <label>E-mail
+          <input id="login-email" name="email" type="email" autocomplete="username" required>
+        </label>
+        <label>Senha
+          <input id="login-password" name="senha" type="password" autocomplete="current-password" required minlength="8">
+        </label>
+        <button id="login-button" class="primary" type="submit">Entrar</button>
+      </form>
+      <div id="login-message" class="message hidden" role="alert"></div>
+      <small>O acesso é individual. Nunca compartilhe sua senha.</small>
+    </main>
+  </section>
+
+  <div id="app-view" class="app-shell hidden">
+    <header class="topbar">
+      <div class="brand-inline"><span class="brand-mark small">CRB</span><div><strong>Portal do Cliente</strong><small>Central Rádios Brasil</small></div></div>
+      <div class="topbar-actions"><span id="session-name"></span><button id="logout-button" class="ghost" type="button">Sair</button></div>
+    </header>
+
+    <nav class="tabs" aria-label="Áreas do Portal do Cliente">
+      <button class="tab active" type="button" data-tab="resumo">Visão geral</button>
+      <button class="tab" type="button" data-tab="site">Meu site</button>
+      <button class="tab" type="button" data-tab="faturas">Faturas</button>
+      <button class="tab" type="button" data-tab="contratos">Contrato</button>
+      <button class="tab" type="button" data-tab="seguranca">Segurança</button>
+    </nav>
+
+    <main class="main-content">
+      <div id="global-message" class="message hidden" role="status"></div>
+
+      <section class="panel" data-panel="resumo">
+        <div class="page-heading"><div><span class="eyebrow">Bem-vindo</span><h1 id="welcome-title">Portal do Cliente</h1><p id="welcome-subtitle" class="muted"></p></div><button id="refresh-button" class="secondary" type="button">Atualizar dados</button></div>
+        <div class="kpis">
+          <article><span>Contrato</span><strong id="kpi-contract">—</strong><small id="kpi-contract-detail">Nenhum contrato</small></article>
+          <article><span>Site</span><strong id="kpi-site">—</strong><small id="kpi-site-detail">Não preparado</small></article>
+          <article><span>Faturas em aberto</span><strong id="kpi-invoices">0</strong><small id="kpi-invoices-detail">R$ 0,00</small></article>
+          <article><span>Próximo vencimento</span><strong id="kpi-due">—</strong><small id="kpi-due-detail">Sem cobrança pendente</small></article>
+        </div>
+        <div class="grid-two">
+          <article class="card"><h2>Andamento do site</h2><div id="site-progress" class="status-stack"></div></article>
+          <article class="card"><h2>Últimas faturas</h2><div id="recent-invoices" class="compact-list"></div></article>
+        </div>
+      </section>
+
+      <section class="panel hidden" data-panel="site">
+        <div class="page-heading"><div><span class="eyebrow">Modelo Rádio Essencial</span><h1>Conteúdo do meu site</h1><p class="muted">Somente os campos liberados pela Central aparecem para edição.</p></div><div class="button-row"><button id="preview-button" class="secondary" type="button">Visualizar prévia</button><button id="save-draft-button" class="primary" type="button">Salvar rascunho</button></div></div>
+        <div id="site-unavailable" class="empty hidden">Nenhum site foi preparado para este cliente.</div>
+        <form id="site-form" class="editor-layout hidden" novalidate>
+          <section class="card form-card">
+            <h2>Identidade</h2>
+            <div class="form-grid">
+              <label data-field="nome">Nome da rádio<input name="nome" maxlength="140"></label>
+              <label data-field="slogan">Slogan<input name="slogan" maxlength="180"></label>
+              <label data-field="logo" class="full">URL da logomarca<input name="logo" type="url" placeholder="https://..."></label>
+              <label data-field="capa" class="full">URL da imagem de capa<input name="capa" type="url" placeholder="https://..."></label>
+              <label data-field="cores">Cor principal<input name="corPrimaria" type="color" value="#0b1f3a"></label>
+              <label data-field="cores">Cor de destaque<input name="corSecundaria" type="color" value="#13a8e5"></label>
+              <label data-field="descricao" class="full">Descrição da rádio<textarea name="descricao" rows="5" maxlength="3000"></textarea></label>
+            </div>
+          </section>
+
+          <section class="card form-card">
+            <h2>Contato e redes</h2>
+            <div class="form-grid">
+              <label data-field="whatsapp">WhatsApp<input name="whatsapp" maxlength="40" placeholder="5564999999999"></label>
+              <label data-field="contatos">E-mail público<input name="contatoEmail" type="email"></label>
+              <label data-field="contatos">Telefone<input name="contatoTelefone" maxlength="40"></label>
+              <label data-field="contatos">Endereço<input name="contatoEndereco" maxlength="240"></label>
+              <label data-field="redes_sociais">Instagram<input name="instagram" type="url" placeholder="https://instagram.com/..."></label>
+              <label data-field="redes_sociais">Facebook<input name="facebook" type="url" placeholder="https://facebook.com/..."></label>
+              <label data-field="redes_sociais">YouTube<input name="youtube" type="url" placeholder="https://youtube.com/..."></label>
+              <label data-field="redes_sociais">TikTok<input name="tiktok" type="url" placeholder="https://tiktok.com/@..."></label>
+            </div>
+          </section>
+
+          <section class="card form-card" data-field="programacao">
+            <h2>Programação</h2>
+            <p class="help">Uma linha por programa: <strong>Dia | Horário | Programa | Apresentador</strong></p>
+            <textarea name="programacao" rows="8" placeholder="Segunda a sexta | 08:00 | Manhã Popular | João Silva"></textarea>
+          </section>
+
+          <section class="card form-card" data-field="locutores">
+            <h2>Equipe e apresentadores</h2>
+            <p class="help">Uma linha por pessoa: <strong>Nome | Função | URL da foto</strong></p>
+            <textarea name="locutores" rows="7" placeholder="Maria Souza | Apresentadora | https://..."></textarea>
+          </section>
+
+          <section class="card form-card" data-field="patrocinadores">
+            <h2>Patrocinadores</h2>
+            <p class="help">Uma linha por parceiro: <strong>Nome | Site | URL da logo</strong></p>
+            <textarea name="patrocinadores" rows="7" placeholder="Empresa Exemplo | https://empresa.com.br | https://..."></textarea>
+          </section>
+
+          <section class="card form-card" data-field="links_aplicativos">
+            <h2>Aplicativos</h2>
+            <div class="form-grid">
+              <label>Android<input name="appAndroid" type="url"></label>
+              <label>iPhone / iOS<input name="appIos" type="url"></label>
+              <label class="full">Alexa / outros<input name="appAlexa" type="url"></label>
+            </div>
+          </section>
+
+          <section class="card form-card" data-field="textos_institucionais">
+            <h2>Textos institucionais</h2>
+            <label>Sobre a rádio<textarea name="sobre" rows="5"></textarea></label>
+          </section>
+
+          <section class="publication-bar">
+            <div><strong id="draft-status">Rascunho ainda não salvo</strong><small id="publication-detail">As alterações não aparecem no site até a publicação.</small></div>
+            <button id="request-publication-button" class="primary" type="button">Solicitar publicação</button>
+          </section>
+        </form>
+      </section>
+
+      <section class="panel hidden" data-panel="faturas">
+        <div class="page-heading"><div><span class="eyebrow">Financeiro</span><h1>Faturas e pagamentos</h1><p class="muted">Consulte competências, vencimentos e situação dos pagamentos.</p></div></div>
+        <div class="table-wrap"><table><thead><tr><th>Fatura</th><th>Serviço</th><th>Competência</th><th>Vencimento</th><th>Total</th><th>Pago</th><th>Status</th></tr></thead><tbody id="invoices-body"></tbody></table></div>
+      </section>
+
+      <section class="panel hidden" data-panel="contratos">
+        <div class="page-heading"><div><span class="eyebrow">Serviços contratados</span><h1>Meu contrato</h1><p class="muted">Resumo do plano e do andamento dos serviços.</p></div></div>
+        <div id="contracts-list" class="cards-list"></div>
+      </section>
+
+      <section class="panel hidden" data-panel="seguranca">
+        <div class="page-heading"><div><span class="eyebrow">Segurança</span><h1>Alterar senha</h1><p class="muted">Use uma senha exclusiva e não a compartilhe.</p></div></div>
+        <form id="password-form" class="card narrow-form">
+          <label>Senha atual<input name="senhaAtual" type="password" autocomplete="current-password" required></label>
+          <label>Nova senha<input name="novaSenha" type="password" autocomplete="new-password" minlength="8" required></label>
+          <label>Confirmar nova senha<input name="confirmacao" type="password" autocomplete="new-password" minlength="8" required></label>
+          <button class="primary" type="submit">Atualizar senha</button>
+        </form>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="preview-dialog" class="preview-dialog">
+    <div class="dialog-head"><div><span class="eyebrow">Prévia local</span><h2>Como o conteúdo poderá aparecer</h2></div><button id="close-preview" class="ghost" type="button" aria-label="Fechar prévia">✕</button></div>
+    <div id="preview-content" class="site-preview"></div>
+  </dialog>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

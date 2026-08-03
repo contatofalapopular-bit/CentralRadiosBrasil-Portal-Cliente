@@ -1,25 +1,43 @@
-# Portal do Cliente — Central Rádios Brasil v1.1.0
+# Central Rádios Brasil — Portal do Cliente v1.2.0
 
-Evolução do Commit 22.18 com painel avançado de gerenciamento do site da rádio.
+## Commit 22.18 — Parte 1 de 7: Estrutura principal
 
-## O que mudou
+Esta versão reconstrói a estrutura do painel administrativo do cliente com a sequência funcional aprovada:
 
-- menu lateral completo de edição, inspirado na organização funcional de painéis profissionais de rádio;
-- configurações principais, redes sociais, player, Google e contato;
-- cabeçalho, rodapé, cores, fundo, páginas fixas, menu e SEO;
-- ativação de módulos;
-- destaques, enquete, galeria, locutores, mural, notícias, ouvinte do mês, parceiros, pedidos, programação, publicidades, top músicas, vídeos, Web TV, WhatsApp e aplicativos;
-- podcasts, eventos, promoções, acessibilidade e backup JSON;
-- prévia local ampliada;
-- histórico real de versões;
-- indicadores editoriais baseados no conteúdo cadastrado, sem inventar audiência ou visitas.
+1. Inicial
+2. Configurações
+3. Layout
+4. Módulos
+5. Conteúdo
+6. Usuários
+
+As áreas comerciais de Faturas, Contrato e Publicação continuam disponíveis em uma seção secundária, sem interromper a sequência principal de administração do site.
+
+## O que esta entrega implementa
+
+- menu lateral completo e expansível;
+- página inicial com dados reais já disponíveis no Worker;
+- cabeçalho com identificação do cliente e do site;
+- sessão, logout e troca de senha preservados;
+- navegação responsiva para computador e celular;
+- ligação dos itens do novo menu às telas funcionais já existentes;
+- destaque da seção ativa;
+- preservação de rascunhos, prévia, histórico, solicitação e aprovação de publicação;
+- aviso explícito onde ainda não existem estatísticas reais, sem inventar visitas.
 
 ## Compatibilidade
 
-Esta versão usa os mesmos endpoints do Worker 1.14.2. Não exige alteração no Worker nem no Admin.
+- Worker principal: v1.14.2
+- Admin da Central: v3.10.0
+- Repositório: `CentralRadiosBrasil-Portal-Cliente`
 
-Os novos recursos são organizados dentro dos 16 campos já liberados no modelo Rádio Essencial. Conteúdo existente é preservado durante a edição.
+Esta atualização substitui somente os arquivos do Portal do Cliente. Não exige migração no D1 e não apaga dados.
 
-## Publicação
+## Próximas partes
 
-Substitua os arquivos do repositório `CentralRadiosBrasil-Portal-Cliente` pelos arquivos desta pasta e aguarde o GitHub Pages concluir a implantação.
+- Parte 2: Configurações
+- Parte 3: Layout
+- Parte 4: Módulos
+- Parte 5: Conteúdo
+- Parte 6: Usuários e permissões
+- Parte 7: Estatísticas e auditoria

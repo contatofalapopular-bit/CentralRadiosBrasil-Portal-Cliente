@@ -1,6 +1,6 @@
 {
-  "name": "Portal do Cliente — Central Rádios Brasil",
-  "short_name": "Portal CRB",
+  "name": "Painel do Site — Central Rádios Brasil",
+  "short_name": "Painel CRB",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#050d1d",

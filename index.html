@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#07142b">
-  <meta name="description" content="Área segura para clientes da Central Rádios Brasil acompanharem contratos, faturas e o conteúdo de seus sites.">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://broken-bar-45e2.contatofalapopular.workers.dev; img-src 'self' data: https:; media-src https:; style-src 'self'; script-src 'self'; font-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'">
+  <meta name="description" content="Painel do cliente para administrar o conteúdo do site da rádio, contratos e faturas.">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://broken-bar-45e2.contatofalapopular.workers.dev; img-src 'self' data: https:; media-src https:; style-src 'self' 'unsafe-inline'; script-src 'self'; font-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'">
   <title>Portal do Cliente — Central Rádios Brasil</title>
   <link rel="stylesheet" href="styles.css">
   <link rel="manifest" href="manifest.webmanifest">
@@ -17,20 +17,16 @@
     <div class="brand-card" aria-hidden="true">
       <div class="brand-mark">CRB</div>
       <span>Central Rádios Brasil</span>
-      <h1>Seu projeto em um só lugar.</h1>
-      <p>Acompanhe o contrato, as faturas e atualize o conteúdo autorizado do site da sua rádio.</p>
+      <h1>O site da sua rádio sob seu controle.</h1>
+      <p>Atualize conteúdo, aparência, programação, equipe, notícias e módulos em um painel moderno e seguro.</p>
     </div>
     <main class="login-card" id="conteudo">
       <span class="eyebrow">Área segura</span>
       <h2>Portal do Cliente</h2>
-      <p class="muted">Entre com o e-mail cadastrado e a senha fornecida pela Central.</p>
+      <p class="muted">Entre com o e-mail cadastrado e sua senha.</p>
       <form id="login-form" novalidate>
-        <label>E-mail
-          <input id="login-email" name="email" type="email" autocomplete="username" required>
-        </label>
-        <label>Senha
-          <input id="login-password" name="senha" type="password" autocomplete="current-password" required minlength="8">
-        </label>
+        <label>E-mail<input id="login-email" name="email" type="email" autocomplete="username" required></label>
+        <label>Senha<input id="login-password" name="senha" type="password" autocomplete="current-password" required minlength="8"></label>
         <button id="login-button" class="primary" type="submit">Entrar</button>
       </form>
       <div id="login-message" class="message hidden" role="alert"></div>
@@ -46,7 +42,7 @@
 
     <nav class="tabs" aria-label="Áreas do Portal do Cliente">
       <button class="tab active" type="button" data-tab="resumo">Visão geral</button>
-      <button class="tab" type="button" data-tab="site">Meu site</button>
+      <button class="tab" type="button" data-tab="site">Gerenciar site</button>
       <button class="tab" type="button" data-tab="faturas">Faturas</button>
       <button class="tab" type="button" data-tab="contratos">Contrato</button>
       <button class="tab" type="button" data-tab="seguranca">Segurança</button>
@@ -70,71 +66,322 @@
       </section>
 
       <section class="panel hidden" data-panel="site">
-        <div class="page-heading"><div><span class="eyebrow">Modelo Rádio Essencial</span><h1>Conteúdo do meu site</h1><p class="muted">Somente os campos liberados pela Central aparecem para edição.</p></div><div class="button-row"><button id="preview-button" class="secondary" type="button">Visualizar prévia</button><button id="save-draft-button" class="primary" type="button">Salvar rascunho</button></div></div>
         <div id="site-unavailable" class="empty hidden">Nenhum site foi preparado para este cliente.</div>
-        <form id="site-form" class="editor-layout hidden" novalidate>
-          <section class="card form-card">
-            <h2>Identidade</h2>
-            <div class="form-grid">
-              <label data-field="nome">Nome da rádio<input name="nome" maxlength="140"></label>
-              <label data-field="slogan">Slogan<input name="slogan" maxlength="180"></label>
-              <label data-field="logo" class="full">URL da logomarca<input name="logo" type="url" placeholder="https://..."></label>
-              <label data-field="capa" class="full">URL da imagem de capa<input name="capa" type="url" placeholder="https://..."></label>
-              <label data-field="cores">Cor principal<input name="corPrimaria" type="color" value="#0b1f3a"></label>
-              <label data-field="cores">Cor de destaque<input name="corSecundaria" type="color" value="#13a8e5"></label>
-              <label data-field="descricao" class="full">Descrição da rádio<textarea name="descricao" rows="5" maxlength="3000"></textarea></label>
+        <form id="site-form" class="site-manager hidden" novalidate>
+          <aside class="manager-sidebar" aria-label="Menu de edição do site">
+            <div class="manager-brand">
+              <span class="eyebrow">Modelo Rádio Essencial</span>
+              <strong id="manager-site-name">Meu site</strong>
+              <small id="manager-site-status">Rascunho</small>
             </div>
-          </section>
 
-          <section class="card form-card">
-            <h2>Contato e redes</h2>
-            <div class="form-grid">
-              <label data-field="whatsapp">WhatsApp<input name="whatsapp" maxlength="40" placeholder="5564999999999"></label>
-              <label data-field="contatos">E-mail público<input name="contatoEmail" type="email"></label>
-              <label data-field="contatos">Telefone<input name="contatoTelefone" maxlength="40"></label>
-              <label data-field="contatos">Endereço<input name="contatoEndereco" maxlength="240"></label>
-              <label data-field="redes_sociais">Instagram<input name="instagram" type="url" placeholder="https://instagram.com/..."></label>
-              <label data-field="redes_sociais">Facebook<input name="facebook" type="url" placeholder="https://facebook.com/..."></label>
-              <label data-field="redes_sociais">YouTube<input name="youtube" type="url" placeholder="https://youtube.com/..."></label>
-              <label data-field="redes_sociais">TikTok<input name="tiktok" type="url" placeholder="https://tiktok.com/@..."></label>
+            <button type="button" class="manager-link active" data-editor-page="inicio">⌂ <span>Inicial</span></button>
+
+            <details open>
+              <summary>⚙ Configurações</summary>
+              <button type="button" class="manager-link" data-editor-page="principal">Principal</button>
+              <button type="button" class="manager-link" data-editor-page="redes">Redes sociais</button>
+              <button type="button" class="manager-link" data-editor-page="player">Player</button>
+              <button type="button" class="manager-link" data-editor-page="google">Serviços Google</button>
+              <button type="button" class="manager-link" data-editor-page="contato">Página Fale Conosco</button>
+            </details>
+
+            <details open>
+              <summary>▣ Layout</summary>
+              <button type="button" class="manager-link" data-editor-page="cabecalho">Cabeçalho</button>
+              <button type="button" class="manager-link" data-editor-page="rodape">Rodapé</button>
+              <button type="button" class="manager-link" data-editor-page="aparencia">Plano de fundo, cores e ícones</button>
+              <button type="button" class="manager-link" data-editor-page="paginas">Páginas fixas</button>
+              <button type="button" class="manager-link" data-editor-page="menu">Menu do site</button>
+              <button type="button" class="manager-link" data-editor-page="seo">SEO e compartilhamento</button>
+            </details>
+
+            <details open>
+              <summary>◆ Módulos</summary>
+              <button type="button" class="manager-link" data-editor-page="modulos">Ativar e organizar módulos</button>
+            </details>
+
+            <details open>
+              <summary>✎ Conteúdo</summary>
+              <button type="button" class="manager-link" data-editor-page="destaques">Destaques e banners</button>
+              <button type="button" class="manager-link" data-editor-page="enquete">Enquete</button>
+              <button type="button" class="manager-link" data-editor-page="galeria">Galeria de fotos</button>
+              <button type="button" class="manager-link" data-editor-page="locutores">Locutores</button>
+              <button type="button" class="manager-link" data-editor-page="mural">Mural</button>
+              <button type="button" class="manager-link" data-editor-page="noticias">Notícias</button>
+              <button type="button" class="manager-link" data-editor-page="ouvinte">Ouvinte do mês</button>
+              <button type="button" class="manager-link" data-editor-page="parceiros">Parceiros e patrocinadores</button>
+              <button type="button" class="manager-link" data-editor-page="pedidos">Peça sua música</button>
+              <button type="button" class="manager-link" data-editor-page="programacao">Programação</button>
+              <button type="button" class="manager-link" data-editor-page="publicidades">Publicidades</button>
+              <button type="button" class="manager-link" data-editor-page="topmusicas">Top músicas</button>
+              <button type="button" class="manager-link" data-editor-page="videos">Vídeos e Web TV</button>
+              <button type="button" class="manager-link" data-editor-page="whatsapp">WhatsApp</button>
+              <button type="button" class="manager-link" data-editor-page="aplicativos">Aplicativos</button>
+            </details>
+
+            <details open>
+              <summary>＋ Extras</summary>
+              <button type="button" class="manager-link" data-editor-page="podcasts">Podcasts</button>
+              <button type="button" class="manager-link" data-editor-page="eventos">Agenda e eventos</button>
+              <button type="button" class="manager-link" data-editor-page="promocoes">Promoções e sorteios</button>
+              <button type="button" class="manager-link" data-editor-page="acessibilidade">Acessibilidade</button>
+              <button type="button" class="manager-link" data-editor-page="backup">Backup do conteúdo</button>
+            </details>
+
+            <button type="button" class="manager-link publication-link" data-editor-page="publicacao">✓ Publicação</button>
+          </aside>
+
+          <section class="manager-content">
+            <div class="manager-toolbar">
+              <div><span class="eyebrow" id="editor-breadcrumb">Painel do site</span><h1 id="editor-title">Inicial</h1><p id="editor-description" class="muted">Resumo do conteúdo e atalhos de edição.</p></div>
+              <div class="button-row"><button id="preview-button" class="secondary" type="button">Visualizar prévia</button><button id="save-draft-button" class="primary" type="button">Salvar rascunho</button></div>
             </div>
-          </section>
 
-          <section class="card form-card" data-field="programacao">
-            <h2>Programação</h2>
-            <p class="help">Uma linha por programa: <strong>Dia | Horário | Programa | Apresentador</strong></p>
-            <textarea name="programacao" rows="8" placeholder="Segunda a sexta | 08:00 | Manhã Popular | João Silva"></textarea>
-          </section>
+            <section class="editor-page active" data-editor-page-content="inicio">
+              <div class="editor-kpis">
+                <article><span>Preenchimento</span><strong id="editor-completion">0%</strong><small>Campos principais preenchidos</small></article>
+                <article><span>Conteúdos</span><strong id="editor-content-count">0</strong><small>Itens cadastrados</small></article>
+                <article><span>Módulos ativos</span><strong id="editor-modules-count">0</strong><small>Seções visíveis no site</small></article>
+                <article><span>Última versão</span><strong id="editor-version">—</strong><small id="editor-version-date">Ainda não salva</small></article>
+              </div>
+              <div class="grid-two">
+                <article class="card"><h2>Atalhos</h2><div class="shortcut-grid"><button type="button" data-go-editor="principal">Dados principais</button><button type="button" data-go-editor="programacao">Programação</button><button type="button" data-go-editor="noticias">Notícias</button><button type="button" data-go-editor="publicacao">Publicar</button></div></article>
+                <article class="card"><h2>Situação</h2><div id="editor-status-list" class="status-stack"></div></article>
+              </div>
+              <article class="card"><h2>Histórico de versões</h2><div id="versions-list" class="compact-list"></div></article>
+            </section>
 
-          <section class="card form-card" data-field="locutores">
-            <h2>Equipe e apresentadores</h2>
-            <p class="help">Uma linha por pessoa: <strong>Nome | Função | URL da foto</strong></p>
-            <textarea name="locutores" rows="7" placeholder="Maria Souza | Apresentadora | https://..."></textarea>
-          </section>
+            <section class="editor-page" data-editor-page-content="principal" data-field="nome slogan logo capa descricao textos_institucionais">
+              <div class="section-heading"><h2>Informações principais</h2><p>Nome, identidade e apresentação da rádio.</p></div>
+              <div class="form-grid">
+                <label data-field="nome">Nome da rádio<input name="nome" maxlength="140"></label>
+                <label data-field="slogan">Slogan<input name="slogan" maxlength="180"></label>
+                <label data-field="logo" class="full">URL da logomarca<input name="logo" type="url" placeholder="https://..."></label>
+                <label data-field="capa" class="full">URL da imagem de capa<input name="capa" type="url" placeholder="https://..."></label>
+                <label data-field="descricao" class="full">Descrição curta<textarea name="descricao" rows="4" maxlength="3000"></textarea></label>
+                <label data-field="textos_institucionais" class="full">Sobre a rádio<textarea name="sobre" rows="6"></textarea></label>
+                <label data-field="textos_institucionais" class="full">Missão<textarea name="missao" rows="3"></textarea></label>
+                <label data-field="textos_institucionais" class="full">Visão<textarea name="visao" rows="3"></textarea></label>
+                <label data-field="textos_institucionais" class="full">Valores<textarea name="valores" rows="3"></textarea></label>
+              </div>
+            </section>
 
-          <section class="card form-card" data-field="patrocinadores">
-            <h2>Patrocinadores</h2>
-            <p class="help">Uma linha por parceiro: <strong>Nome | Site | URL da logo</strong></p>
-            <textarea name="patrocinadores" rows="7" placeholder="Empresa Exemplo | https://empresa.com.br | https://..."></textarea>
-          </section>
+            <section class="editor-page" data-editor-page-content="redes" data-field="redes_sociais">
+              <div class="section-heading"><h2>Redes sociais</h2><p>Links oficiais exibidos no site.</p></div>
+              <div class="form-grid">
+                <label>Instagram<input name="instagram" type="url"></label><label>Facebook<input name="facebook" type="url"></label>
+                <label>YouTube<input name="youtube" type="url"></label><label>TikTok<input name="tiktok" type="url"></label>
+                <label>X / Twitter<input name="xTwitter" type="url"></label><label>Threads<input name="threads" type="url"></label>
+                <label>Telegram<input name="telegram" type="url"></label><label>Spotify<input name="spotify" type="url"></label>
+              </div>
+            </section>
 
-          <section class="card form-card" data-field="links_aplicativos">
-            <h2>Aplicativos</h2>
-            <div class="form-grid">
-              <label>Android<input name="appAndroid" type="url"></label>
-              <label>iPhone / iOS<input name="appIos" type="url"></label>
-              <label class="full">Alexa / outros<input name="appAlexa" type="url"></label>
-            </div>
-          </section>
+            <section class="editor-page" data-editor-page-content="player" data-field="textos_institucionais cores capa logo">
+              <div class="section-heading"><h2>Player da rádio</h2><p>O endereço técnico do áudio continua protegido e é definido pela Central.</p></div>
+              <div class="notice"><strong>Stream técnico:</strong> <span id="technical-stream">Será definido pela Central.</span></div>
+              <div class="form-grid">
+                <label>Título do player<input name="playerTitulo" maxlength="120" placeholder="Ouça ao vivo"></label>
+                <label>Texto do botão<input name="playerBotao" maxlength="50" placeholder="Tocar rádio"></label>
+                <label>Estilo<select name="playerEstilo"><option value="compacto">Compacto</option><option value="destaque">Destaque</option><option value="flutuante">Flutuante</option></select></label>
+                <label>Mostrar capa atual<select name="playerMostrarCapa"><option value="sim">Sim</option><option value="nao">Não</option></select></label>
+                <label class="full">Mensagem quando offline<input name="playerOffline" maxlength="180" placeholder="Transmissão temporariamente indisponível"></label>
+              </div>
+            </section>
 
-          <section class="card form-card" data-field="textos_institucionais">
-            <h2>Textos institucionais</h2>
-            <label>Sobre a rádio<textarea name="sobre" rows="5"></textarea></label>
-          </section>
+            <section class="editor-page" data-editor-page-content="google" data-field="textos_institucionais">
+              <div class="section-heading"><h2>Serviços Google</h2><p>Identificadores de ferramentas externas. Nenhum dado de visita é inventado.</p></div>
+              <div class="form-grid">
+                <label>Google Analytics 4<input name="googleAnalytics" placeholder="G-XXXXXXXXXX"></label>
+                <label>Google Tag Manager<input name="googleTagManager" placeholder="GTM-XXXXXXX"></label>
+                <label>Google Search Console<input name="googleSearchConsole" placeholder="Código de verificação"></label>
+                <label>Google AdSense<input name="googleAdsense" placeholder="ca-pub-..."></label>
+                <label class="full">Link do mapa / Google Maps<input name="googleMaps" type="url"></label>
+              </div>
+            </section>
 
-          <section class="publication-bar">
-            <div><strong id="draft-status">Rascunho ainda não salvo</strong><small id="publication-detail">As alterações não aparecem no site até a publicação.</small></div>
-            <button id="request-publication-button" class="primary" type="button">Solicitar publicação</button>
+            <section class="editor-page" data-editor-page-content="contato" data-field="contatos whatsapp">
+              <div class="section-heading"><h2>Página Fale Conosco</h2><p>Informações públicas de contato.</p></div>
+              <div class="form-grid">
+                <label>E-mail público<input name="contatoEmail" type="email"></label><label>Telefone<input name="contatoTelefone"></label>
+                <label>Responsável<input name="contatoResponsavel"></label><label>Horário de atendimento<input name="contatoHorario"></label>
+                <label class="full">Endereço<input name="contatoEndereco"></label><label>Cidade<input name="contatoCidade"></label><label>Estado<input name="contatoEstado" maxlength="2"></label>
+                <label class="toggle full"><input name="contatoFormulario" type="checkbox"> Exibir formulário de contato no site</label>
+              </div>
+            </section>
+
+            <section class="editor-page" data-editor-page-content="cabecalho" data-field="textos_institucionais logo slogan">
+              <div class="section-heading"><h2>Cabeçalho</h2><p>Organize a área superior do site.</p></div>
+              <div class="form-grid">
+                <label>Modelo<select name="headerModelo"><option value="centralizado">Centralizado</option><option value="horizontal">Horizontal</option><option value="hero">Hero com imagem</option></select></label>
+                <label>Alinhamento<select name="headerAlinhamento"><option value="centro">Centro</option><option value="esquerda">Esquerda</option><option value="direita">Direita</option></select></label>
+                <label>Altura<input name="headerAltura" type="number" min="120" max="700" value="360"></label>
+                <label class="toggle"><input name="headerMostrarLogo" type="checkbox"> Mostrar logomarca</label>
+                <label class="toggle"><input name="headerMostrarSlogan" type="checkbox"> Mostrar slogan</label>
+                <label class="toggle"><input name="headerMostrarPlayer" type="checkbox"> Mostrar player no cabeçalho</label>
+              </div>
+            </section>
+
+            <section class="editor-page" data-editor-page-content="rodape" data-field="textos_institucionais contatos redes_sociais">
+              <div class="section-heading"><h2>Rodapé</h2><p>Textos e elementos exibidos no final das páginas.</p></div>
+              <div class="form-grid">
+                <label class="full">Texto do rodapé<textarea name="footerTexto" rows="3"></textarea></label>
+                <label class="toggle"><input name="footerRedes" type="checkbox"> Mostrar redes sociais</label>
+                <label class="toggle"><input name="footerContato" type="checkbox"> Mostrar contato</label>
+                <label class="toggle"><input name="footerMenu" type="checkbox"> Mostrar menu</label>
+                <label class="full">Aviso de direitos autorais<input name="footerCopyright"></label>
+              </div>
+            </section>
+
+            <section class="editor-page" data-editor-page-content="aparencia" data-field="cores">
+              <div class="section-heading"><h2>Plano de fundo, cores e ícones</h2><p>Personalize a identidade visual sem alterar o código.</p></div>
+              <div class="form-grid colors-grid">
+                <label>Cor principal<input name="corPrimaria" type="color" value="#0b1f3a"></label><label>Cor de destaque<input name="corSecundaria" type="color" value="#13a8e5"></label>
+                <label>Fundo<input name="corFundo" type="color" value="#07142b"></label><label>Texto<input name="corTexto" type="color" value="#f4f8ff"></label>
+                <label>Cabeçalho<input name="corCabecalho" type="color" value="#0b1f3a"></label><label>Rodapé<input name="corRodape" type="color" value="#07142b"></label>
+                <label class="full">Imagem de fundo<input name="fundoImagem" type="url" placeholder="https://..."></label>
+                <label>Fonte<select name="fonteSite"><option value="sistema">Sistema</option><option value="moderna">Moderna</option><option value="classica">Clássica</option><option value="condensada">Condensada</option></select></label>
+                <label>Estilo dos ícones<select name="iconeEstilo"><option value="linha">Linha</option><option value="preenchido">Preenchido</option><option value="arredondado">Arredondado</option></select></label>
+              </div>
+            </section>
+
+            <section class="editor-page" data-editor-page-content="paginas" data-field="textos_institucionais">
+              <div class="section-heading inline"><div><h2>Páginas fixas</h2><p>Crie páginas institucionais adicionais.</p></div><button type="button" class="secondary" data-add-item="paginas">+ Nova página</button></div>
+              <div id="pages-list" class="repeater-list"></div>
+            </section>
+
+            <section class="editor-page" data-editor-page-content="menu" data-field="textos_institucionais">
+              <div class="section-heading"><h2>Menu do site</h2><p>Defina os itens e a ordem. Uma linha por item: Nome | Link.</p></div>
+              <textarea name="menuItens" rows="10" placeholder="Início | #inicio&#10;Programação | #programacao&#10;Contato | #contato"></textarea>
+              <div class="form-grid compact-top"><label>Estilo<select name="menuEstilo"><option value="horizontal">Horizontal</option><option value="hamburguer">Menu recolhido</option><option value="lateral">Lateral</option></select></label><label class="toggle"><input name="menuFixo" type="checkbox"> Manter menu fixo no topo</label></div>
+            </section>
+
+            <section class="editor-page" data-editor-page-content="seo" data-field="textos_institucionais capa">
+              <div class="section-heading"><h2>SEO e compartilhamento</h2><p>Como a rádio aparece em buscadores e redes sociais.</p></div>
+              <div class="form-grid">
+                <label class="full">Título para buscadores<input name="seoTitulo" maxlength="70"></label>
+                <label class="full">Descrição para buscadores<textarea name="seoDescricao" rows="3" maxlength="170"></textarea></label>
+                <label class="full">Palavras-chave<input name="seoPalavras" placeholder="rádio, música, cidade"></label>
+                <label class="full">Imagem de compartilhamento<input name="seoImagem" type="url"></label>
+                <label class="toggle full"><input name="seoIndexar" type="checkbox"> Permitir indexação pelos buscadores</label>
+              </div>
+            </section>
+
+            <section class="editor-page" data-editor-page-content="modulos" data-field="textos_institucionais">
+              <div class="section-heading"><h2>Ativar e organizar módulos</h2><p>Escolha quais seções ficarão disponíveis no site.</p></div>
+              <div id="modules-grid" class="modules-grid"></div>
+            </section>
+
+            <section class="editor-page" data-editor-page-content="destaques" data-field="banners">
+              <div class="section-heading inline"><div><h2>Destaques e banners</h2><p>Slides e chamadas da página inicial.</p></div><button type="button" class="secondary" data-add-item="destaques">+ Novo destaque</button></div>
+              <div id="highlights-list" class="repeater-list"></div>
+            </section>
+
+            <section class="editor-page" data-editor-page-content="enquete" data-field="textos_institucionais">
+              <div class="section-heading"><h2>Enquete</h2><p>Configure uma pergunta para os ouvintes.</p></div>
+              <div class="form-grid"><label class="full">Pergunta<input name="enquetePergunta"></label><label class="full">Opções, uma por linha<textarea name="enqueteOpcoes" rows="6"></textarea></label><label class="toggle"><input name="enqueteAtiva" type="checkbox"> Enquete ativa</label></div>
+            </section>
+
+            <section class="editor-page" data-editor-page-content="galeria" data-field="textos_institucionais">
+              <div class="section-heading inline"><div><h2>Galeria de fotos</h2><p>Imagens de eventos, estúdio e equipe.</p></div><button type="button" class="secondary" data-add-item="galeria">+ Nova foto</button></div>
+              <div id="gallery-list" class="repeater-list"></div>
+            </section>
+
+            <section class="editor-page" data-editor-page-content="locutores" data-field="locutores">
+              <div class="section-heading inline"><div><h2>Locutores e equipe</h2><p>Apresentadores, produtores e colaboradores.</p></div><button type="button" class="secondary" data-add-item="locutores">+ Novo locutor</button></div>
+              <div id="hosts-list" class="repeater-list"></div>
+            </section>
+
+            <section class="editor-page" data-editor-page-content="mural" data-field="textos_institucionais">
+              <div class="section-heading"><h2>Mural</h2><p>Configure mensagens e participação do público.</p></div>
+              <div class="form-grid"><label>Título<input name="muralTitulo"></label><label>Moderação<select name="muralModeracao"><option value="sim">Aprovar antes de exibir</option><option value="nao">Exibir automaticamente</option></select></label><label class="full">Mensagem de orientação<textarea name="muralMensagem" rows="4"></textarea></label><label class="toggle"><input name="muralAtivo" type="checkbox"> Mural ativo</label></div>
+            </section>
+
+            <section class="editor-page" data-editor-page-content="noticias" data-field="noticias">
+              <div class="section-heading inline"><div><h2>Notícias</h2><p>Publique notícias e comunicados da rádio.</p></div><button type="button" class="secondary" data-add-item="noticias">+ Nova notícia</button></div>
+              <div id="news-list" class="repeater-list"></div>
+            </section>
+
+            <section class="editor-page" data-editor-page-content="ouvinte" data-field="textos_institucionais">
+              <div class="section-heading"><h2>Ouvinte do mês</h2><p>Destaque um ouvinte na página inicial.</p></div>
+              <div class="form-grid"><label>Nome<input name="ouvinteNome"></label><label>Cidade<input name="ouvinteCidade"></label><label class="full">Foto<input name="ouvinteFoto" type="url"></label><label class="full">Mensagem<textarea name="ouvinteMensagem" rows="4"></textarea></label><label class="toggle"><input name="ouvinteAtivo" type="checkbox"> Exibir no site</label></div>
+            </section>
+
+            <section class="editor-page" data-editor-page-content="parceiros" data-field="patrocinadores">
+              <div class="section-heading inline"><div><h2>Parceiros e patrocinadores</h2><p>Empresas apoiadoras da emissora.</p></div><button type="button" class="secondary" data-add-item="parceiros">+ Novo parceiro</button></div>
+              <div id="sponsors-list" class="repeater-list"></div>
+            </section>
+
+            <section class="editor-page" data-editor-page-content="pedidos" data-field="textos_institucionais whatsapp contatos">
+              <div class="section-heading"><h2>Peça sua música</h2><p>Configure a participação dos ouvintes.</p></div>
+              <div class="form-grid"><label>Canal<select name="pedidoCanal"><option value="whatsapp">WhatsApp</option><option value="formulario">Formulário do site</option><option value="email">E-mail</option></select></label><label>Destino<input name="pedidoDestino"></label><label class="full">Mensagem inicial<textarea name="pedidoMensagem" rows="4"></textarea></label><label class="toggle"><input name="pedidoAtivo" type="checkbox"> Aceitar pedidos de música</label></div>
+            </section>
+
+            <section class="editor-page" data-editor-page-content="programacao" data-field="programacao">
+              <div class="section-heading inline"><div><h2>Programação</h2><p>Grade de programas e horários.</p></div><button type="button" class="secondary" data-add-item="programacao">+ Novo programa</button></div>
+              <div id="schedule-list" class="repeater-list"></div>
+            </section>
+
+            <section class="editor-page" data-editor-page-content="publicidades" data-field="banners">
+              <div class="section-heading inline"><div><h2>Publicidades</h2><p>Banners comerciais e publicidade de abertura.</p></div><button type="button" class="secondary" data-add-item="publicidades">+ Nova publicidade</button></div>
+              <div id="ads-list" class="repeater-list"></div>
+              <article class="card nested-card"><h3>Publicidade de abertura</h3><div class="form-grid"><label class="toggle"><input name="aberturaAtiva" type="checkbox"> Ativar ao abrir o site</label><label>Tempo em segundos<input name="aberturaSegundos" type="number" min="1" max="30" value="5"></label><label class="full">Imagem<input name="aberturaImagem" type="url"></label><label class="full">Link<input name="aberturaLink" type="url"></label></div></article>
+            </section>
+
+            <section class="editor-page" data-editor-page-content="topmusicas" data-field="textos_institucionais">
+              <div class="section-heading inline"><div><h2>Top músicas</h2><p>Ranking editorial informado pela rádio.</p></div><button type="button" class="secondary" data-add-item="topmusicas">+ Nova música</button></div>
+              <div id="top-songs-list" class="repeater-list"></div>
+            </section>
+
+            <section class="editor-page" data-editor-page-content="videos" data-field="textos_institucionais">
+              <div class="section-heading inline"><div><h2>Vídeos e Web TV</h2><p>Vídeos incorporados e transmissão de vídeo.</p></div><button type="button" class="secondary" data-add-item="videos">+ Novo vídeo</button></div>
+              <div id="videos-list" class="repeater-list"></div>
+              <article class="card nested-card"><h3>Web TV</h3><div class="form-grid"><label class="toggle"><input name="webtvAtiva" type="checkbox"> Ativar Web TV</label><label>Título<input name="webtvTitulo"></label><label class="full">URL da transmissão<input name="webtvUrl" type="url"></label></div></article>
+            </section>
+
+            <section class="editor-page" data-editor-page-content="whatsapp" data-field="whatsapp">
+              <div class="section-heading"><h2>WhatsApp</h2><p>Botão flutuante e mensagens rápidas.</p></div>
+              <div class="form-grid"><label>Número com DDI e DDD<input name="whatsappNumero" placeholder="5564999999999"></label><label>Título do botão<input name="whatsappTitulo" placeholder="Fale com a rádio"></label><label class="full">Mensagem automática<textarea name="whatsappMensagem" rows="4"></textarea></label><label>Horário de atendimento<input name="whatsappHorario"></label><label class="toggle"><input name="whatsappFlutuante" type="checkbox"> Mostrar botão flutuante</label></div>
+            </section>
+
+            <section class="editor-page" data-editor-page-content="aplicativos" data-field="links_aplicativos">
+              <div class="section-heading"><h2>Baixe nosso aplicativo</h2><p>Links para PWA, lojas e assistentes de voz.</p></div>
+              <div class="form-grid"><label>Google Play<input name="appAndroid" type="url"></label><label>App Store<input name="appIos" type="url"></label><label>PWA<input name="appPwa" type="url"></label><label>Alexa<input name="appAlexa" type="url"></label><label>Windows<input name="appWindows" type="url"></label><label>QR Code<input name="appQr" type="url"></label></div>
+            </section>
+
+            <section class="editor-page" data-editor-page-content="podcasts" data-field="textos_institucionais">
+              <div class="section-heading inline"><div><h2>Podcasts</h2><p>Episódios e programas sob demanda.</p></div><button type="button" class="secondary" data-add-item="podcasts">+ Novo episódio</button></div>
+              <div id="podcasts-list" class="repeater-list"></div>
+            </section>
+
+            <section class="editor-page" data-editor-page-content="eventos" data-field="textos_institucionais">
+              <div class="section-heading inline"><div><h2>Agenda e eventos</h2><p>Eventos, transmissões e ações externas.</p></div><button type="button" class="secondary" data-add-item="eventos">+ Novo evento</button></div>
+              <div id="events-list" class="repeater-list"></div>
+            </section>
+
+            <section class="editor-page" data-editor-page-content="promocoes" data-field="textos_institucionais">
+              <div class="section-heading inline"><div><h2>Promoções e sorteios</h2><p>Campanhas promocionais com regras claras.</p></div><button type="button" class="secondary" data-add-item="promocoes">+ Nova promoção</button></div>
+              <div id="promotions-list" class="repeater-list"></div>
+            </section>
+
+            <section class="editor-page" data-editor-page-content="acessibilidade" data-field="textos_institucionais">
+              <div class="section-heading"><h2>Acessibilidade</h2><p>Recursos para ampliar o acesso ao conteúdo.</p></div>
+              <div class="form-grid"><label class="toggle"><input name="acessibilidadeContraste" type="checkbox"> Botão de alto contraste</label><label class="toggle"><input name="acessibilidadeFonte" type="checkbox"> Controle de tamanho da fonte</label><label class="toggle"><input name="acessibilidadeReducao" type="checkbox"> Respeitar redução de movimento</label><label class="toggle"><input name="acessibilidadeLeitor" type="checkbox"> Otimização para leitor de tela</label><label class="full">Texto alternativo padrão para a logo<input name="acessibilidadeLogoAlt"></label></div>
+            </section>
+
+            <section class="editor-page" data-editor-page-content="backup">
+              <div class="section-heading"><h2>Backup do conteúdo</h2><p>Baixe uma cópia JSON do rascunho atual para segurança.</p></div>
+              <div class="card backup-card"><p>O arquivo contém apenas o conteúdo do site, sem senha, contrato ou dados financeiros.</p><button id="export-content-button" class="secondary" type="button">Baixar backup JSON</button></div>
+            </section>
+
+            <section class="editor-page" data-editor-page-content="publicacao">
+              <div class="section-heading"><h2>Publicação</h2><p>Revise o rascunho e envie para aprovação da Central.</p></div>
+              <div class="publication-center">
+                <article class="card"><span>Status atual</span><strong id="draft-status">Rascunho ainda não salvo</strong><small id="publication-detail">As alterações não aparecem no site até a publicação.</small></article>
+                <article class="card"><span>Fluxo</span><ol><li>Preencha o conteúdo.</li><li>Salve o rascunho.</li><li>Visualize a prévia.</li><li>Solicite a publicação.</li></ol></article>
+              </div>
+              <div class="publication-actions"><button id="publication-preview-button" class="secondary" type="button">Visualizar prévia</button><button id="publication-save-button" class="secondary" type="button">Salvar rascunho</button><button id="request-publication-button" class="primary" type="button">Solicitar publicação</button></div>
+            </section>
           </section>
         </form>
       </section>
@@ -162,9 +409,11 @@
   </div>
 
   <dialog id="preview-dialog" class="preview-dialog">
-    <div class="dialog-head"><div><span class="eyebrow">Prévia local</span><h2>Como o conteúdo poderá aparecer</h2></div><button id="close-preview" class="ghost" type="button" aria-label="Fechar prévia">✕</button></div>
+    <div class="dialog-head"><div><span class="eyebrow">Prévia local</span><h2>Como o site poderá aparecer</h2></div><button id="close-preview" class="ghost" type="button" aria-label="Fechar prévia">✕</button></div>
     <div id="preview-content" class="site-preview"></div>
   </dialog>
+
+  <template id="repeater-template"><article class="repeater-item"><div class="repeater-fields"></div><button type="button" class="danger-link" data-remove-item>Remover</button></article></template>
 
   <script src="config.js"></script>
   <script src="app.js"></script>

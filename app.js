@@ -7,6 +7,9 @@
     dashboard: null,
     site: null,
     versions: [],
+    media: [],
+    mediaUsage: 0,
+    mediaLimit: 25 * 1024 * 1024,
     activeEditor: "inicio"
   };
 
@@ -20,6 +23,7 @@
     player:["Configurações","Player","Aparência e mensagens do player da rádio."],
     google:["Configurações","Serviços Google","Integrações de medição, busca e publicidade."],
     contato:["Configurações","Página Fale Conosco","Informações públicas e formulário de contato."],
+    midias:["Configurações","Biblioteca de imagens","Arquivos enviados e otimizados para o site."],
     cabecalho:["Layout","Cabeçalho","Organize a parte superior do site."],
     rodape:["Layout","Rodapé","Configure a parte inferior das páginas."],
     aparencia:["Layout","Plano de fundo, cores e ícones","Personalize a identidade visual."],
@@ -73,45 +77,69 @@
     ["promocoes","Promoções","Campanhas e sorteios"]
   ];
 
+  const MEDIA_PROFILES = Object.freeze({
+    logo:{label:"Logomarca",targetW:800,targetH:400,minW:300,minH:150,maxBytes:300*1024,fit:"contain"},
+    favicon:{label:"Ícone do site",targetW:512,targetH:512,minW:192,minH:192,maxBytes:120*1024,fit:"cover"},
+    capa:{label:"Capa principal",targetW:1600,targetH:600,minW:1200,minH:450,maxBytes:600*1024,fit:"cover"},
+    fundo:{label:"Plano de fundo",targetW:1920,targetH:1080,minW:1280,minH:720,maxBytes:700*1024,fit:"cover"},
+    compartilhamento:{label:"Compartilhamento",targetW:1200,targetH:630,minW:800,minH:420,maxBytes:300*1024,fit:"cover"},
+    player:{label:"Imagem do player",targetW:800,targetH:800,minW:500,minH:500,maxBytes:250*1024,fit:"cover"},
+    destaque:{label:"Destaque",targetW:1200,targetH:675,minW:900,minH:450,maxBytes:350*1024,fit:"cover"},
+    galeria:{label:"Foto da galeria",targetW:1600,targetH:1200,minW:800,minH:600,maxBytes:600*1024,fit:"cover"},
+    locutor:{label:"Foto do locutor",targetW:800,targetH:1000,minW:480,minH:600,maxBytes:300*1024,fit:"cover"},
+    noticia:{label:"Capa da notícia",targetW:1200,targetH:675,minW:800,minH:450,maxBytes:300*1024,fit:"cover"},
+    parceiro:{label:"Logo do parceiro",targetW:600,targetH:300,minW:300,minH:120,maxBytes:180*1024,fit:"contain"},
+    programa:{label:"Capa do programa",targetW:800,targetH:800,minW:500,minH:500,maxBytes:250*1024,fit:"cover"},
+    publicidade:{label:"Publicidade",targetW:1200,targetH:400,minW:300,minH:90,maxBytes:300*1024,fit:"contain"},
+    musica:{label:"Capa da música",targetW:800,targetH:800,minW:500,minH:500,maxBytes:250*1024,fit:"cover"},
+    video:{label:"Miniatura do vídeo",targetW:1280,targetH:720,minW:800,minH:450,maxBytes:300*1024,fit:"cover"},
+    podcast:{label:"Capa do podcast",targetW:1400,targetH:1400,minW:800,minH:800,maxBytes:400*1024,fit:"cover"},
+    promocao:{label:"Imagem da promoção",targetW:1200,targetH:675,minW:800,minH:450,maxBytes:300*1024,fit:"cover"},
+    evento:{label:"Imagem do evento",targetW:1200,targetH:675,minW:800,minH:450,maxBytes:300*1024,fit:"cover"},
+    ouvinte:{label:"Foto do ouvinte",targetW:800,targetH:800,minW:500,minH:500,maxBytes:250*1024,fit:"cover"},
+    abertura:{label:"Publicidade de abertura",targetW:1200,targetH:675,minW:800,minH:450,maxBytes:350*1024,fit:"cover"},
+    qrcode:{label:"QR Code",targetW:512,targetH:512,minW:256,minH:256,maxBytes:150*1024,fit:"contain"}
+  });
+
   const REPEATERS = {
     paginas:{container:"pages-list",fields:[
       ["titulo","Título","text"],["slug","Endereço amigável","text"],["conteudo","Conteúdo","textarea","full"],["menu","Mostrar no menu","checkbox"],["ativo","Página ativa","checkbox"]
     ]},
     destaques:{container:"highlights-list",fields:[
-      ["titulo","Título","text"],["subtitulo","Subtítulo","text"],["imagem","Imagem","url","full"],["link","Link","url"],["botao","Texto do botão","text"],["ativo","Ativo","checkbox"]
+      ["titulo","Título","text"],["subtitulo","Subtítulo","text"],["imagem","Imagem","image","full",null,"destaque"],["link","Link","url"],["botao","Texto do botão","text"],["ativo","Ativo","checkbox"]
     ]},
     galeria:{container:"gallery-list",fields:[
-      ["titulo","Título","text"],["categoria","Categoria","text"],["imagem","Imagem","url","full"],["legenda","Legenda","textarea","full"],["ativo","Ativa","checkbox"]
+      ["titulo","Título","text"],["categoria","Categoria","text"],["imagem","Imagem","image","full",null,"galeria"],["legenda","Legenda","textarea","full"],["ativo","Ativa","checkbox"]
     ]},
     locutores:{container:"hosts-list",fields:[
-      ["nome","Nome","text"],["funcao","Função","text"],["foto","Foto","url","full"],["instagram","Instagram","url"],["descricao","Biografia","textarea","full"]
+      ["nome","Nome","text"],["funcao","Função","text"],["foto","Foto","image","full",null,"locutor"],["instagram","Instagram","url"],["descricao","Biografia","textarea","full"]
     ]},
     noticias:{container:"news-list",fields:[
-      ["titulo","Título","text","full"],["categoria","Categoria","text"],["data","Data","date"],["imagem","Imagem","url","full"],["resumo","Resumo","textarea","full"],["conteudo","Conteúdo","textarea","full"],["status","Status","select",null,["rascunho:Rascunho","publicada:Publicada"]]
+      ["titulo","Título","text","full"],["categoria","Categoria","text"],["data","Data","date"],["imagem","Imagem","image","full",null,"noticia"],["resumo","Resumo","textarea","full"],["conteudo","Conteúdo","textarea","full"],["status","Status","select",null,["rascunho:Rascunho","publicada:Publicada"]]
     ]},
     parceiros:{container:"sponsors-list",fields:[
-      ["nome","Nome","text"],["categoria","Categoria","text"],["site","Site","url"],["logo","Logomarca","url"],["ordem","Ordem","number"]
+      ["nome","Nome","text"],["categoria","Categoria","text"],["site","Site","url"],["logo","Logomarca","image","full",null,"parceiro"],["ordem","Ordem","number"]
     ]},
     programacao:{container:"schedule-list",fields:[
-      ["dia","Dia","text"],["inicio","Início","time"],["fim","Fim","time"],["programa","Programa","text"],["apresentador","Apresentador","text"],["imagem","Imagem","url"],["descricao","Descrição","textarea","full"]
+      ["dia","Dia","text"],["inicio","Início","time"],["fim","Fim","time"],["programa","Programa","text"],["apresentador","Apresentador","text"],["imagem","Imagem","image","full",null,"programa"],["descricao","Descrição","textarea","full"]
     ]},
     publicidades:{container:"ads-list",fields:[
-      ["nome","Campanha","text"],["posicao","Posição","select",null,["topo:Topo","meio:Meio","rodape:Rodapé","player:Player"]],["imagem","Imagem","url","full"],["link","Link","url"],["inicio","Início","date"],["fim","Fim","date"],["ativo","Ativa","checkbox"]
+      ["nome","Campanha","text"],["posicao","Posição","select",null,["topo:Topo","meio:Meio","rodape:Rodapé","player:Player"]],["imagem","Imagem","image","full",null,"publicidade"],["link","Link","url"],["inicio","Início","date"],["fim","Fim","date"],["ativo","Ativa","checkbox"]
     ]},
     topmusicas:{container:"top-songs-list",fields:[
-      ["posicao","Posição","number"],["musica","Música","text"],["artista","Artista","text"],["capa","Capa","url"],["link","Link","url"]
+      ["posicao","Posição","number"],["musica","Música","text"],["artista","Artista","text"],["capa","Capa","image","full",null,"musica"],["link","Link","url"]
     ]},
     videos:{container:"videos-list",fields:[
-      ["titulo","Título","text"],["categoria","Categoria","text"],["url","URL do vídeo","url","full"],["miniatura","Miniatura","url","full"],["ativo","Ativo","checkbox"]
+      ["titulo","Título","text"],["categoria","Categoria","text"],["url","URL do vídeo","url","full"],["miniatura","Miniatura","image","full",null,"video"],["ativo","Ativo","checkbox"]
     ]},
     podcasts:{container:"podcasts-list",fields:[
-      ["titulo","Título","text"],["data","Data","date"],["audio","URL do áudio","url","full"],["capa","Capa","url","full"],["descricao","Descrição","textarea","full"]
+      ["titulo","Título","text"],["data","Data","date"],["audio","URL do áudio","url","full"],["capa","Capa","image","full",null,"podcast"],["descricao","Descrição","textarea","full"]
     ]},
     eventos:{container:"events-list",fields:[
-      ["titulo","Evento","text"],["data","Data","date"],["horario","Horário","time"],["local","Local","text"],["link","Link","url","full"],["descricao","Descrição","textarea","full"]
+      ["titulo","Evento","text"],["data","Data","date"],["horario","Horário","time"],["local","Local","text"],["imagem","Imagem","image","full",null,"evento"],["link","Link","url","full"],["descricao","Descrição","textarea","full"]
     ]},
     promocoes:{container:"promotions-list",fields:[
-      ["titulo","Promoção","text"],["inicio","Início","date"],["fim","Fim","date"],["imagem","Imagem","url","full"],["link","Link","url","full"],["regulamento","Regulamento","textarea","full"],["ativa","Ativa","checkbox"]
+      ["titulo","Promoção","text"],["inicio","Início","date"],["fim","Fim","date"],["imagem","Imagem","image","full",null,"promocao"],["link","Link","url","full"],["regulamento","Regulamento","textarea","full"],["ativa","Ativa","checkbox"]
     ]}
   };
 
@@ -129,6 +157,7 @@
     $("#close-preview").addEventListener("click", () => $("#preview-dialog").close());
     $("#password-form").addEventListener("submit", changePassword);
     $("#export-content-button").addEventListener("click", exportContent);
+    $("#refresh-media-button")?.addEventListener("click", loadMediaLibrary);
     $$("[data-tab]").forEach(button => button.addEventListener("click", () => navigateToTab(button.dataset.tab, button)));
     $$("[data-editor-page]").forEach(button => button.addEventListener("click", () => navigateToEditor(button.dataset.editorPage, button)));
     $$("[data-route-tab]").forEach(button => button.addEventListener("click", () => navigateToTab(button.dataset.routeTab, button)));
@@ -141,7 +170,13 @@
     $$("[data-add-item]").forEach(button => button.addEventListener("click", () => addRepeaterItem(button.dataset.addItem)));
     $("#site-form").addEventListener("click", event => {
       const remove = event.target.closest("[data-remove-item]");
-      if (remove) { remove.closest(".repeater-item")?.remove(); updateEditorMetrics(); }
+      if (remove) { remove.closest(".repeater-item")?.remove(); updateEditorMetrics(); return; }
+      const removeMedia = event.target.closest("[data-media-remove]");
+      if (removeMedia) { clearMediaControl(removeMedia.closest("[data-media-control]")); updateEditorMetrics(); }
+    });
+    $("#site-form").addEventListener("change", event => {
+      const fileInput=event.target.closest("[data-media-file]");
+      if(fileInput) handleMediaUpload(fileInput);
     });
     $("#site-form").addEventListener("input", updateEditorMetrics);
     if (state.token) resumeSession();
@@ -192,7 +227,7 @@
 
   async function resumeSession() { try { await api("/api/cliente/sessao"); showApp(); await loadAll(); } catch { forceLogout(); } }
   async function logout() { try { await api("/api/cliente/logout", { method:"POST" }); } catch {} forceLogout(); }
-  function forceLogout(message="") { state.token=""; state.dashboard=null; state.site=null; state.versions=[]; sessionStorage.removeItem(CONFIG.TOKEN_KEY); closeSidebar(); $("#app-view").classList.add("hidden"); $("#login-view").classList.remove("hidden"); if(message)showMessage("#login-message",message,"error"); }
+  function forceLogout(message="") { state.token=""; state.dashboard=null; state.site=null; state.versions=[]; state.media=[]; state.mediaUsage=0; sessionStorage.removeItem(CONFIG.TOKEN_KEY); closeSidebar(); $("#app-view").classList.add("hidden"); $("#login-view").classList.remove("hidden"); if(message)showMessage("#login-message",message,"error"); }
   function showApp(){ $("#login-view").classList.add("hidden"); $("#app-view").classList.remove("hidden"); closeSidebar(); }
 
   async function loadAll() {
@@ -203,7 +238,11 @@
         api("/api/cliente/site").catch(error => error.status === 404 ? null : Promise.reject(error))
       ]);
       state.dashboard=dashboard; state.site=siteResult?.site||null; state.versions=siteResult?.versoes||[];
-      renderDashboard(); renderSite(); renderInvoices(); renderContracts();
+      if(state.site){
+        const mediaResult=await api("/api/cliente/site/midias").catch(()=>({midias:[],usoBytes:0,limiteBytes:25*1024*1024}));
+        state.media=mediaResult.midias||[]; state.mediaUsage=Number(mediaResult.usoBytes||0); state.mediaLimit=Number(mediaResult.limiteBytes||25*1024*1024);
+      }else{state.media=[];state.mediaUsage=0;}
+      renderDashboard(); renderSite(); renderMediaLibrary(); renderInvoices(); renderContracts();
       showGlobal("Dados atualizados.","success",2200);
       if(dashboard.forcarTrocaSenha){switchTab("seguranca");showGlobal("Troque a senha temporária para proteger sua conta.","error");}
     } catch(error){showGlobal(error.message,"error");}
@@ -243,7 +282,8 @@
     setValue(form,"nome",content.nome);setValue(form,"slogan",content.slogan);setValue(form,"logo",content.logo);setValue(form,"capa",content.capa);setValue(form,"descricao",content.descricao);
     setValue(form,"sobre",texts.sobre);setValue(form,"missao",texts.missao);setValue(form,"visao",texts.visao);setValue(form,"valores",texts.valores);
     ["instagram","facebook","youtube","tiktok","xTwitter","threads","telegram","spotify"].forEach(name=>setValue(form,name,social[name]||social[name==="xTwitter"?"x":""]));
-    const player=texts.player||{};setValue(form,"playerTitulo",player.titulo);setValue(form,"playerBotao",player.botao);setValue(form,"playerEstilo",player.estilo||"compacto");setValue(form,"playerMostrarCapa",player.mostrarCapa||"sim");setValue(form,"playerOffline",player.offline);
+    const identity=texts.identidade||{};setValue(form,"favicon",identity.favicon);
+    const player=texts.player||{};setValue(form,"playerTitulo",player.titulo);setValue(form,"playerBotao",player.botao);setValue(form,"playerEstilo",player.estilo||"compacto");setValue(form,"playerMostrarCapa",player.mostrarCapa||"sim");setValue(form,"playerOffline",player.offline);setValue(form,"playerImagem",player.imagem);
     const google=texts.google||{};setValue(form,"googleAnalytics",google.analytics);setValue(form,"googleTagManager",google.tagManager);setValue(form,"googleSearchConsole",google.searchConsole);setValue(form,"googleAdsense",google.adsense);setValue(form,"googleMaps",google.maps);
     setValue(form,"contatoEmail",contacts.email);setValue(form,"contatoTelefone",contacts.telefone);setValue(form,"contatoResponsavel",contacts.responsavel);setValue(form,"contatoHorario",contacts.horario);setValue(form,"contatoEndereco",contacts.endereco);setValue(form,"contatoCidade",contacts.cidade);setValue(form,"contatoEstado",contacts.estado);setChecked(form,"contatoFormulario",contacts.formularioAtivo!==false);
     const header=texts.cabecalho||{};setValue(form,"headerModelo",header.modelo||"centralizado");setValue(form,"headerAlinhamento",header.alinhamento||"centro");setValue(form,"headerAltura",header.altura||360);setChecked(form,"headerMostrarLogo",header.mostrarLogo!==false);setChecked(form,"headerMostrarSlogan",header.mostrarSlogan!==false);setChecked(form,"headerMostrarPlayer",header.mostrarPlayer!==false);
@@ -263,6 +303,7 @@
 
     renderModules(texts.modulos||{});
     renderRepeater("paginas",texts.paginasFixas||[]);renderRepeater("destaques",banners.destaques||[]);renderRepeater("galeria",texts.galeria||[]);renderRepeater("locutores",content.locutores||[]);renderRepeater("noticias",content.noticias||[]);renderRepeater("parceiros",content.patrocinadores||[]);renderRepeater("programacao",content.programacao||[]);renderRepeater("publicidades",banners.publicidades||[]);renderRepeater("topmusicas",texts.topMusicas||[]);renderRepeater("videos",texts.videos||[]);renderRepeater("podcasts",texts.podcasts||[]);renderRepeater("eventos",texts.eventos||[]);renderRepeater("promocoes",texts.promocoes||[]);
+    refreshAllMediaControls();
   }
 
   function collectSiteContent(){
@@ -277,7 +318,8 @@
     if(allowed.has("links_aplicativos"))content.links_aplicativos={android:value("appAndroid"),ios:value("appIos"),pwa:value("appPwa"),alexa:value("appAlexa"),windows:value("appWindows"),qr:value("appQr")};
     if(allowed.has("textos_institucionais"))content.textos_institucionais={
       ...(content.textos_institucionais||{}),sobre:value("sobre"),missao:value("missao"),visao:value("visao"),valores:value("valores"),
-      player:{titulo:value("playerTitulo"),botao:value("playerBotao"),estilo:value("playerEstilo"),mostrarCapa:value("playerMostrarCapa"),offline:value("playerOffline")},
+      identidade:{favicon:value("favicon")},
+      player:{titulo:value("playerTitulo"),botao:value("playerBotao"),estilo:value("playerEstilo"),mostrarCapa:value("playerMostrarCapa"),offline:value("playerOffline"),imagem:value("playerImagem")},
       google:{analytics:value("googleAnalytics"),tagManager:value("googleTagManager"),searchConsole:value("googleSearchConsole"),adsense:value("googleAdsense"),maps:value("googleMaps")},
       cabecalho:{modelo:value("headerModelo"),alinhamento:value("headerAlinhamento"),altura:Number(value("headerAltura")||360),mostrarLogo:checked("headerMostrarLogo"),mostrarSlogan:checked("headerMostrarSlogan"),mostrarPlayer:checked("headerMostrarPlayer")},
       rodape:{texto:value("footerTexto"),mostrarRedes:checked("footerRedes"),mostrarContato:checked("footerContato"),mostrarMenu:checked("footerMenu"),copyright:value("footerCopyright")},
@@ -294,8 +336,91 @@
 
   function renderRepeater(type,items){const def=REPEATERS[type];if(!def)return;const container=$("#"+def.container);container.innerHTML="";(Array.isArray(items)?items:[]).forEach(item=>container.appendChild(createRepeaterItem(type,item)));if(!container.children.length)container.innerHTML='<div class="empty repeater-empty">Nenhum item cadastrado.</div>';}
   function addRepeaterItem(type){const def=REPEATERS[type];if(!def)return;const container=$("#"+def.container);container.querySelector(".repeater-empty")?.remove();container.appendChild(createRepeaterItem(type,{}));container.lastElementChild.scrollIntoView({behavior:"smooth",block:"center"});updateEditorMetrics();}
-  function createRepeaterItem(type,item){const def=REPEATERS[type],template=$("#repeater-template").content.cloneNode(true),article=$(".repeater-item",template),fields=$(".repeater-fields",template);article.dataset.repeaterType=type;def.fields.forEach(([key,label,inputType,layout,options])=>{const wrapper=document.createElement("label");wrapper.className=layout||"";wrapper.textContent=label;let input;if(inputType==="textarea"){input=document.createElement("textarea");input.rows=4;}else if(inputType==="select"){input=document.createElement("select");(options||[]).forEach(option=>{const [value,text]=option.split(":");input.add(new Option(text,value));});}else{input=document.createElement("input");input.type=inputType||"text";}input.dataset.itemKey=key;if(inputType==="checkbox"){wrapper.classList.add("toggle");input.checked=Boolean(item?.[key]);wrapper.textContent="";wrapper.append(input,document.createTextNode(" "+label));}else{input.value=item?.[key]??"";wrapper.appendChild(input);}fields.appendChild(wrapper);});return template;}
+  function createRepeaterItem(type,item){
+    const def=REPEATERS[type],template=$("#repeater-template").content.cloneNode(true),article=$(".repeater-item",template),fields=$(".repeater-fields",template);
+    article.dataset.repeaterType=type;
+    def.fields.forEach(([key,label,inputType,layout,options,profile])=>{
+      if(inputType==="image"){
+        const control=createMediaControl({name:"",key,label,profile,value:item?.[key]||"",field:`${type}.${key}`});
+        control.classList.add(layout||"full"); fields.appendChild(control); return;
+      }
+      const wrapper=document.createElement("label");wrapper.className=layout||"";wrapper.textContent=label;let input;
+      if(inputType==="textarea"){input=document.createElement("textarea");input.rows=4;}
+      else if(inputType==="select"){input=document.createElement("select");(options||[]).forEach(option=>{const [value,text]=option.split(":");input.add(new Option(text,value));});}
+      else{input=document.createElement("input");input.type=inputType||"text";}
+      input.dataset.itemKey=key;
+      if(inputType==="checkbox"){wrapper.classList.add("toggle");input.checked=Boolean(item?.[key]);wrapper.textContent="";wrapper.append(input,document.createTextNode(" "+label));}
+      else{input.value=item?.[key]??"";wrapper.appendChild(input);}fields.appendChild(wrapper);
+    });
+    return template;
+  }
   function collectRepeater(type){const def=REPEATERS[type];if(!def)return[];return $$(".repeater-item",$("#"+def.container)).map(article=>{const item={};$$('[data-item-key]',article).forEach(input=>{item[input.dataset.itemKey]=input.type==="checkbox"?input.checked:input.type==="number"?Number(input.value||0):String(input.value||"").trim();});return item;}).filter(item=>Object.values(item).some(value=>value!==""&&value!==false&&value!==0)).slice(0,60);}
+
+
+  function createMediaControl({name="",key="",label,profile,value="",field="imagem"}){
+    const spec=MEDIA_PROFILES[profile]||MEDIA_PROFILES.destaque;
+    const control=document.createElement("div");control.className="media-control";control.dataset.mediaControl="";control.dataset.mediaProfile=profile;control.dataset.mediaLabel=label;control.dataset.mediaField=field;
+    const hidden=document.createElement("input");hidden.type="hidden";hidden.value=value||"";if(name)hidden.name=name;if(key)hidden.dataset.itemKey=key;
+    const copy=document.createElement("div");copy.className="media-copy";copy.innerHTML=`<strong>${escapeHtml(label)}</strong><small>Recomendado: ${spec.targetW} × ${spec.targetH} px • JPG, PNG ou WEBP • até ${Math.round(spec.maxBytes/1024)} KB</small>`;
+    const preview=document.createElement("div");preview.className=`media-preview ${spec.targetW===spec.targetH?"media-preview-square":"media-preview-wide"}`;preview.dataset.mediaPreview="";
+    const actions=document.createElement("div");actions.className="media-actions";actions.innerHTML='<label class="media-file-button">Selecionar imagem<input accept="image/jpeg,image/png,image/webp" data-media-file type="file"></label><button class="ghost media-remove" data-media-remove type="button">Remover</button>';
+    const progress=document.createElement("div");progress.className="media-progress hidden";progress.dataset.mediaProgress="";
+    control.append(hidden,copy,preview,actions,progress);updateMediaControl(control);return control;
+  }
+
+  function refreshAllMediaControls(){$$('[data-media-control]',$("#site-form")).forEach(updateMediaControl);}
+  function updateMediaControl(control){if(!control)return;const hidden=$("input[type=hidden]",control),preview=$("[data-media-preview]",control),url=safeUrl(hidden?.value);if(!preview)return;preview.innerHTML=url?`<img src="${escapeAttr(url)}" alt="Prévia da imagem enviada">`:'<span>Nenhuma imagem selecionada</span>';control.classList.toggle("has-media",Boolean(url));}
+  function clearMediaControl(control){if(!control)return;const hidden=$("input[type=hidden]",control);if(hidden)hidden.value="";const file=$("[data-media-file]",control);if(file)file.value="";updateMediaControl(control);showMediaProgress(control,"Imagem removida deste campo.","success");}
+  function showMediaProgress(control,message,type=""){const box=$("[data-media-progress]",control);if(!box)return;box.textContent=message;box.className=`media-progress ${type||""} ${message?"":"hidden"}`.trim();}
+
+  async function handleMediaUpload(input){
+    const control=input.closest("[data-media-control]"),file=input.files?.[0],profile=control?.dataset.mediaProfile,spec=MEDIA_PROFILES[profile];
+    if(!control||!file||!spec)return;
+    if(!["image/jpeg","image/png","image/webp"].includes(file.type)){showMediaProgress(control,"Use uma imagem JPG, PNG ou WEBP.","error");input.value="";return;}
+    const button=input.closest("label");button?.classList.add("disabled");showMediaProgress(control,"Lendo e ajustando a imagem…");
+    try{
+      const processed=await optimizeImage(file,spec);
+      showMediaProgress(control,`Enviando ${processed.width} × ${processed.height} px (${formatBytes(processed.blob.size)})…`);
+      const dataBase64=await blobToBase64(processed.blob);
+      const result=await api("/api/cliente/site/midias",{method:"POST",body:JSON.stringify({perfil:profile,campo:control.dataset.mediaField||control.dataset.mediaLabel||profile,nomeOriginal:file.name,mime:processed.blob.type,largura:processed.width,altura:processed.height,dataBase64})});
+      const hidden=$("input[type=hidden]",control);hidden.value=result.midia.url;updateMediaControl(control);showMediaProgress(control,result.reutilizada?"Imagem já existente reutilizada.":"Imagem enviada e otimizada com sucesso.","success");
+      await loadMediaLibrary(false);updateEditorMetrics();
+    }catch(error){showMediaProgress(control,error.message||"Não foi possível enviar a imagem.","error");}
+    finally{button?.classList.remove("disabled");input.value="";}
+  }
+
+  async function optimizeImage(file,spec){
+    const bitmap=await createImageBitmap(file);
+    try{
+      if(bitmap.width<spec.minW||bitmap.height<spec.minH)throw new Error(`${spec.label}: a imagem original deve ter no mínimo ${spec.minW} × ${spec.minH} px.`);
+      let width=spec.targetW,height=spec.targetH,quality=.9,blob=null;
+      for(let scale=1;scale>=.72;scale-=.08){
+        width=Math.max(1,Math.round(spec.targetW*scale));height=Math.max(1,Math.round(spec.targetH*scale));
+        const canvas=document.createElement("canvas");canvas.width=width;canvas.height=height;const ctx=canvas.getContext("2d",{alpha:true});ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality="high";
+        if(spec.fit==="contain"){
+          ctx.clearRect(0,0,width,height);const ratio=Math.min(width/bitmap.width,height/bitmap.height),dw=bitmap.width*ratio,dh=bitmap.height*ratio;ctx.drawImage(bitmap,(width-dw)/2,(height-dh)/2,dw,dh);
+        }else{
+          const ratio=Math.max(width/bitmap.width,height/bitmap.height),sw=width/ratio,sh=height/ratio,sx=(bitmap.width-sw)/2,sy=(bitmap.height-sh)/2;ctx.drawImage(bitmap,sx,sy,sw,sh,0,0,width,height);
+        }
+        for(quality=.9;quality>=.5;quality-=.08){blob=await canvasToBlob(canvas,"image/webp",quality);if(blob.size<=spec.maxBytes)break;}
+        if(blob&&blob.size<=spec.maxBytes)return{blob,width,height};
+      }
+      throw new Error(`${spec.label}: não foi possível reduzir o arquivo ao limite de ${Math.round(spec.maxBytes/1024)} KB.`);
+    }finally{bitmap.close?.();}
+  }
+  function canvasToBlob(canvas,type,quality){return new Promise((resolve,reject)=>canvas.toBlob(blob=>blob?resolve(blob):reject(new Error("Falha ao processar a imagem.")),type,quality));}
+  function blobToBase64(blob){return new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(String(reader.result||"").split(",")[1]||"");reader.onerror=()=>reject(new Error("Falha ao ler a imagem."));reader.readAsDataURL(blob);});}
+  function formatBytes(bytes){const value=Number(bytes||0);if(value<1024)return`${value} B`;if(value<1024*1024)return`${(value/1024).toFixed(0)} KB`;return`${(value/1024/1024).toFixed(1)} MB`;}
+
+  async function loadMediaLibrary(showNotice=true){
+    if(!state.site)return;
+    try{const result=await api("/api/cliente/site/midias");state.media=result.midias||[];state.mediaUsage=Number(result.usoBytes||0);state.mediaLimit=Number(result.limiteBytes||25*1024*1024);renderMediaLibrary();if(showNotice)showGlobal("Biblioteca de imagens atualizada.","success",1800);}
+    catch(error){if(showNotice)showGlobal(error.message,"error");}
+  }
+  function renderMediaLibrary(){
+    text("#home-media-count",String(state.media.length));const usageText=$("#media-usage-text"),progress=$("#media-usage-progress");if(usageText)usageText.textContent=`${formatBytes(state.mediaUsage)} de ${formatBytes(state.mediaLimit)}`;if(progress)progress.value=state.mediaLimit?Math.min(100,state.mediaUsage/state.mediaLimit*100):0;
+    const library=$("#media-library");if(!library)return;library.innerHTML=state.media.map(media=>`<article class="media-card"><img src="${escapeAttr(safeUrl(media.url))}" alt="${escapeAttr(media.nomeOriginal||"Imagem")}" loading="lazy"><strong title="${escapeAttr(media.nomeOriginal||"")}">${escapeHtml(media.nomeOriginal||"Imagem")}</strong><span class="badge">${escapeHtml((MEDIA_PROFILES[media.perfil]?.label)||media.perfil)}</span><small>${Number(media.largura)} × ${Number(media.altura)} px • ${formatBytes(media.bytes)}<br>${dateTimeBr(media.criadoEm)}</small></article>`).join("")||'<div class="empty">Nenhuma imagem enviada.</div>';
+  }
 
   async function saveDraft(){
     if(!state.site)return;const active=state.activeEditor,buttons=[$("#save-draft-button"),$("#publication-save-button")];buttons.forEach(button=>setButton(button,true,"Salvando…"));

@@ -67,6 +67,7 @@
 <button data-route-editor="player" type="button">Player</button>
 <button data-route-editor="google" type="button">Serviços Google</button>
 <button data-route-editor="contato" type="button">Página Fale Conosco</button>
+<button data-route-editor="midias" type="button">Biblioteca de Imagens</button>
 </div>
 </details>
 <details class="client-nav-group">
@@ -122,8 +123,8 @@
 <button class="client-nav-link secondary-link" data-route-editor="publicacao" type="button"><span class="nav-icon">✓</span><span>Publicação</span></button>
 </nav>
 <footer class="sidebar-footer">
-<strong>Portal do Cliente v1.2.1</strong>
-<span>Commit 22.18.1 • Revisão visual</span>
+<strong>Portal do Cliente v1.3.0</strong>
+<span>Commit 22.18.2 • Configurações e mídias</span>
 </footer>
 </aside><main class="main-content client-workspace" id="conteudo">
 <div class="message hidden" id="global-message" role="status"></div>
@@ -147,6 +148,7 @@
 <div><strong id="home-content-count">0</strong><span>itens de conteúdo</span></div>
 <div><strong id="home-module-count">0</strong><span>módulos ativos</span></div>
 <div><strong id="home-version-count">0</strong><span>versões registradas</span></div>
+<div><strong id="home-media-count">0</strong><span>imagens enviadas</span></div>
 </div>
 </article>
 <article class="dashboard-card">
@@ -185,8 +187,27 @@
 <div class="form-grid">
 <label data-field="nome">Nome da rádio<input maxlength="140" name="nome"/></label>
 <label data-field="slogan">Slogan<input maxlength="180" name="slogan"/></label>
-<label class="full" data-field="logo">URL da logomarca<input name="logo" placeholder="https://..." type="url"/></label>
-<label class="full" data-field="capa">URL da imagem de capa<input name="capa" placeholder="https://..." type="url"/></label>
+<div class="full media-control" data-media-control data-media-profile="logo" data-media-label="Logomarca principal">
+<input name="logo" type="hidden"/>
+<div class="media-copy"><strong>Logomarca principal</strong><small>Recomendado: 800 × 400 px • PNG, JPG ou WEBP • até 300 KB</small></div>
+<div class="media-preview" data-media-preview><span>Nenhuma imagem</span></div>
+<div class="media-actions"><label class="media-file-button">Selecionar imagem<input accept="image/jpeg,image/png,image/webp" data-media-file type="file"/></label><button class="ghost media-remove" data-media-remove type="button">Remover</button></div>
+<div class="media-progress hidden" data-media-progress></div>
+</div>
+<div class="full media-control" data-media-control data-media-profile="capa" data-media-label="Imagem de capa">
+<input name="capa" type="hidden"/>
+<div class="media-copy"><strong>Imagem de capa</strong><small>Recomendado: 1600 × 600 px • corte horizontal automático • até 600 KB</small></div>
+<div class="media-preview media-preview-wide" data-media-preview><span>Nenhuma imagem</span></div>
+<div class="media-actions"><label class="media-file-button">Selecionar imagem<input accept="image/jpeg,image/png,image/webp" data-media-file type="file"/></label><button class="ghost media-remove" data-media-remove type="button">Remover</button></div>
+<div class="media-progress hidden" data-media-progress></div>
+</div>
+<div class="full media-control" data-media-control data-media-profile="favicon" data-media-label="Ícone do site">
+<input name="favicon" type="hidden"/>
+<div class="media-copy"><strong>Ícone do site / favicon</strong><small>Recomendado: 512 × 512 px • formato quadrado • até 120 KB</small></div>
+<div class="media-preview media-preview-square" data-media-preview><span>Nenhuma imagem</span></div>
+<div class="media-actions"><label class="media-file-button">Selecionar imagem<input accept="image/jpeg,image/png,image/webp" data-media-file type="file"/></label><button class="ghost media-remove" data-media-remove type="button">Remover</button></div>
+<div class="media-progress hidden" data-media-progress></div>
+</div>
 <label class="full" data-field="descricao">Descrição curta<textarea maxlength="3000" name="descricao" rows="4"></textarea></label>
 <label class="full" data-field="textos_institucionais">Sobre a rádio<textarea name="sobre" rows="6"></textarea></label>
 <label class="full" data-field="textos_institucionais">Missão<textarea name="missao" rows="3"></textarea></label>
@@ -212,6 +233,13 @@
 <label>Estilo<select name="playerEstilo"><option value="compacto">Compacto</option><option value="destaque">Destaque</option><option value="flutuante">Flutuante</option></select></label>
 <label>Mostrar capa atual<select name="playerMostrarCapa"><option value="sim">Sim</option><option value="nao">Não</option></select></label>
 <label class="full">Mensagem quando offline<input maxlength="180" name="playerOffline" placeholder="Transmissão temporariamente indisponível"/></label>
+<div class="full media-control" data-media-control data-media-profile="player" data-media-label="Imagem padrão do player">
+<input name="playerImagem" type="hidden"/>
+<div class="media-copy"><strong>Imagem padrão do player</strong><small>Recomendado: 800 × 800 px • formato quadrado • até 250 KB</small></div>
+<div class="media-preview media-preview-square" data-media-preview><span>Nenhuma imagem</span></div>
+<div class="media-actions"><label class="media-file-button">Selecionar imagem<input accept="image/jpeg,image/png,image/webp" data-media-file type="file"/></label><button class="ghost media-remove" data-media-remove type="button">Remover</button></div>
+<div class="media-progress hidden" data-media-progress></div>
+</div>
 </div>
 </section>
 <section class="editor-page" data-editor-page-content="google" data-field="textos_institucionais">
@@ -232,6 +260,13 @@
 <label class="full">Endereço<input name="contatoEndereco"/></label><label>Cidade<input name="contatoCidade"/></label><label>Estado<input maxlength="2" name="contatoEstado"/></label>
 <label class="toggle full"><input name="contatoFormulario" type="checkbox"/> Exibir formulário de contato no site</label>
 </div>
+</section>
+
+<section class="editor-page" data-editor-page-content="midias">
+<div class="section-heading inline"><div><h2>Biblioteca de imagens</h2><p>Arquivos enviados pelo cliente e usados no site.</p></div><button class="secondary" id="refresh-media-button" type="button">Atualizar biblioteca</button></div>
+<div class="media-usage-card"><div><strong>Armazenamento utilizado</strong><small id="media-usage-text">0 KB de 25 MB</small></div><progress id="media-usage-progress" max="100" value="0">0%</progress></div>
+<div class="notice"><strong>Imagens otimizadas automaticamente</strong><p>O painel recorta, redimensiona e comprime cada arquivo de acordo com o local em que será usado. O cliente não precisa informar endereços de imagens.</p></div>
+<div class="media-library" id="media-library"><div class="empty">Nenhuma imagem enviada.</div></div>
 </section>
 <section class="editor-page" data-editor-page-content="cabecalho" data-field="textos_institucionais logo slogan">
 <div class="section-heading"><h2>Cabeçalho</h2><p>Organize a área superior do site.</p></div>
@@ -260,7 +295,13 @@
 <label>Cor principal<input name="corPrimaria" type="color" value="#0b1f3a"/></label><label>Cor de destaque<input name="corSecundaria" type="color" value="#13a8e5"/></label>
 <label>Fundo<input name="corFundo" type="color" value="#07142b"/></label><label>Texto<input name="corTexto" type="color" value="#f4f8ff"/></label>
 <label>Cabeçalho<input name="corCabecalho" type="color" value="#0b1f3a"/></label><label>Rodapé<input name="corRodape" type="color" value="#07142b"/></label>
-<label class="full">Imagem de fundo<input name="fundoImagem" placeholder="https://..." type="url"/></label>
+<div class="full media-control" data-media-control data-media-profile="fundo" data-media-label="Imagem de fundo">
+<input name="fundoImagem" type="hidden"/>
+<div class="media-copy"><strong>Imagem de fundo</strong><small>Recomendado: 1920 × 1080 px • até 700 KB</small></div>
+<div class="media-preview media-preview-wide" data-media-preview><span>Nenhuma imagem</span></div>
+<div class="media-actions"><label class="media-file-button">Selecionar imagem<input accept="image/jpeg,image/png,image/webp" data-media-file type="file"/></label><button class="ghost media-remove" data-media-remove type="button">Remover</button></div>
+<div class="media-progress hidden" data-media-progress></div>
+</div>
 <label>Fonte<select name="fonteSite"><option value="sistema">Sistema</option><option value="moderna">Moderna</option><option value="classica">Clássica</option><option value="condensada">Condensada</option></select></label>
 <label>Estilo dos ícones<select name="iconeEstilo"><option value="linha">Linha</option><option value="preenchido">Preenchido</option><option value="arredondado">Arredondado</option></select></label>
 </div>
@@ -282,7 +323,13 @@ Contato | #contato" rows="10"></textarea>
 <label class="full">Título para buscadores<input maxlength="70" name="seoTitulo"/></label>
 <label class="full">Descrição para buscadores<textarea maxlength="170" name="seoDescricao" rows="3"></textarea></label>
 <label class="full">Palavras-chave<input name="seoPalavras" placeholder="rádio, música, cidade"/></label>
-<label class="full">Imagem de compartilhamento<input name="seoImagem" type="url"/></label>
+<div class="full media-control" data-media-control data-media-profile="compartilhamento" data-media-label="Imagem de compartilhamento">
+<input name="seoImagem" type="hidden"/>
+<div class="media-copy"><strong>Imagem de compartilhamento</strong><small>Recomendado: 1200 × 630 px • até 300 KB</small></div>
+<div class="media-preview media-preview-wide" data-media-preview><span>Nenhuma imagem</span></div>
+<div class="media-actions"><label class="media-file-button">Selecionar imagem<input accept="image/jpeg,image/png,image/webp" data-media-file type="file"/></label><button class="ghost media-remove" data-media-remove type="button">Remover</button></div>
+<div class="media-progress hidden" data-media-progress></div>
+</div>
 <label class="toggle full"><input name="seoIndexar" type="checkbox"/> Permitir indexação pelos buscadores</label>
 </div>
 </section>
@@ -316,7 +363,13 @@ Contato | #contato" rows="10"></textarea>
 </section>
 <section class="editor-page" data-editor-page-content="ouvinte" data-field="textos_institucionais">
 <div class="section-heading"><h2>Ouvinte do mês</h2><p>Destaque um ouvinte na página inicial.</p></div>
-<div class="form-grid"><label>Nome<input name="ouvinteNome"/></label><label>Cidade<input name="ouvinteCidade"/></label><label class="full">Foto<input name="ouvinteFoto" type="url"/></label><label class="full">Mensagem<textarea name="ouvinteMensagem" rows="4"></textarea></label><label class="toggle"><input name="ouvinteAtivo" type="checkbox"/> Exibir no site</label></div>
+<div class="form-grid"><label>Nome<input name="ouvinteNome"/></label><label>Cidade<input name="ouvinteCidade"/></label><div class="full media-control" data-media-control data-media-profile="ouvinte" data-media-label="Foto do ouvinte">
+<input name="ouvinteFoto" type="hidden"/>
+<div class="media-copy"><strong>Foto do ouvinte</strong><small>Recomendado: 800 × 800 px • até 250 KB</small></div>
+<div class="media-preview media-preview-square" data-media-preview><span>Nenhuma imagem</span></div>
+<div class="media-actions"><label class="media-file-button">Selecionar imagem<input accept="image/jpeg,image/png,image/webp" data-media-file type="file"/></label><button class="ghost media-remove" data-media-remove type="button">Remover</button></div>
+<div class="media-progress hidden" data-media-progress></div>
+</div><label class="full">Mensagem<textarea name="ouvinteMensagem" rows="4"></textarea></label><label class="toggle"><input name="ouvinteAtivo" type="checkbox"/> Exibir no site</label></div>
 </section>
 <section class="editor-page" data-editor-page-content="parceiros" data-field="patrocinadores">
 <div class="section-heading inline"><div><h2>Parceiros e patrocinadores</h2><p>Empresas apoiadoras da emissora.</p></div><button class="secondary" data-add-item="parceiros" type="button">+ Novo parceiro</button></div>
@@ -333,7 +386,13 @@ Contato | #contato" rows="10"></textarea>
 <section class="editor-page" data-editor-page-content="publicidades" data-field="banners">
 <div class="section-heading inline"><div><h2>Publicidades</h2><p>Banners comerciais e publicidade de abertura.</p></div><button class="secondary" data-add-item="publicidades" type="button">+ Nova publicidade</button></div>
 <div class="repeater-list" id="ads-list"></div>
-<article class="card nested-card"><h3>Publicidade de abertura</h3><div class="form-grid"><label class="toggle"><input name="aberturaAtiva" type="checkbox"/> Ativar ao abrir o site</label><label>Tempo em segundos<input max="30" min="1" name="aberturaSegundos" type="number" value="5"/></label><label class="full">Imagem<input name="aberturaImagem" type="url"/></label><label class="full">Link<input name="aberturaLink" type="url"/></label></div></article>
+<article class="card nested-card"><h3>Publicidade de abertura</h3><div class="form-grid"><label class="toggle"><input name="aberturaAtiva" type="checkbox"/> Ativar ao abrir o site</label><label>Tempo em segundos<input max="30" min="1" name="aberturaSegundos" type="number" value="5"/></label><div class="full media-control" data-media-control data-media-profile="abertura" data-media-label="Publicidade de abertura">
+<input name="aberturaImagem" type="hidden"/>
+<div class="media-copy"><strong>Imagem da abertura</strong><small>Recomendado: 1200 × 675 px • até 350 KB</small></div>
+<div class="media-preview media-preview-wide" data-media-preview><span>Nenhuma imagem</span></div>
+<div class="media-actions"><label class="media-file-button">Selecionar imagem<input accept="image/jpeg,image/png,image/webp" data-media-file type="file"/></label><button class="ghost media-remove" data-media-remove type="button">Remover</button></div>
+<div class="media-progress hidden" data-media-progress></div>
+</div><label class="full">Link<input name="aberturaLink" type="url"/></label></div></article>
 </section>
 <section class="editor-page" data-editor-page-content="topmusicas" data-field="textos_institucionais">
 <div class="section-heading inline"><div><h2>Top músicas</h2><p>Ranking editorial informado pela rádio.</p></div><button class="secondary" data-add-item="topmusicas" type="button">+ Nova música</button></div>
@@ -350,7 +409,13 @@ Contato | #contato" rows="10"></textarea>
 </section>
 <section class="editor-page" data-editor-page-content="aplicativos" data-field="links_aplicativos">
 <div class="section-heading"><h2>Baixe nosso aplicativo</h2><p>Links para PWA, lojas e assistentes de voz.</p></div>
-<div class="form-grid"><label>Google Play<input name="appAndroid" type="url"/></label><label>App Store<input name="appIos" type="url"/></label><label>PWA<input name="appPwa" type="url"/></label><label>Alexa<input name="appAlexa" type="url"/></label><label>Windows<input name="appWindows" type="url"/></label><label>QR Code<input name="appQr" type="url"/></label></div>
+<div class="form-grid"><label>Google Play<input name="appAndroid" type="url"/></label><label>App Store<input name="appIos" type="url"/></label><label>PWA<input name="appPwa" type="url"/></label><label>Alexa<input name="appAlexa" type="url"/></label><label>Windows<input name="appWindows" type="url"/></label><div class="full media-control" data-media-control data-media-profile="qrcode" data-media-label="QR Code do aplicativo">
+<input name="appQr" type="hidden"/>
+<div class="media-copy"><strong>QR Code do aplicativo</strong><small>Recomendado: 512 × 512 px • até 150 KB</small></div>
+<div class="media-preview media-preview-square" data-media-preview><span>Nenhuma imagem</span></div>
+<div class="media-actions"><label class="media-file-button">Selecionar imagem<input accept="image/jpeg,image/png,image/webp" data-media-file type="file"/></label><button class="ghost media-remove" data-media-remove type="button">Remover</button></div>
+<div class="media-progress hidden" data-media-progress></div>
+</div></div>
 </section>
 <section class="editor-page" data-editor-page-content="podcasts" data-field="textos_institucionais">
 <div class="section-heading inline"><div><h2>Podcasts</h2><p>Episódios e programas sob demanda.</p></div><button class="secondary" data-add-item="podcasts" type="button">+ Novo episódio</button></div>

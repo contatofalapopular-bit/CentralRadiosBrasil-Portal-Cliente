@@ -1,43 +1,18 @@
-# Central Rádios Brasil — Portal do Cliente v1.2.1
+# Central Rádios Brasil — Portal do Cliente v1.3.0
 
-## Commit 22.18 — Parte 1 de 7: Estrutura principal
+Parte 2 do Commit 22.18: Configurações e biblioteca de imagens.
 
-Esta versão reconstrói a estrutura do painel administrativo do cliente com a sequência funcional aprovada:
+## Incluído
+- estrutura visual inspirada no painel de referência aprovado;
+- revisão global de espaçamentos;
+- Configurações: Principal, Redes Sociais, Player, Google e Fale Conosco;
+- upload real de imagens com otimização automática;
+- biblioteca de imagens por site;
+- upload em todos os campos visuais já existentes;
+- rascunho, prévia, publicação, contrato e faturas preservados.
 
-1. Inicial
-2. Configurações
-3. Layout
-4. Módulos
-5. Conteúdo
-6. Usuários
+## Dependência
+Requer Worker v1.15.0. Publique o Worker antes deste Portal.
 
-As áreas comerciais de Faturas, Contrato e Publicação continuam disponíveis em uma seção secundária, sem interromper a sequência principal de administração do site.
-
-## O que esta entrega implementa
-
-- menu lateral completo e expansível;
-- página inicial com dados reais já disponíveis no Worker;
-- cabeçalho com identificação do cliente e do site;
-- sessão, logout e troca de senha preservados;
-- navegação responsiva para computador e celular;
-- ligação dos itens do novo menu às telas funcionais já existentes;
-- destaque da seção ativa;
-- preservação de rascunhos, prévia, histórico, solicitação e aprovação de publicação;
-- aviso explícito onde ainda não existem estatísticas reais, sem inventar visitas.
-
-## Compatibilidade
-
-- Worker principal: v1.14.2
-- Admin da Central: v3.10.0
-- Repositório: `CentralRadiosBrasil-Portal-Cliente`
-
-Esta atualização substitui somente os arquivos do Portal do Cliente. Não exige migração no D1 e não apaga dados.
-
-## Próximas partes
-
-- Parte 2: Configurações
-- Parte 3: Layout
-- Parte 4: Módulos
-- Parte 5: Conteúdo
-- Parte 6: Usuários e permissões
-- Parte 7: Estatísticas e auditoria
+## Observação técnica
+Nesta etapa as mídias são armazenadas no D1, com limite de 25 MB por site. Uma migração futura para Cloudflare R2 poderá ampliar a capacidade sem mudar o painel.

@@ -1,4 +1,4 @@
-# Central Rádios Brasil — Portal do Cliente v1.2.0
+# Central Rádios Brasil — Portal do Cliente v1.2.1
 
 ## Commit 22.18 — Parte 1 de 7: Estrutura principal
 

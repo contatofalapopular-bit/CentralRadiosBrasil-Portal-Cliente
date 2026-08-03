@@ -136,6 +136,7 @@
     $("#sidebar-toggle")?.addEventListener("click", toggleSidebar);
     $("#sidebar-backdrop")?.addEventListener("click", closeSidebar);
     window.addEventListener("keydown", event => { if (event.key === "Escape") closeSidebar(); });
+    setupMenuAccordion();
     $$("[data-go-editor]").forEach(button => button.addEventListener("click", () => switchEditor(button.dataset.goEditor)));
     $$("[data-add-item]").forEach(button => button.addEventListener("click", () => addRepeaterItem(button.dataset.addItem)));
     $("#site-form").addEventListener("click", event => {
@@ -144,6 +145,16 @@
     });
     $("#site-form").addEventListener("input", updateEditorMetrics);
     if (state.token) resumeSession();
+  }
+
+  function setupMenuAccordion() {
+    const groups = $$(".client-nav-group");
+    groups.forEach(group => {
+      group.addEventListener("toggle", () => {
+        if (!group.open) return;
+        groups.forEach(other => { if (other !== group) other.open = false; });
+      });
+    });
   }
 
   async function api(path, options = {}) {

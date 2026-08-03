@@ -1,4 +1,4 @@
-Central Rádios Brasil — Portal do Cliente v1.2.0
+Central Rádios Brasil — Portal do Cliente v1.2.1
 Validação da Parte 1 — Estrutura Principal
 
 [OK] JavaScript: Sintaxe válida
@@ -9,7 +9,7 @@ Validação da Parte 1 — Estrutura Principal
 [OK] Rotas principais: Inicial, Usuários, Faturas e Contrato disponíveis
 [OK] Sequência principal: Inicial → Configurações → Layout → Módulos → Conteúdo → Usuários
 [OK] CSS: Chaves balanceadas (268)
-[OK] Versão: 1.2.0 configurada
+[OK] Versão: 1.2.1 configurada
 [OK] Worker: Endpoint preservado
 [OK] Arquivos do pacote: Estrutura completa
 

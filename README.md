@@ -1,60 +1,45 @@
 # Central Rádios Brasil — Portal do Cliente
 
-## v2.6.0 — Etapa 4.1: Reorganização do Editor Visual
+## v2.6.0 — Final Consolidada
 
-Esta entrega evolui exclusivamente o **Portal do Cliente**, usando a v2.6.0 Etapa 3 como base. Nenhum arquivo do Worker, Portal Público/PWA, Painel Administrativo, firmware ou outro repositório foi alterado.
+Esta versão encerra a fase **Editor Visual e temas consolidados**. Ela reúne, em uma única base estável do Portal do Cliente:
 
-### Validação antes do envio
+- seis modelos de site, com estruturas visuais distintas;
+- modelo Jovem preservado por padrão;
+- opções específicas por modelo;
+- 14 blocos ativáveis, reordenáveis e configuráveis;
+- configurações independentes por modelo e bloco;
+- cores próprias de fundo, títulos, textos, chamadas e botões;
+- verificação automática de contraste;
+- prévia em tempo real para desktop, tablet e celular;
+- validação obrigatória de formato, peso e dimensões das imagens antes do envio;
+- Editor Visual reorganizado, sem rolagem horizontal geral nas resoluções auditadas;
+- usuários, permissões, auditoria e backup preservados;
+- todos os módulos editoriais e comerciais das versões anteriores.
 
-Todo novo arquivo de imagem é conferido antes da chamada ao endpoint de mídia:
+### Correção encontrada na consolidação
 
-- formatos permitidos: JPG, PNG e WEBP;
-- largura e altura reais em pixels;
-- proporção correspondente ao padrão informado;
-- peso máximo original do arquivo;
-- obrigatoriedade da imagem nos cadastros que exigem peça, capa ou logomarca.
+A auditoria final identificou que os blocos montados no trecho complementar de alguns modelos eram exibidos, mas não recebiam integralmente o título, composição e cores escolhidos no Editor Visual. A montagem foi unificada para que **todos os blocos**, inclusive os posicionados automaticamente no restante da página, passem pelo mesmo mecanismo de apresentação.
 
-O Portal **não recorta, não redimensiona e não comprime automaticamente**. Um arquivo fora do padrão é rejeitado e a mensagem mostra o valor recebido e o padrão exigido.
+### Identificação técnica
 
-### Campos abrangidos
+- Release interna: `2.6.0-final`
+- Schema interno: `12`
+- Endpoint de rascunho: `/api/cliente/site/rascunho`
+- Migração SQL: não necessária
 
-Logomarca da rádio, banner principal, player, programação, locutores, notícias, podcasts, vídeos, promoções, galeria, eventos, equipe, anunciantes, campanhas desktop/mobile, parceiros, banners desktop/mobile, popups, SEO, ícone do aplicativo e QR Code.
+### Isolamento
 
-### Compatibilidade e isolamento
+Esta entrega modifica somente arquivos do **Portal do Cliente**. Não houve alteração no Worker, D1, Portal Público/PWA, Painel Administrativo, firmware ou outro repositório. A URL do Worker e os nove endpoints existentes foram preservados.
 
-- endpoint de mídia preservado: `/api/cliente/site/midias`;
-- endpoint de rascunho preservado: `/api/cliente/site/rascunho`;
-- endpoints adicionados: 0;
-- endpoints removidos: 0;
-- Worker e D1 não alterados;
-- nenhuma migração SQL;
-- conteúdos anteriores preservados;
-- imagens já cadastradas não são apagadas automaticamente;
-- toda nova seleção passa pela validação obrigatória.
+### Auditoria final
 
-### Auditoria
-
-- testes específicos: 39/39;
-- regressão Etapa 1: 48/48;
-- regressão Etapa 2: 46/46;
-- regressão Etapa 3: 56/56;
-- total: **189/189 verificações aprovadas**;
-- persistência: aprovada;
+- verificações em Chromium: 46/46;
+- verificações estáticas e de isolamento: 20/20;
+- total da consolidação: **66/66 aprovadas**;
 - exceções JavaScript: 0;
-- erros relevantes de console: 0.
+- erros relevantes de console: 0;
+- endpoints adicionados: 0;
+- endpoints removidos: 0.
 
-Release interna: `2.6.0-stage4`  
-Schema interno: `12`
-
-
-## Correção de usabilidade — Editor Visual
-
-- elimina a rolagem horizontal geral do módulo em resoluções comuns de notebook e desktop;
-- mantém lista de blocos, controles e prévia organizados em colunas proporcionais;
-- prévia ao vivo permanece fixa enquanto os controles possuem rolagem independente;
-- ao selecionar um bloco, a coluna de controles desloca-se para a configuração correspondente sem retirar a prévia da tela;
-- reduz espaçamentos e tamanhos internos para aproveitar melhor a área útil;
-- adapta o editor para desktop, tablet e celular sem alterar os modelos do site;
-- preserva validação de imagens, cores por bloco, schema 12 e os endpoints existentes.
-
-Release interna: `2.6.0-stage4.1`.
+Consulte `RELATORIO-CONSOLIDACAO-v2.6.0-FINAL.md` e `RESULTADOS-AUDITORIA-v2.6.0-FINAL.json`.

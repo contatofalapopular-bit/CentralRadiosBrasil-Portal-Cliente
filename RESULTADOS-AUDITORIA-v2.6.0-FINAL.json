@@ -1,0 +1,373 @@
+{
+  "version": "2.6.0-final",
+  "schemaVersion": 12,
+  "total": 66,
+  "passed": 66,
+  "failed": 0,
+  "checks": [
+    {
+      "name": "Aplicação autenticada e carregada",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "name": "Versão final visível",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "name": "Configuração final ativa",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "name": "30 áreas do menu disponíveis",
+      "status": "pass",
+      "details": "30 áreas"
+    },
+    {
+      "name": "Todas as áreas do menu abrem",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "name": "Editor sem rolagem horizontal 1600x900",
+      "status": "pass",
+      "details": "1600/1600"
+    },
+    {
+      "name": "Editor mantém prévia e controles 1600x900",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "name": "Editor sem rolagem horizontal 1360x768",
+      "status": "pass",
+      "details": "1360/1360"
+    },
+    {
+      "name": "Editor mantém prévia e controles 1360x768",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "name": "Editor sem rolagem horizontal 1180x800",
+      "status": "pass",
+      "details": "1180/1180"
+    },
+    {
+      "name": "Editor mantém prévia e controles 1180x800",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "name": "Editor sem rolagem horizontal 1024x768",
+      "status": "pass",
+      "details": "1024/1024"
+    },
+    {
+      "name": "Editor mantém prévia e controles 1024x768",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "name": "Seis modelos disponíveis",
+      "status": "pass",
+      "details": "['morada', 'spotify', 'news', 'gospel', 'young', 'custom']"
+    },
+    {
+      "name": "Prévia abre para morada",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "name": "Estrutura do modelo morada",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "name": "Prévia abre para spotify",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "name": "Estrutura do modelo spotify",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "name": "Prévia abre para news",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "name": "Estrutura do modelo news",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "name": "Prévia abre para gospel",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "name": "Estrutura do modelo gospel",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "name": "Prévia abre para young",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "name": "Estrutura do modelo young",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "name": "Prévia abre para custom",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "name": "Estrutura do modelo custom",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "name": "14 blocos no Editor Visual",
+      "status": "pass",
+      "details": "14 blocos"
+    },
+    {
+      "name": "Bloco Notícias selecionado",
+      "status": "pass",
+      "details": "Notícias"
+    },
+    {
+      "name": "Controles de composição por bloco",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "name": "Seis cores por bloco",
+      "status": "pass",
+      "details": "6 cores"
+    },
+    {
+      "name": "Título do bloco atualiza na prévia",
+      "status": "pass",
+      "details": "titles=['Notícias em destaque', 'Notícia de teste']; controls=['Notícias em destaque']"
+    },
+    {
+      "name": "Cor personalizada aplicada ao bloco",
+      "status": "pass",
+      "details": "{'v': '#123456', 'style': '--editor-block-bg:#123456;--editor-block-title:#241342;--editor-block-text:#513653;--editor-block-eyebrow:#ff3d8d;--editor-block-button:#ff3d8d;--editor-block-button-text:#ffffff;', 'cls': 'site-section alt editor-block-editorial editor-width-amplo editor-bg-automatico editor-align-esquerda editor-custom-colors'}"
+    },
+    {
+      "name": "Cards de conteúdo presentes na prévia",
+      "status": "pass",
+      "details": "10 cards"
+    },
+    {
+      "name": "Conteúdo salvo abre em diálogo",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "name": "Imagem fora do padrão é rejeitada",
+      "status": "pass",
+      "details": "Imagem rejeitada. Tamanho recebido: 100 × 100 px. Tamanho obrigatório: 1200 × 675 px."
+    },
+    {
+      "name": "Imagem inválida não chama API de mídia",
+      "status": "pass",
+      "details": "0->0"
+    },
+    {
+      "name": "Imagem exata é aceita",
+      "status": "pass",
+      "details": "Imagem aceita: 1200 × 675 px • 4 KB • PNG."
+    },
+    {
+      "name": "Imagem válida chama API de mídia uma vez",
+      "status": "pass",
+      "details": "0->1"
+    },
+    {
+      "name": "Rascunho salvo pelo endpoint existente",
+      "status": "pass",
+      "details": "2 salvamentos"
+    },
+    {
+      "name": "Release final persistida no rascunho",
+      "status": "pass",
+      "details": "2.6.0-final"
+    },
+    {
+      "name": "Schema 12 preservado",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "name": "Auditoria interna executa",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "name": "Nenhum botão sem identificação",
+      "status": "pass",
+      "details": "0 botões"
+    },
+    {
+      "name": "Nenhum endpoint novo utilizado",
+      "status": "pass",
+      "details": "[]"
+    },
+    {
+      "name": "Sem exceções JavaScript",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "name": "Sem erros relevantes de console",
+      "status": "pass",
+      "details": ""
+    }
+  ],
+  "apiCalls": [
+    {
+      "method": "GET",
+      "path": "/api/cliente/sessao"
+    },
+    {
+      "method": "GET",
+      "path": "/api/cliente/dashboard"
+    },
+    {
+      "method": "GET",
+      "path": "/api/cliente/site"
+    },
+    {
+      "method": "GET",
+      "path": "/api/cliente/site/midias"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/cliente/site/rascunho"
+    },
+    {
+      "method": "POST",
+      "path": "/api/cliente/site/midias"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/cliente/site/rascunho"
+    }
+  ],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "staticChecks": [
+    {
+      "name": "Arquivos principais presentes",
+      "status": "pass",
+      "details": "index.html, app.js, styles.css, config.js, manifest.webmanifest"
+    },
+    {
+      "name": "Release final configurada",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "name": "Schema 12 preservado",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "name": "Nove endpoints preservados",
+      "status": "pass",
+      "details": "['/api/cliente/dashboard', '/api/cliente/login', '/api/cliente/logout', '/api/cliente/sessao', '/api/cliente/site', '/api/cliente/site/midias', '/api/cliente/site/rascunho', '/api/cliente/site/solicitar-publicacao', '/api/cliente/trocar-senha']"
+    },
+    {
+      "name": "URL do Worker preservada",
+      "status": "pass",
+      "details": "https://broken-bar-45e2.contatofalapopular.workers.dev"
+    },
+    {
+      "name": "Configuração compartilhada não alterada",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "name": "Nenhuma biblioteca externa adicionada",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "name": "Nenhum arquivo SQL incluído",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "name": "Nenhum arquivo de Worker incluído",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "name": "IDs HTML únicos",
+      "status": "pass",
+      "details": "[]"
+    },
+    {
+      "name": "Manifesto válido e atualizado",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "name": "Configurações aplicadas também aos blocos restantes",
+      "status": "pass",
+      "details": "Correção transversal dos blocos montados por rest()"
+    },
+    {
+      "name": "Perfis obrigatórios de imagem preservados",
+      "status": "pass",
+      "details": "21 perfis"
+    },
+    {
+      "name": "Cor por bloco: backgroundColor",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "name": "Cor por bloco: titleColor",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "name": "Cor por bloco: textColor",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "name": "Cor por bloco: eyebrowColor",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "name": "Cor por bloco: buttonColor",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "name": "Cor por bloco: buttonTextColor",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "name": "CSS da Etapa 4.1 preservado",
+      "status": "pass",
+      "details": ""
+    }
+  ]
+}

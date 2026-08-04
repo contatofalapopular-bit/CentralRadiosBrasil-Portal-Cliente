@@ -1,0 +1,37 @@
+{
+  "release": "2.6.0-final",
+  "schemaVersion": 12,
+  "base": "2.6.0-stage4.1",
+  "workerUrl": "https://broken-bar-45e2.contatofalapopular.workers.dev",
+  "endpoints": [
+    "/api/cliente/dashboard",
+    "/api/cliente/login",
+    "/api/cliente/logout",
+    "/api/cliente/sessao",
+    "/api/cliente/site",
+    "/api/cliente/site/midias",
+    "/api/cliente/site/rascunho",
+    "/api/cliente/site/solicitar-publicacao",
+    "/api/cliente/trocar-senha"
+  ],
+  "endpointCount": 9,
+  "addedEndpoints": [],
+  "removedEndpoints": [],
+  "workerChanged": false,
+  "d1Changed": false,
+  "otherRepositoriesChanged": false,
+  "sqlMigrationRequired": false,
+  "changedPortalFiles": [
+    "index.html",
+    "app.js",
+    "config.js",
+    "manifest.webmanifest"
+  ],
+  "unchangedPortalFiles": [
+    "styles.css"
+  ],
+  "notes": [
+    "app.js recebeu identificação final e correção para aplicar opções do Editor Visual também aos blocos montados pela função rest().",
+    "config.js teve somente a identificação VERSION atualizada; WORKER_URL, TOKEN_KEY e timeout foram preservados."
+  ]
+}

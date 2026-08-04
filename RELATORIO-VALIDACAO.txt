@@ -1,12 +1,11 @@
-Central Rádios Brasil — Portal do Cliente v2.6.0 Etapa 4
-Validação específica: 39/39
-Regressão Etapa 1: 48/48
-Regressão Etapa 2: 46/46
-Regressão Etapa 3: 56/56
-Total: 189/189
-Persistência: aprovada
-Exceções JavaScript: 0
-Erros relevantes de console: 0
-Worker alterado: não
-Endpoints adicionados/removidos: 0/0
-Migração SQL: não
+Central Rádios Brasil — Portal do Cliente v2.6.0 Final Consolidada
+
+Base: v2.6.0 Etapa 4.1
+Schema interno: 12
+Release interna: 2.6.0-final
+Worker: não alterado
+D1: não alterado
+Outros repositórios: não alterados
+Migração SQL: não necessária
+
+Os resultados detalhados da auditoria final estão nos arquivos RELATORIO-CONSOLIDACAO-v2.6.0-FINAL.md e RESULTADOS-AUDITORIA-v2.6.0-FINAL.json.

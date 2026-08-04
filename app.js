@@ -132,14 +132,28 @@
       summary: item => `${item.categoria || "Notícias"} • ${statusNewsLabel(item)} • ${formatDate(item.data)}`
     },
     podcasts: {
-      title: "Podcasts", singular: "episódio", imageProfile: "square", description: "Organize programas gravados e episódios sob demanda.",
-      fields: [["titulo","Título do episódio","text",true],["programa","Podcast/programa","text"],["data","Data","date"],["descricao","Descrição","textarea"],["audio","Endereço do áudio","url"],["imagem","Capa","image",false,"square"],["ativo","Publicado","checkbox"]],
-      summary: item => `${item.programa || "Podcast"} • ${formatDate(item.data)}`
+      title: "Podcasts", singular: "episódio", imageProfile: "square", description: "Organize programas, temporadas e episódios com player, destaque e publicação.",
+      fields: [
+        ["titulo","Título do episódio","text",true], ["programa","Podcast/programa","text",true],
+        ["temporada","Temporada","number"], ["episodio","Número do episódio","number"],
+        ["categoria","Categoria","text"], ["data","Data de publicação","date",true],
+        ["duracaoMinutos","Duração em minutos","number"], ["audio","Endereço do áudio","url",true],
+        ["descricao","Descrição","textarea"], ["imagem","Capa quadrada","image",false,"square"],
+        ["destaque","Episódio em destaque","checkbox"], ["ativo","Publicado","checkbox"]
+      ],
+      summary: item => `${item.programa || "Podcast"} • ${episodeLabel(item)}${item.data ? ` • ${formatDate(item.data)}` : ""}${item.duracaoMinutos ? ` • ${formatDuration(item.duracaoMinutos)}` : ""}`
     },
     videos: {
-      title: "Vídeos", singular: "vídeo", imageProfile: "news", description: "Cadastre entrevistas, clipes e transmissões incorporadas.",
-      fields: [["titulo","Título","text",true],["url","YouTube ou vídeo incorporado","url",true],["categoria","Categoria","text"],["descricao","Descrição","textarea"],["imagem","Miniatura personalizada","image",false,"news"],["ativo","Publicado","checkbox"]],
-      summary: item => item.categoria || "Vídeo"
+      title: "Vídeos", singular: "vídeo", imageProfile: "news", description: "Cadastre e organize YouTube, Vimeo, arquivos diretos, transmissões e links externos.",
+      fields: [
+        ["titulo","Título","text",true], ["url","Endereço do vídeo","url",true],
+        ["tipo","Tipo do vídeo","select",true,["Automático","YouTube","Vimeo","Arquivo de vídeo","Link externo","Transmissão ao vivo"]],
+        ["categoria","Categoria","text",true], ["data","Data de publicação","date"],
+        ["duracaoMinutos","Duração em minutos","number"], ["descricao","Descrição","textarea"],
+        ["imagem","Miniatura personalizada","image",false,"news"], ["destaque","Vídeo em destaque","checkbox"],
+        ["ativo","Publicado","checkbox"]
+      ],
+      summary: item => `${item.categoria || "Vídeo"} • ${videoTypeLabel(item)}${item.data ? ` • ${formatDate(item.data)}` : ""}${item.duracaoMinutos ? ` • ${formatDuration(item.duracaoMinutos)}` : ""}`
     },
     promocoes: {
       title: "Promoções", singular: "promoção", imageProfile: "news", description: "Gerencie promoções, datas e regulamentos.",
@@ -195,7 +209,7 @@
   function defaultState() {
     const today = new Date().toISOString().slice(0, 10);
     return {
-      version: "2.2.1",
+      version: "2.3.0-etapa1",
       updatedAt: new Date().toISOString(),
       status: "rascunho",
       selectedTheme: "morada",
@@ -282,7 +296,8 @@
   let editing = null;
   let searchTerm = "";
   let collectionFilter = "todos";
-  let collectionSort = "recentes";
+  let collectionContextFilter = "todos";
+  let collectionSort = "padrao";
 
   function loadState() { return defaultState(); }
 
@@ -370,7 +385,8 @@
     currentPage = page;
     searchTerm = "";
     collectionFilter = "todos";
-    collectionSort = "recentes";
+    collectionContextFilter = "todos";
+    collectionSort = "padrao";
     renderNav();
     renderPage();
     if (window.innerWidth <= 980) $("#sidebar").classList.remove("open");
@@ -440,7 +456,7 @@
       </div>
       <div class="grid-2 equal" style="margin-top:18px">
         <section class="card"><header class="card-header"><div><h3>Dados reais, sem números inventados</h3><p>Audiência e ouvintes.</p></div></header><div class="card-body"><div class="notice">O painel não exibe audiência fictícia. O número de ouvintes só será mostrado quando existir uma fonte técnica confiável do streaming.</div></div></section>
-        <section class="card"><header class="card-header"><div><h3>Integração ativa</h3><p>Ambiente utilizado nesta instalação.</p></div></header><div class="card-body"><div class="code-box">Portal: ${escapeHTML(CONFIG.VERSION || "2.2.1")}\nWorker: ${escapeHTML(CONFIG.WORKER_URL || "—")}\nPersistência: Cloudflare D1\nMídias: API do site\nPublicação: supervisionada pela Central</div></div></section>
+        <section class="card"><header class="card-header"><div><h3>Integração ativa</h3><p>Ambiente utilizado nesta instalação.</p></div></header><div class="card-body"><div class="code-box">Portal: ${escapeHTML(CONFIG.VERSION || "2.3.0-etapa1")}\nWorker: ${escapeHTML(CONFIG.WORKER_URL || "—")}\nPersistência: Cloudflare D1\nMídias: API do site\nPublicação: supervisionada pela Central</div></div></section>
       </div>`;
     bindGoButtons(root);
   }
@@ -692,26 +708,55 @@
       return [["Programas",items.length],["Ativos",active],["Dias cobertos",days.size],["Locutores",new Set(items.map(i=>i.locutor).filter(Boolean)).size]];
     }
     if (key === "locutores") return [["Locutores",items.length],["Ativos",active],["Com foto",items.filter(i=>i.foto).length],["Na programação",new Set(state.content.programacao.map(i=>i.locutor).filter(Boolean)).size]];
+    if (key === "podcasts") return [["Episódios",items.length],["Publicados",active],["Destaques",items.filter(i=>i.destaque&&i.ativo!==false).length],["Programas",new Set(items.map(i=>i.programa).filter(Boolean)).size]];
+    if (key === "videos") return [["Vídeos",items.length],["Publicados",active],["Destaques",items.filter(i=>i.destaque&&i.ativo!==false).length],["Categorias",new Set(items.map(i=>i.categoria).filter(Boolean)).size]];
     return [];
   }
 
+  function selectOptions(values,prefix) {
+    return [...new Set(values.map(value=>String(value||"").trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"pt-BR")).map(value=>`<option value="${prefix}:${escapeHTML(value)}" ${collectionContextFilter === `${prefix}:${value}` ? "selected" : ""}>${escapeHTML(value)}</option>`).join("");
+  }
+
+  function sortOptions(key) {
+    const options = key === "podcasts" ? [["padrao","Mais recentes"],["destaques","Destaques primeiro"],["programa","Programa e episódio"],["titulo","Título A–Z"],["antigos","Mais antigos"]]
+      : key === "videos" ? [["padrao","Mais recentes"],["destaques","Destaques primeiro"],["categoria","Categoria"],["titulo","Título A–Z"],["antigos","Mais antigos"]]
+      : key === "noticias" ? [["padrao","Destaques e recentes"],["recentes","Mais recentes"],["titulo","Título A–Z"],["antigos","Mais antigas"]]
+      : [];
+    return options.length ? `<select id="collection-sort" aria-label="Ordenar conteúdos">${options.map(([value,label])=>`<option value="${value}" ${collectionSort===value?"selected":""}>${label}</option>`).join("")}</select>` : "";
+  }
+
   function collectionFilters(key, allItems) {
-    const base = `<select id="collection-filter"><option value="todos" ${collectionFilter === "todos" ? "selected" : ""}>Todos os status</option><option value="ativos" ${collectionFilter === "ativos" ? "selected" : ""}>Ativos</option><option value="inativos" ${collectionFilter === "inativos" ? "selected" : ""}>Inativos</option></select>`;
-    if (key === "programacao") return `${base}<select id="collection-context-filter"><option value="todos">Todos os dias</option>${weekOrder.map(day=>`<option value="dia:${day}" ${collectionFilter === `dia:${day}` ? "selected" : ""}>${day}</option>`).join("")}</select>`;
-    if (key === "noticias") return `<select id="collection-filter"><option value="todos" ${collectionFilter === "todos" ? "selected" : ""}>Todas as situações</option>${["publicada","agendada","rascunho","arquivada"].map(value=>`<option value="news:${value}" ${collectionFilter === `news:${value}` ? "selected" : ""}>${value[0].toUpperCase()+value.slice(1)}</option>`).join("")}</select>`;
+    const base = `<select id="collection-filter" aria-label="Filtrar por publicação"><option value="todos" ${collectionFilter === "todos" ? "selected" : ""}>Todos os status</option><option value="ativos" ${collectionFilter === "ativos" ? "selected" : ""}>Publicados</option><option value="inativos" ${collectionFilter === "inativos" ? "selected" : ""}>Não publicados</option></select>`;
+    if (key === "programacao") return `${base}<select id="collection-context-filter" aria-label="Filtrar por dia"><option value="todos" ${collectionContextFilter === "todos" ? "selected" : ""}>Todos os dias</option>${weekOrder.map(day=>`<option value="dia:${day}" ${collectionContextFilter === `dia:${day}` ? "selected" : ""}>${day}</option>`).join("")}</select>`;
+    if (key === "noticias") return `<select id="collection-filter" aria-label="Filtrar situação editorial"><option value="todos" ${collectionFilter === "todos" ? "selected" : ""}>Todas as situações</option>${["publicada","agendada","rascunho","arquivada"].map(value=>`<option value="news:${value}" ${collectionFilter === `news:${value}` ? "selected" : ""}>${value[0].toUpperCase()+value.slice(1)}</option>`).join("")}</select><select id="collection-context-filter" aria-label="Filtrar categoria"><option value="todos" ${collectionContextFilter === "todos" ? "selected" : ""}>Todas as categorias</option>${selectOptions(allItems.map(i=>i.categoria),"categoria")}</select>${sortOptions(key)}`;
+    if (key === "podcasts") return `${base}<select id="collection-context-filter" aria-label="Filtrar podcast"><option value="todos" ${collectionContextFilter === "todos" ? "selected" : ""}>Todos os programas</option>${selectOptions(allItems.map(i=>i.programa),"programa")}</select>${sortOptions(key)}`;
+    if (key === "videos") return `${base}<select id="collection-context-filter" aria-label="Filtrar categoria"><option value="todos" ${collectionContextFilter === "todos" ? "selected" : ""}>Todas as categorias</option>${selectOptions(allItems.map(i=>i.categoria),"categoria")}</select>${sortOptions(key)}`;
     return base;
+  }
+
+  function contentTimestamp(item) {
+    const raw = item.data ? `${item.data}T${item.hora||"12:00"}:00` : (item.atualizadoEm || item.criadoEm || "");
+    const time=Date.parse(raw); return Number.isFinite(time)?time:0;
   }
 
   function filterAndSortCollection(key, source) {
     let items = source.filter(item => !searchTerm || JSON.stringify(item).toLowerCase().includes(searchTerm.toLowerCase()));
     if (collectionFilter === "ativos") items = items.filter(item => item.ativo !== false);
     else if (collectionFilter === "inativos") items = items.filter(item => item.ativo === false);
-    else if (collectionFilter.startsWith("dia:")) items = items.filter(item => normalizeDays(item.dias || item.dia).includes(collectionFilter.slice(4)));
     else if (collectionFilter.startsWith("news:")) items = items.filter(item => newsStatusValue(item) === collectionFilter.slice(5));
+    if (collectionContextFilter.startsWith("dia:")) items = items.filter(item => normalizeDays(item.dias || item.dia).includes(collectionContextFilter.slice(4)));
+    else if (collectionContextFilter.startsWith("programa:")) items = items.filter(item => String(item.programa||"") === collectionContextFilter.slice(9));
+    else if (collectionContextFilter.startsWith("categoria:")) items = items.filter(item => String(item.categoria||"") === collectionContextFilter.slice(10));
     items = [...items];
     if (key === "programacao") items.sort((a,b)=>Math.min(...normalizeDays(a.dias||a.dia).map(d=>weekOrder.indexOf(d)).filter(i=>i>=0),99)-Math.min(...normalizeDays(b.dias||b.dia).map(d=>weekOrder.indexOf(d)).filter(i=>i>=0),99) || compareTime(a.inicio,b.inicio));
     else if (key === "locutores") items.sort((a,b)=>Number(a.ordem||999)-Number(b.ordem||999) || String(a.nome||"").localeCompare(String(b.nome||"")));
-    else if (key === "noticias") items.sort((a,b)=>Number(Boolean(b.destaque))-Number(Boolean(a.destaque)) || String(`${b.data||""} ${b.hora||""}`).localeCompare(String(`${a.data||""} ${a.hora||""}`)));
+    else if (collectionSort === "titulo") items.sort((a,b)=>String(a.titulo||a.nome||"").localeCompare(String(b.titulo||b.nome||""),"pt-BR"));
+    else if (collectionSort === "antigos") items.sort((a,b)=>contentTimestamp(a)-contentTimestamp(b));
+    else if (collectionSort === "destaques") items.sort((a,b)=>Number(Boolean(b.destaque))-Number(Boolean(a.destaque)) || contentTimestamp(b)-contentTimestamp(a));
+    else if (collectionSort === "programa") items.sort((a,b)=>String(a.programa||"").localeCompare(String(b.programa||""),"pt-BR") || Number(a.temporada||0)-Number(b.temporada||0) || Number(a.episodio||0)-Number(b.episodio||0));
+    else if (collectionSort === "categoria") items.sort((a,b)=>String(a.categoria||"").localeCompare(String(b.categoria||""),"pt-BR") || contentTimestamp(b)-contentTimestamp(a));
+    else if (key === "noticias") items.sort((a,b)=>Number(Boolean(b.destaque))-Number(Boolean(a.destaque)) || contentTimestamp(b)-contentTimestamp(a));
+    else if (["podcasts","videos"].includes(key)) items.sort((a,b)=>Number(Boolean(b.destaque))-Number(Boolean(a.destaque)) || contentTimestamp(b)-contentTimestamp(a));
     return items;
   }
 
@@ -729,7 +774,8 @@
     $$('[data-preview]',root).forEach(button=>button.addEventListener("click",openPreview));
     $("#collection-search").addEventListener("input", event => { searchTerm = event.target.value; renderCollection(root,key); $("#collection-search")?.focus(); });
     $("#collection-filter")?.addEventListener("change", event => { collectionFilter=event.target.value; renderCollection(root,key); });
-    $("#collection-context-filter")?.addEventListener("change", event => { collectionFilter=event.target.value; renderCollection(root,key); });
+    $("#collection-context-filter")?.addEventListener("change", event => { collectionContextFilter=event.target.value; renderCollection(root,key); });
+    $("#collection-sort")?.addEventListener("change", event => { collectionSort=event.target.value; renderCollection(root,key); });
     $$('[data-view-item]', root).forEach(button => button.addEventListener("click", () => openSiteDetail(key,button.dataset.viewItem)));
     $$('[data-edit-item]', root).forEach(button => button.addEventListener("click", () => openItemModal(key,button.dataset.editItem)));
     $$('[data-duplicate-item]', root).forEach(button => button.addEventListener("click", () => duplicateItem(key,button.dataset.duplicateItem)));
@@ -742,7 +788,7 @@
       const status = newsStatusValue(item);
       return `<span class="badge status-${status}">${escapeHTML(statusNewsLabel(item))}</span>`;
     }
-    return `<button class="badge ${item.ativo === false ? "inactive" : "active"}" data-toggle-item="${item.id}" type="button">${item.ativo === false ? "Inativo" : "Ativo"}</button>`;
+    return `<div class="collection-status-stack"><button class="badge ${item.ativo === false ? "inactive" : "active"}" data-toggle-item="${item.id}" type="button">${item.ativo === false ? "Não publicado" : "Publicado"}</button>${item.destaque ? `<span class="badge featured">Destaque</span>` : ""}</div>`;
   }
 
   function collectionRow(schema,key,item) {
@@ -753,7 +799,12 @@
 
   function openItemModal(key,id=null) {
     const schema = schemas[key];
-    const base = key === "noticias" ? { ativo:true, status:"Rascunho", data:new Date().toISOString().slice(0,10) } : key === "programacao" ? { ativo:true, dias:["Segunda","Terça","Quarta","Quinta","Sexta"], cor:"#e31c45" } : { ativo:true };
+    const today=new Date().toISOString().slice(0,10);
+    const base = key === "noticias" ? { ativo:true, status:"Rascunho", data:today }
+      : key === "programacao" ? { ativo:true, dias:["Segunda","Terça","Quarta","Quinta","Sexta"], cor:"#e31c45" }
+      : key === "podcasts" ? { ativo:true, destaque:false, data:today, temporada:1, episodio:0, duracaoMinutos:0 }
+      : key === "videos" ? { ativo:true, destaque:false, data:today, tipo:"Automático", duracaoMinutos:0 }
+      : { ativo:true };
     const item = id ? state.content[key].find(entry => entry.id === id) : base;
     editing = { key, id };
     $("#modal-eyebrow").textContent = schema.title;
@@ -773,7 +824,10 @@
     if (type === "multicheck") { const selected=normalizeDays(value); return `<fieldset class="field full checkbox-fieldset"><legend>${escapeHTML(label)}${required?" *":""}</legend><div class="checkbox-grid">${extra.map(option=>`<label><input type="checkbox" name="${name}" value="${escapeHTML(option)}" ${selected.includes(option)?"checked":""}><span>${escapeHTML(option)}</span></label>`).join("")}</div></fieldset>`; }
     if (type === "checkbox") return `<div class="field"><span class="field-label">${escapeHTML(label)}</span><div class="toggle-row"><div><strong>${value === false ? "Desativado" : "Ativado"}</strong><small>Altere o status deste registro.</small></div><label class="switch"><input aria-label="${escapeHTML(label)}" type="checkbox" name="${name}" ${value === false ? "" : "checked"}><span></span></label></div></div>`;
     if (type === "image") return mediaFieldHTML(name,label,extra || "news",value);
-    return `<div class="field"><label for="${inputId}">${escapeHTML(label)}</label><input id="${inputId}" name="${name}" type="${type}" value="${escapeHTML(value)}" ${required ? "required" : ""}></div>`;
+    const numeric = type === "number" ? ` min="0" step="1" inputmode="numeric"` : "";
+    const help = name === "audio" ? `<small class="field-help">Use uma URL pública HTTPS de MP3, AAC, M4A, OGG, WAV, Opus ou outro áudio reproduzível pelo navegador.</small>`
+      : name === "url" ? `<small class="field-help">Aceita YouTube, Vimeo, MP4/WebM/Ogg, transmissão HLS ou outro link público HTTPS.</small>` : "";
+    return `<div class="field"><label for="${inputId}">${escapeHTML(label)}</label><input id="${inputId}" name="${name}" type="${type}" value="${escapeHTML(value)}" ${required ? "required" : ""}${numeric}>${help}</div>`;
   }
 
   function validateEditorialItem(key,item,id) {
@@ -791,6 +845,26 @@
       item.status=statusNewsLabel(item);
       if (item.status === "Agendada" && (!item.data || !item.hora)) return "Informe data e horário para uma notícia agendada.";
       item.ativo = item.status === "Publicada" ? item.ativo !== false : item.ativo !== false;
+    }
+    if (key === "podcasts") {
+      item.temporada=Math.max(0,Math.trunc(Number(item.temporada||0)));
+      item.episodio=Math.max(0,Math.trunc(Number(item.episodio||0)));
+      item.duracaoMinutos=Math.max(0,Math.trunc(Number(item.duracaoMinutos||0)));
+      if (!absoluteHttpURL(item.audio)) return "Informe um endereço público válido de áudio começando com https:// ou http://.";
+      const duplicate=item.episodio>0 && state.content.podcasts.find(other=>other.id!==id && String(other.programa||"").trim().toLowerCase()===String(item.programa||"").trim().toLowerCase() && Number(other.temporada||0)===item.temporada && Number(other.episodio||0)===item.episodio);
+      if (duplicate) return `Já existe o episódio ${item.episodio} da temporada ${item.temporada || 1} em “${item.programa}”.`;
+    }
+    if (key === "videos") {
+      item.duracaoMinutos=Math.max(0,Math.trunc(Number(item.duracaoMinutos||0)));
+      if (!absoluteHttpURL(item.url)) return "Informe um endereço público válido de vídeo começando com https:// ou http://.";
+      const detected=detectVideoType(item.url);
+      item.tipoDetectado=detected;
+      if (item.tipo === "YouTube" && detected !== "YouTube") return "O endereço informado não foi reconhecido como vídeo do YouTube.";
+      if (item.tipo === "Vimeo" && detected !== "Vimeo") return "O endereço informado não foi reconhecido como vídeo do Vimeo.";
+      if (item.tipo === "Arquivo de vídeo" && detected !== "Arquivo de vídeo") return "Para Arquivo de vídeo, use um endereço direto terminado em MP4, WebM, OGG, MOV ou M4V.";
+      if (item.tipo === "Transmissão ao vivo" && !["Transmissão ao vivo","Link externo"].includes(detected)) return "Informe o endereço público da transmissão ao vivo.";
+      const duplicate=state.content.videos.find(other=>other.id!==id && normalizeComparableURL(other.url)===normalizeComparableURL(item.url));
+      if (duplicate) return `Este endereço de vídeo já está cadastrado em “${duplicate.titulo}”.`;
     }
     if (key === "locutores") item.ordem=Number(item.ordem||0);
     return "";
@@ -825,6 +899,7 @@
     if (clone.nome) clone.nome=`${clone.nome} — cópia`;
     if (key === "noticias") { clone.slug=slugify(`${clone.slug||clone.titulo}-copia`); clone.status="Rascunho"; clone.destaque=false; }
     if (key === "programacao") { clone.ativo=false; }
+    if (["podcasts","videos"].includes(key)) { clone.ativo=false; clone.destaque=false; }
     state.content[key].unshift(clone); persist(false); renderPage(); notify("Cópia criada para revisão.","success");
   }
 
@@ -953,7 +1028,7 @@
         <section class="card"><div class="card-body"><h3>Exportar JSON</h3><p class="field-help">Baixa configurações, módulos, temas e conteúdos.</p><button class="button primary" id="export-backup" type="button">Baixar backup</button></div></section>
         <section class="card"><div class="card-body"><h3>Importar JSON</h3><p class="field-help">Carrega o arquivo no editor; clique em Salvar rascunho para gravar no D1.</p><button class="button secondary" id="import-backup" type="button">Selecionar arquivo</button></div></section>
         <section class="card"><div class="card-body"><h3>Recarregar do servidor</h3><p class="field-help">Descarta alterações ainda não salvas e recarrega o último rascunho do servidor.</p><button class="button danger" id="reset-demo" type="button">Recarregar dados</button></div></section>
-      </div><section class="card" style="margin-top:18px"><header class="card-header"><div><h3>Sobre esta instalação</h3><p>Informações técnicas.</p></div></header><div class="card-body"><div class="code-box">Modo: produção integrada\nVersão: ${CONFIG.VERSION || "2.2.1"}\nPersistência: Cloudflare D1\nAPI: ${CONFIG.WORKER_URL || "não configurada"}\nÚltima alteração: ${formatDateTime(state.updatedAt)}</div></div></section>`;
+      </div><section class="card" style="margin-top:18px"><header class="card-header"><div><h3>Sobre esta instalação</h3><p>Informações técnicas.</p></div></header><div class="card-body"><div class="code-box">Modo: produção integrada\nVersão: ${CONFIG.VERSION || "2.3.0-etapa1"}\nPersistência: Cloudflare D1\nAPI: ${CONFIG.WORKER_URL || "não configurada"}\nÚltima alteração: ${formatDateTime(state.updatedAt)}</div></div></section>`;
     $("#export-backup").addEventListener("click",exportBackup);
     $("#import-backup").addEventListener("click",()=>$("#backup-import").click());
     $("#reset-demo").addEventListener("click",()=>{if(confirm("Descartar alterações não salvas e recarregar o rascunho do servidor?")) loadAll();});
@@ -1052,8 +1127,8 @@
   function siteProgramming() { const items=[...state.content.programacao].filter(i=>i.ativo!==false).sort((a,b)=>compareTime(a.inicio,b.inicio)).slice(0,4); return `<section class="site-section" data-site-section="programacao"><div class="site-section-head"><div><span>No ar e próximos</span><h2>Programação</h2><p>Conteúdo organizado por dia e horário.</p></div><button class="site-section-link" data-site-list="programacao" type="button">Ver grade completa →</button></div><div class="site-program-grid">${items.map((i,index)=>`<article class="site-program-card ${index===0?"live":""}" data-site-open="programacao" data-site-id="${escapeHTML(i.id)}" role="button" tabindex="0" aria-label="Abrir programa ${escapeHTML(i.titulo)}" style="${i.cor?`--program-color:${i.cor}`:""}"><div class="site-program-time">${index===0?"AGORA":escapeHTML(i.inicio||"")}</div><strong>${escapeHTML(i.titulo)}</strong><small>${escapeHTML(i.locutor||formatDays(i.dias||i.dia))}</small></article>`).join("")}</div></section>`; }
   function siteNews() { const items=[...state.content.noticias].filter(isNewsVisible).sort((a,b)=>Number(Boolean(b.destaque))-Number(Boolean(a.destaque)) || String(`${b.data||""}${b.hora||""}`).localeCompare(String(`${a.data||""}${a.hora||""}`))).slice(0,4); return `<section class="site-section alt" data-site-section="noticias"><div class="site-section-head"><div><span>Informação</span><h2>Últimas notícias</h2><p>Cidade, esporte, agronegócio e os assuntos do dia.</p></div><button class="site-section-link" data-site-list="noticias" type="button">Todas as notícias →</button></div><div class="site-news-grid">${items.map((i,index)=>`<article class="site-news-card ${index===0?"featured":""}" data-site-open="noticias" data-site-id="${escapeHTML(i.id)}" role="button" tabindex="0" aria-label="Abrir notícia ${escapeHTML(i.titulo)}"><div class="site-news-image">${i.imagem?`<img src="${i.imagem}" alt="Capa da notícia ${escapeHTML(i.titulo)}">`:""}</div><div class="site-news-body"><span>${escapeHTML(i.categoria||"Notícias")}</span><h3>${escapeHTML(i.titulo)}</h3><p>${escapeHTML(i.resumo||"")}</p><small class="site-news-meta">${escapeHTML(i.autor||"")} ${i.data?`• ${formatDate(i.data)}`:""}</small></div></article>`).join("")}</div></section>`; }
   function sitePromotions() { const items=state.content.promocoes.filter(i=>i.ativo!==false).slice(0,3); if(!items.length)return ""; return `<section class="site-section" data-site-section="promocoes"><div class="site-section-head"><div><span>Participe</span><h2>Promoções</h2><p>Ações para aproximar a rádio e seus ouvintes.</p></div><button class="site-section-link" data-site-list="promocoes" type="button">Ver todas →</button></div><div class="site-promo-grid">${items.map(i=>`<article class="site-promo-card" data-site-open="promocoes" data-site-id="${escapeHTML(i.id)}" role="button" tabindex="0" aria-label="Abrir promoção ${escapeHTML(i.titulo)}" style="${i.imagem?`--card-image:url('${i.imagem}')`:""}"><span>Promoção</span><strong>${escapeHTML(i.titulo)}</strong><small>${escapeHTML(i.descricao||"")}</small></article>`).join("")}</div></section>`; }
-  function sitePodcasts() { const items=state.content.podcasts.filter(i=>i.ativo!==false).slice(0,3); if(!items.length)return ""; return `<section class="site-section dark" data-site-section="podcasts"><div class="site-section-head"><div><span>Ouça quando quiser</span><h2>Podcasts</h2><p>Entrevistas, boletins e programas gravados.</p></div><button class="site-section-link" data-site-list="podcasts" type="button">Todos os episódios →</button></div><div class="site-podcast-grid">${items.map(i=>`<article class="site-podcast-card" data-site-open="podcasts" data-site-id="${escapeHTML(i.id)}" role="button" tabindex="0" aria-label="Abrir podcast ${escapeHTML(i.titulo)}"><div class="site-podcast-cover">${i.imagem?`<img src="${i.imagem}" alt="Capa de ${escapeHTML(i.titulo)}">`:`◉`}</div><div><strong>${escapeHTML(i.titulo)}</strong><small>${escapeHTML(i.programa||i.descricao||"")}</small></div></article>`).join("")}</div></section>`; }
-  function siteVideos() { const items=state.content.videos.filter(i=>i.ativo!==false).slice(0,3); if(!items.length)return ""; return `<section class="site-section alt" data-site-section="videos"><div class="site-section-head"><div><span>Assista</span><h2>Vídeos</h2><p>Entrevistas, música e bastidores.</p></div><button class="site-section-link" data-site-list="videos" type="button">Todos os vídeos →</button></div><div class="site-news-grid">${items.map((i,index)=>`<article class="site-news-card ${index===0?"featured":""}" data-site-open="videos" data-site-id="${escapeHTML(i.id)}" role="button" tabindex="0" aria-label="Abrir vídeo ${escapeHTML(i.titulo)}"><div class="site-news-image site-video-thumb">${i.imagem?`<img src="${i.imagem}" alt="Miniatura de ${escapeHTML(i.titulo)}">`:""}<span class="site-video-play" aria-hidden="true">▶</span></div><div class="site-news-body"><span>${escapeHTML(i.categoria||"Vídeo")}</span><h3>${escapeHTML(i.titulo)}</h3><p>${escapeHTML(i.descricao||"")}</p></div></article>`).join("")}</div></section>`; }
+  function sitePodcasts() { const items=sortMediaItems("podcasts",state.content.podcasts.filter(i=>i.ativo!==false)).slice(0,4); if(!items.length)return ""; return `<section class="site-section dark" data-site-section="podcasts"><div class="site-section-head"><div><span>Ouça quando quiser</span><h2>Podcasts</h2><p>Programas, entrevistas e episódios sob demanda.</p></div><button class="site-section-link" data-site-list="podcasts" type="button">Todos os episódios →</button></div><div class="site-podcast-grid">${items.map(i=>`<article class="site-podcast-card ${i.destaque?"media-featured":""}" data-site-open="podcasts" data-site-id="${escapeHTML(i.id)}" role="button" tabindex="0" aria-label="Ouvir podcast ${escapeHTML(i.titulo)}"><div class="site-podcast-cover">${i.imagem?`<img src="${i.imagem}" alt="Capa de ${escapeHTML(i.titulo)}">`:`<span aria-hidden="true">◉</span>`}<i class="site-media-play" aria-hidden="true">▶</i></div><div class="site-podcast-copy"><div class="site-media-labels">${i.destaque?`<span>Destaque</span>`:""}<span>${escapeHTML(episodeLabel(i))}</span></div><strong>${escapeHTML(i.titulo)}</strong><small>${escapeHTML(i.programa||"Podcast")}</small><em>${[i.data?formatDate(i.data):"",i.duracaoMinutos?formatDuration(i.duracaoMinutos):""].filter(Boolean).map(escapeHTML).join(" • ")}</em></div></article>`).join("")}</div></section>`; }
+  function siteVideos() { const items=sortMediaItems("videos",state.content.videos.filter(i=>i.ativo!==false)).slice(0,4); if(!items.length)return ""; return `<section class="site-section alt" data-site-section="videos"><div class="site-section-head"><div><span>Assista</span><h2>Vídeos</h2><p>Entrevistas, música, transmissões e bastidores.</p></div><button class="site-section-link" data-site-list="videos" type="button">Todos os vídeos →</button></div><div class="site-news-grid">${items.map((i,index)=>{const thumb=videoThumbnailURL(i);return `<article class="site-news-card ${(i.destaque||index===0)?"featured":""}" data-site-open="videos" data-site-id="${escapeHTML(i.id)}" role="button" tabindex="0" aria-label="Assistir vídeo ${escapeHTML(i.titulo)}"><div class="site-news-image site-video-thumb">${thumb?`<img src="${escapeHTML(thumb)}" alt="Miniatura de ${escapeHTML(i.titulo)}">`:""}<span class="site-video-play" aria-hidden="true">▶</span>${i.destaque?`<b class="site-media-corner">Destaque</b>`:""}</div><div class="site-news-body"><span>${escapeHTML(i.categoria||"Vídeo")} • ${escapeHTML(videoTypeLabel(i))}</span><h3>${escapeHTML(i.titulo)}</h3><p>${escapeHTML(i.descricao||"")}</p><small class="site-news-meta">${[i.data?formatDate(i.data):"",i.duracaoMinutos?formatDuration(i.duracaoMinutos):""].filter(Boolean).map(escapeHTML).join(" • ")}</small></div></article>`;}).join("")}</div></section>`; }
   function siteTeam() { const items=[...state.content.locutores].sort((a,b)=>Number(a.ordem||999)-Number(b.ordem||999)).concat(state.content.equipe).filter(i=>i.ativo!==false).slice(0,5); if(!items.length)return ""; return `<section class="site-section" data-site-section="equipe"><div class="site-section-head"><div><span>Quem faz</span><h2>Nossa equipe</h2><p>As vozes e profissionais da emissora.</p></div><button class="site-section-link" data-site-list="equipe" type="button">Conheça a equipe →</button></div><div class="site-team-grid">${items.map(i=>`<article class="site-team-card" data-site-open="${state.content.locutores.some(loc=>loc.id===i.id)?"locutores":"equipe"}" data-site-id="${escapeHTML(i.id)}" role="button" tabindex="0" aria-label="Abrir perfil de ${escapeHTML(i.nome)}"><div class="site-team-photo">${i.foto?`<img src="${i.foto}" alt="Foto de ${escapeHTML(i.nome)}">`:""}</div><strong>${escapeHTML(i.nome)}</strong><small>${escapeHTML(i.cargo||"")}</small></article>`).join("")}</div></section>`; }
   function siteGallery() { const items=state.content.galeria.filter(i=>i.ativo!==false).slice(0,5); if(!items.length)return ""; return `<section class="site-section alt" data-site-section="galeria"><div class="site-section-head"><div><span>Imagens</span><h2>Galeria</h2><p>Eventos, bastidores e momentos da rádio.</p></div><button class="site-section-link" data-site-list="galeria" type="button">Ver galeria →</button></div><div class="site-gallery-grid">${items.map(i=>`<div data-site-open="galeria" data-site-id="${escapeHTML(i.id)}" role="button" tabindex="0" aria-label="Ampliar foto ${escapeHTML(i.titulo)}">${i.imagem?`<img src="${i.imagem}" alt="${escapeHTML(i.titulo)}">`:`<span class="site-gallery-placeholder">${escapeHTML(i.titulo||"Foto")}</span>`}</div>`).join("")}</div></section>`; }
   function siteEvents() { const items=state.content.eventos.filter(i=>i.ativo!==false).slice(0,3); if(!items.length)return ""; return `<section class="site-section" data-site-section="eventos"><div class="site-section-head"><div><span>Agenda</span><h2>Próximos eventos</h2></div><button class="site-section-link" data-site-list="eventos" type="button">Agenda completa →</button></div><div class="site-promo-grid">${items.map(i=>`<article class="site-promo-card" data-site-open="eventos" data-site-id="${escapeHTML(i.id)}" role="button" tabindex="0" aria-label="Abrir evento ${escapeHTML(i.titulo)}" style="${i.imagem?`--card-image:url('${i.imagem}')`:""}"><span>${formatDate(i.data)}</span><strong>${escapeHTML(i.titulo)}</strong><small>${escapeHTML(i.local||"")}</small></article>`).join("")}</div></section>`; }
@@ -1090,6 +1165,72 @@
     target.scrollIntoView({behavior:"smooth",block:"start"});
   }
 
+  function absoluteHttpURL(value) {
+    const raw=String(value||"").trim();
+    if (!/^https?:\/\//i.test(raw)) return "";
+    try { const url=new URL(raw); return ["http:","https:"].includes(url.protocol)?url.href:""; } catch { return ""; }
+  }
+
+  function normalizeComparableURL(value) {
+    const valid=absoluteHttpURL(value); if(!valid)return "";
+    const youtubeId=youtubeVideoId(valid); if(youtubeId)return `youtube:${youtubeId.toLowerCase()}`;
+    const vimeoId=vimeoVideoId(valid); if(vimeoId)return `vimeo:${vimeoId}`;
+    try { const url=new URL(valid); url.hash=""; return url.href.replace(/\/$/,"").toLowerCase(); } catch { return valid.toLowerCase(); }
+  }
+
+  function youtubeVideoId(value) {
+    const valid=absoluteHttpURL(value); if(!valid)return "";
+    try {
+      const url=new URL(valid), host=url.hostname.toLowerCase().replace(/^www\./,"");
+      if(host==="youtu.be")return url.pathname.split("/").filter(Boolean)[0]||"";
+      if(!["youtube.com","m.youtube.com","music.youtube.com","youtube-nocookie.com"].includes(host))return "";
+      if(url.searchParams.get("v"))return url.searchParams.get("v");
+      const parts=url.pathname.split("/").filter(Boolean);
+      if(["embed","shorts","live"].includes(parts[0]))return parts[1]||"";
+    } catch {}
+    return "";
+  }
+
+  function vimeoVideoId(value) {
+    const valid=absoluteHttpURL(value); if(!valid)return "";
+    try { const url=new URL(valid); if(!/(^|\.)vimeo\.com$/i.test(url.hostname))return ""; return url.pathname.split("/").filter(Boolean).find(part=>/^\d+$/.test(part))||""; } catch { return ""; }
+  }
+
+  function detectVideoType(value) {
+    const url=absoluteHttpURL(value); if(!url)return "Link inválido";
+    if(youtubeVideoId(url))return "YouTube";
+    if(vimeoVideoId(url))return "Vimeo";
+    if(/\.(mp4|webm|ogg|mov|m4v)(?:$|[?#])/i.test(url))return "Arquivo de vídeo";
+    if(/\.(m3u8)(?:$|[?#])/i.test(url)||/[?&](live|stream)=/i.test(url))return "Transmissão ao vivo";
+    return "Link externo";
+  }
+
+  function videoTypeLabel(item) {
+    return item?.tipo && item.tipo !== "Automático" ? item.tipo : (item?.tipoDetectado || detectVideoType(item?.url));
+  }
+
+  function videoThumbnailURL(item) {
+    if(item?.imagem)return item.imagem;
+    const id=youtubeVideoId(item?.url); return id?`https://i.ytimg.com/vi/${encodeURIComponent(id)}/hqdefault.jpg`:"";
+  }
+
+  function formatDuration(value) {
+    const minutes=Math.max(0,Math.trunc(Number(value||0))); if(!minutes)return "";
+    const hours=Math.floor(minutes/60), rest=minutes%60; return hours?`${hours}h${rest?` ${String(rest).padStart(2,"0")}min`:""}`:`${minutes} min`;
+  }
+
+  function episodeLabel(item) {
+    const season=Math.max(0,Math.trunc(Number(item?.temporada||0))), episode=Math.max(0,Math.trunc(Number(item?.episodio||0)));
+    if(season&&episode)return `T${season} • E${episode}`;
+    if(episode)return `Episódio ${episode}`;
+    if(season)return `Temporada ${season}`;
+    return "Episódio";
+  }
+
+  function sortMediaItems(key,items) {
+    return [...items].sort((a,b)=>Number(Boolean(b.destaque))-Number(Boolean(a.destaque)) || contentTimestamp(b)-contentTimestamp(a) || (key==="podcasts"?Number(b.episodio||0)-Number(a.episodio||0):0));
+  }
+
   function safeExternalURL(value) {
     if (!value) return "";
     try { const url=new URL(String(value),window.location.href); return ["http:","https:"].includes(url.protocol)?url.href:""; }
@@ -1119,22 +1260,20 @@
   function detailMeta(parts) { const values=parts.filter(Boolean); return values.length?`<div class="site-detail-meta">${values.map(value=>`<span>${escapeHTML(value)}</span>`).join("")}</div>`:""; }
 
   function videoPlayerHTML(urlValue,title) {
-    const url=safeExternalURL(urlValue);
-    if (!url) return `<div class="site-detail-notice">Este vídeo foi salvo sem um endereço válido. Edite o cadastro e informe a URL do vídeo.</div>`;
-    try {
-      const parsed=new URL(url); let id="";
-      if (["youtube.com","www.youtube.com","m.youtube.com"].includes(parsed.hostname)) id=parsed.searchParams.get("v") || parsed.pathname.split("/").filter(Boolean).pop();
-      if (parsed.hostname === "youtu.be") id=parsed.pathname.split("/").filter(Boolean)[0] || "";
-      if (id) return `<div class="site-video-frame"><iframe src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(id)}" title="${escapeHTML(title)}" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>`;
-      if (["vimeo.com","www.vimeo.com","player.vimeo.com"].includes(parsed.hostname)) { const vid=parsed.pathname.split("/").filter(Boolean).find(part=>/^\d+$/.test(part)); if(vid)return `<div class="site-video-frame"><iframe src="https://player.vimeo.com/video/${vid}" title="${escapeHTML(title)}" loading="lazy" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe></div>`; }
-      if (/\.(mp4|webm|ogg)(?:$|\?)/i.test(url)) return `<video class="site-native-video" src="${escapeHTML(url)}" controls preload="metadata">Seu navegador não suporta vídeo.</video>`;
-    } catch {}
-    return `<div class="site-detail-notice">A prévia não reconheceu um formato incorporável.</div><a class="button primary site-detail-external" href="${escapeHTML(url)}" target="_blank" rel="noopener noreferrer">Abrir vídeo salvo</a>`;
+    const url=absoluteHttpURL(urlValue);
+    if (!url) return `<div class="site-detail-notice">Este vídeo foi salvo sem um endereço público válido. Edite o cadastro e informe uma URL iniciada por HTTPS.</div>`;
+    const youtubeId=youtubeVideoId(url), vimeoId=vimeoVideoId(url);
+    if (youtubeId) return `<div class="site-video-frame"><iframe src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(youtubeId)}" title="${escapeHTML(title)}" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>`;
+    if (vimeoId) return `<div class="site-video-frame"><iframe src="https://player.vimeo.com/video/${encodeURIComponent(vimeoId)}" title="${escapeHTML(title)}" loading="lazy" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe></div>`;
+    if (/\.(mp4|webm|ogg|mov|m4v)(?:$|[?#])/i.test(url)) return `<video class="site-native-video" src="${escapeHTML(url)}" controls preload="metadata" playsinline>Seu navegador não suporta vídeo.</video>`;
+    if (/\.m3u8(?:$|[?#])/i.test(url)) return `<div class="site-detail-notice">Esta transmissão usa HLS. A reprodução direta depende do navegador; use o botão abaixo caso o player não seja iniciado.</div><video class="site-native-video" src="${escapeHTML(url)}" controls preload="metadata" playsinline></video><a class="button secondary site-detail-external" href="${escapeHTML(url)}" target="_blank" rel="noopener noreferrer">Abrir transmissão</a>`;
+    return `<div class="site-detail-notice">Este endereço não oferece incorporação direta na prévia.</div><a class="button primary site-detail-external" href="${escapeHTML(url)}" target="_blank" rel="noopener noreferrer">Abrir vídeo original</a>`;
   }
 
   function podcastPlayerHTML(item) {
-    const url=safeExternalURL(item.audio);
-    return url?`<audio class="site-audio-player" src="${escapeHTML(url)}" controls preload="metadata"></audio>`:`<div class="site-detail-notice">Este episódio foi salvo sem um endereço de áudio válido.</div>`;
+    const url=absoluteHttpURL(item.audio);
+    if(!url)return `<div class="site-detail-notice">Este episódio foi salvo sem um endereço público válido de áudio.</div>`;
+    return `<div class="site-audio-box">${item.imagem?`<img src="${escapeHTML(item.imagem)}" alt="Capa de ${escapeHTML(item.titulo||"Podcast")}">`:""}<div><strong>${escapeHTML(item.titulo||"Episódio")}</strong><span>${escapeHTML(item.programa||"Podcast")} • ${escapeHTML(episodeLabel(item))}</span><audio class="site-audio-player" src="${escapeHTML(url)}" controls preload="metadata"></audio><a href="${escapeHTML(url)}" target="_blank" rel="noopener noreferrer">Abrir áudio em nova guia</a></div></div>`;
   }
 
   function genericDetailHTML(key,item) {
@@ -1151,8 +1290,8 @@
 
   function siteDetailContent(key,item) {
     if (key === "noticias") return `${detailImage(item)}${detailMeta([item.categoria,item.autor,item.data?formatDate(item.data):"",item.hora])}<div class="site-detail-text">${multilineHTML(item.conteudo || item.resumo)}</div>`;
-    if (key === "videos") return `${videoPlayerHTML(item.url,item.titulo)}${detailMeta([item.categoria])}<div class="site-detail-text">${multilineHTML(item.descricao)}</div>`;
-    if (key === "podcasts") return `${detailImage(item)}${podcastPlayerHTML(item)}${detailMeta([item.programa,item.data?formatDate(item.data):""])}<div class="site-detail-text">${multilineHTML(item.descricao)}</div>`;
+    if (key === "videos") return `${videoPlayerHTML(item.url,item.titulo)}${detailMeta([item.categoria,videoTypeLabel(item),item.data?formatDate(item.data):"",item.duracaoMinutos?formatDuration(item.duracaoMinutos):"",item.destaque?"Destaque":""])}<div class="site-detail-text">${multilineHTML(item.descricao)}</div>`;
+    if (key === "podcasts") return `${podcastPlayerHTML(item)}${detailMeta([item.programa,episodeLabel(item),item.categoria,item.data?formatDate(item.data):"",item.duracaoMinutos?formatDuration(item.duracaoMinutos):"",item.destaque?"Destaque":""])}<div class="site-detail-text">${multilineHTML(item.descricao)}</div>`;
     if (key === "programacao") return `${detailImage(item)}${detailMeta([item.categoria,formatDays(item.dias||item.dia),item.inicio&&item.fim?`${item.inicio} às ${item.fim}`:"",item.locutor])}<div class="site-detail-text">${multilineHTML(item.descricao)}</div>`;
     if (key === "promocoes") return `${detailImage(item)}${detailMeta([item.inicio?`Início: ${formatDate(item.inicio)}`:"",item.fim?`Encerramento: ${formatDate(item.fim)}`:""])}<div class="site-detail-text">${multilineHTML(item.descricao)}${item.regulamento?`<h3>Regulamento</h3>${multilineHTML(item.regulamento)}`:""}</div><button class="button primary" data-site-action="whatsapp" type="button">Participar pelo WhatsApp</button>`;
     if (key === "eventos") return `${detailImage(item)}${detailMeta([item.data?formatDate(item.data):"",item.hora,item.local])}<div class="site-detail-text">${multilineHTML(item.descricao)}</div>`;
@@ -1176,6 +1315,7 @@
   function collectionVisibleItems(key) {
     if (key === "noticias") return state.content.noticias.filter(isNewsVisible);
     if (key === "equipe") return [...state.content.locutores.map(i=>({...i,_collection:"locutores"})),...state.content.equipe.map(i=>({...i,_collection:"equipe"}))].filter(i=>i.ativo!==false);
+    if (["podcasts","videos"].includes(key)) return sortMediaItems(key,(state.content[key] || []).filter(i=>i.ativo!==false));
     return (state.content[key] || []).filter(i=>i.ativo!==false);
   }
 
@@ -1272,7 +1412,7 @@
 
   function mapRemoteToState(site,dashboard) {
     const fresh=defaultState(), content=site.conteudoRascunho || site.conteudoPublicado || {}, texts=content.textos_institucionais || {}, cms=texts.cms_v2 || {}, contacts=content.contatos || {}, whats=typeof content.whatsapp === "string" ? {numero:content.whatsapp} : (content.whatsapp || {}), colors=content.cores || {}, apps=content.links_aplicativos || {}, banners=content.banners || {};
-    fresh.version="2.2.1"; fresh.updatedAt=versions[0]?.criado_em || new Date().toISOString(); fresh.status=site.status_publicacao || "sem_rascunho"; fresh.selectedTheme=cms.selectedTheme || "morada";
+    fresh.version="2.3.0-etapa1"; fresh.updatedAt=versions[0]?.criado_em || new Date().toISOString(); fresh.status=site.status_publicacao || "sem_rascunho"; fresh.selectedTheme=cms.selectedTheme || "morada";
     fresh.radio={...fresh.radio,nome:content.nome || site.nome_site || dashboard?.cliente?.nome_radio || "Minha rádio",slogan:content.slogan || "",descricao:content.descricao || texts.sobre || "",cidade:contacts.cidade || dashboard?.cliente?.cidade || "",estado:contacts.estado || dashboard?.cliente?.estado || "",email:contacts.email || dashboard?.cliente?.email || "",telefone:contacts.telefone || "",whatsapp:whats.numero || "",endereco:contacts.endereco || "",streamUrl:site.stream_url || "",musicaAtual:texts.player?.titulo || "Transmissão ao vivo",locutorAtual:texts.player?.subtitulo || "Programação da rádio",logo:content.logo || "",hero:content.capa || "",playerImage:texts.player?.imagem || "",cores:{primaria:colors.primaria || "#e31c45",secundaria:colors.secundaria || "#121d31",destaque:colors.destaque || "#f1a11a",fundo:colors.fundo || "#f4f6f9"},listenersEnabled:false};
     const moduleValues=texts.modulos || {}; const savedModules=safeArray(cms.modules);
     fresh.modules=modulesCatalog.map(([id,label,description],index)=>{const saved=savedModules.find(m=>m.id===id);return{id,label,description,enabled:saved? saved.enabled!==false : moduleValues[id]!==false,order:Number(saved?.order ?? index)};});
@@ -1280,7 +1420,8 @@
       programacao:ensureIds(safeArray(content.programacao).map(i=>({...i,titulo:i.titulo||i.programa||"",locutor:i.locutor||i.apresentador||"",dias:normalizeDays(i.dias||i.dia),categoria:i.categoria||"Variedades",cor:i.cor||"#e31c45",ativo:i.ativo!==false})),"prog"),
       locutores:ensureIds(safeArray(content.locutores).map((i,index)=>({...i,cargo:i.cargo||i.funcao||"",bio:i.bio||i.descricao||"",ordem:Number(i.ordem||index+1),ativo:i.ativo!==false})),"loc"),
       noticias:ensureIds(safeArray(content.noticias).map(i=>({...i,slug:i.slug||slugify(i.titulo),status:i.status|| (i.ativo===false?"Rascunho":"Publicada"),hora:i.hora||"",ativo:i.ativo!==false})),"news"),
-      podcasts:ensureIds(texts.podcasts,"pod"), videos:ensureIds(texts.videos,"vid"), promocoes:ensureIds(texts.promocoes,"promo"), galeria:ensureIds(texts.galeria,"foto"), eventos:ensureIds(texts.eventos,"evento"),
+      podcasts:ensureIds(safeArray(texts.podcasts).map(i=>({...i,temporada:Number(i.temporada||0),episodio:Number(i.episodio||0),duracaoMinutos:Number(i.duracaoMinutos||0),destaque:Boolean(i.destaque),ativo:i.ativo!==false})),"pod"),
+      videos:ensureIds(safeArray(texts.videos).map(i=>({...i,tipo:i.tipo||"Automático",tipoDetectado:i.tipoDetectado||detectVideoType(i.url),duracaoMinutos:Number(i.duracaoMinutos||0),destaque:Boolean(i.destaque),ativo:i.ativo!==false})),"vid"), promocoes:ensureIds(texts.promocoes,"promo"), galeria:ensureIds(texts.galeria,"foto"), eventos:ensureIds(texts.eventos,"evento"),
       equipe:ensureIds(cms.content?.equipe,"team"), publicidade:ensureIds(banners.publicidades,"ad"),
       parceiros:ensureIds(safeArray(content.patrocinadores).map(i=>({...i,link:i.link||i.site||"",ativo:i.ativo!==false})),"part"),
       banners:ensureIds(banners.destaques,"banner"), popups:ensureIds(cms.content?.popups,"popup"), usuarios:[]
@@ -1309,7 +1450,7 @@
     if(can("patrocinadores"))content.patrocinadores=state.content.parceiros.map(i=>({...i,site:i.link}));
     if(can("banners"))content.banners={...(content.banners||{}),destaques:state.content.banners,publicidades:state.content.publicidade};
     if(can("links_aplicativos"))content.links_aplicativos={...(content.links_aplicativos||{}),android:state.integrations.aplicativo.android,ios:state.integrations.aplicativo.ios,pwa:state.integrations.aplicativo.pwa,qr:state.integrations.aplicativo.qrcode};
-    if(can("textos_institucionais"))content.textos_institucionais={...texts,sobre:state.radio.descricao,player:{...(texts.player||{}),titulo:state.radio.musicaAtual,subtitulo:state.radio.locutorAtual,imagem:state.radio.playerImage},seo:state.integrations.seo,podcasts:state.content.podcasts,videos:state.content.videos,promocoes:state.content.promocoes,galeria:state.content.galeria,eventos:state.content.eventos,modulos:Object.fromEntries(state.modules.map(m=>[m.id,m.enabled])),pedidosMusica:{...(texts.pedidosMusica||{}),ativo:state.integrations.whatsapp.pedidos},acessibilidade:{...(texts.acessibilidade||{}),leitorTela:state.integrations.configuracoes.acessibilidade},cms_v2:{...cms,schemaVersion:2,selectedTheme:state.selectedTheme,modules:state.modules,content:{equipe:state.content.equipe,popups:state.content.popups},aplicativo:{icone:state.integrations.aplicativo.icone},configuracoes:state.integrations.configuracoes,updatedAt:new Date().toISOString()}};
+    if(can("textos_institucionais"))content.textos_institucionais={...texts,sobre:state.radio.descricao,player:{...(texts.player||{}),titulo:state.radio.musicaAtual,subtitulo:state.radio.locutorAtual,imagem:state.radio.playerImage},seo:state.integrations.seo,podcasts:state.content.podcasts,videos:state.content.videos,promocoes:state.content.promocoes,galeria:state.content.galeria,eventos:state.content.eventos,modulos:Object.fromEntries(state.modules.map(m=>[m.id,m.enabled])),pedidosMusica:{...(texts.pedidosMusica||{}),ativo:state.integrations.whatsapp.pedidos},acessibilidade:{...(texts.acessibilidade||{}),leitorTela:state.integrations.configuracoes.acessibilidade},cms_v2:{...cms,schemaVersion:3,selectedTheme:state.selectedTheme,modules:state.modules,content:{equipe:state.content.equipe,popups:state.content.popups},aplicativo:{icone:state.integrations.aplicativo.icone},configuracoes:state.integrations.configuracoes,updatedAt:new Date().toISOString()}};
     return content;
   }
 

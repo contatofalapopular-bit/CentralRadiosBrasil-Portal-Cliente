@@ -1,32 +1,27 @@
-# Portal do Cliente v2.2.1 — Auditoria Funcional
+# Portal do Cliente v2.3.0 — Etapa 1: Podcasts e Vídeos
 
-Correção incremental sobre a v2.2.0. Mantém a arquitetura Worker + D1 e adiciona auditoria funcional dos botões, ícones e conteúdos salvos.
+Evolução direta da v2.2.1 — Auditoria Funcional. Mantém a arquitetura integrada com Worker + D1 e não exige migração SQL.
 
-## Correções principais
+## Podcasts
 
-- seta **Ver grade completa** abre toda a programação;
-- notícias salvas abrem o conteúdo completo;
-- vídeos salvos abrem player incorporado ou link externo;
-- podcasts abrem o áudio salvo;
-- cards de promoções, eventos, equipe e galeria abrem detalhes;
-- links de navegação, WhatsApp, aplicativo, redes sociais, parceiros e publicidade foram vinculados;
-- cada tabela de conteúdo ganhou o botão **Visualizar**;
-- navegação por teclado e foco visível nos cards interativos.
+- organização por programa, temporada e número do episódio;
+- data de publicação, duração, categoria e destaque;
+- URL pública de áudio obrigatória e validada;
+- bloqueio de episódio duplicado dentro do mesmo programa/temporada;
+- busca, filtros por publicação e programa, e ordenação;
+- player completo na visualização do CMS e na prévia pública;
+- cards com capa, destaque, episódio, data e duração.
 
-## Base preservada: v2.2.0 — Etapa 2 Editorial e Temas
+## Vídeos
 
-Evolução da base v2.0.0 aprovada pelo usuário.
-
-## Entregas
-
-- Programação com vários dias, categorias, vínculo de locutor, cor e bloqueio de conflito de horário.
-- Locutores com ordenação, contatos e redes sociais.
-- Notícias com slug, autoria, tags, situação editorial, agendamento, destaque e validação de duplicidade.
-- Busca, filtros, indicadores, duplicação e visualização no site.
-- Seis temas com o mesmo conteúdo e composições visualmente diferentes.
-- Tema Morada mantido na estrutura aprovada.
-- Compatível com Worker 1.15.0 e Admin 3.10.0; sem migração SQL.
+- suporte a YouTube, Vimeo, MP4, WebM, OGG, MOV, M4V, HLS e links externos;
+- tipo automático ou escolhido pelo cliente, com validação de compatibilidade;
+- categoria, data, duração, miniatura e destaque;
+- miniatura automática para YouTube quando não houver imagem personalizada;
+- bloqueio de URL duplicada;
+- busca, filtros por publicação e categoria, e ordenação;
+- player incorporado ou abertura segura do link original.
 
 ## Instalação
 
-Substitua os arquivos do repositório `CentralRadiosBrasil-Portal-Cliente` pelos arquivos desta pasta e atualize com Ctrl+F5.
+Substitua os arquivos da v2.2.1 pelos arquivos desta pasta e atualize o navegador com Ctrl+F5. Preserve um backup da versão anterior.

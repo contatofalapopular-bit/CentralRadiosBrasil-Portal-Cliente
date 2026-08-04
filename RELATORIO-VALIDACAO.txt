@@ -1,6 +1,5 @@
-VALIDAÇÃO — Portal do Cliente v2.0.0 Integrado
-
-Resultado: 35/35 verificações aprovadas
+Central Rádios Brasil — Portal do Cliente v2.2.0
+Validação da Etapa 2 — Programação, Locutores, Notícias e Temas
 
 [OK] Arquivo index.html
 [OK] Arquivo styles.css
@@ -8,32 +7,28 @@ Resultado: 35/35 verificações aprovadas
 [OK] Arquivo config.js
 [OK] Arquivo manifest.webmanifest
 [OK] Arquivo README.md
-[OK] Arquivo RELATORIO-INTEGRACAO.md
+[OK] Sintaxe JavaScript
+[OK] Manifesto JSON
 [OK] HTML sem IDs duplicados
-[OK] ID login-view
-[OK] ID app-shell
-[OK] ID sidebar-nav
-[OK] ID page-root
-[OK] ID preview-dialog
-[OK] ID editor-modal
-[OK] Worker configurado
-[OK] Versão 2.0.0
-[OK] Endpoint /api/cliente/login
-[OK] Endpoint /api/cliente/sessao
-[OK] Endpoint /api/cliente/dashboard
-[OK] Endpoint /api/cliente/site
-[OK] Endpoint /api/cliente/site/rascunho
-[OK] Endpoint /api/cliente/site/midias
-[OK] Endpoint /api/cliente/site/solicitar-publicacao
-[OK] Endpoint /api/cliente/trocar-senha
-[OK] Endpoint /api/cliente/logout
-[OK] Sem localStorage
-[OK] Mapeamento remoto -> CMS
-[OK] Mapeamento CMS -> rascunho
-[OK] Namespace cms_v2
-[OK] Upload real de mídia
-[OK] Publicação supervisionada
-[OK] Dashboard sem audiência fictícia
-[OK] Prévia desktop/tablet/celular
-[OK] Manifest JSON válido
-[OK] Manifest standalone
+[OK] Versão 2.2.0 no config
+[OK] Versão 2.2.0 na interface
+[OK] Sem localStorage como banco
+[OK] Persistência Worker/D1
+[OK] Programação multi-dia
+[OK] Locutores com ordenação
+[OK] Notícias editoriais
+[OK] Duplicação de registros
+[OK] Filtros editoriais
+[OK] Morada preservado
+[OK] Tema spotify diferenciado
+[OK] Tema news diferenciado
+[OK] Tema gospel diferenciado
+[OK] Tema young diferenciado
+[OK] Tema custom diferenciado
+[OK] Mesmo conteúdo entre temas
+[OK] Fallback visual sem imagem
+[OK] Formulários acessíveis
+[OK] Teste visual automatizado — NO_ERRORS
+[OK] Teste funcional automatizado — FUNCTIONAL_OK 3 saves errors []
+
+Resultado: 29 de 29 verificações aprovadas.

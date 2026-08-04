@@ -88,34 +88,48 @@
   ];
 
   const themes = [
-    { id: "morada", name: "Rádio Morada Moderna", description: "Estrutura completa de rádio, notícias, programação e conteúdo local.", colors: ["#e31c45", "#121d31", "#f1a11a", "#f4f6f9"] },
-    { id: "spotify", name: "Rádio Spotify", description: "Visual escuro com foco em música, playlists e podcasts.", colors: ["#1db954", "#101114", "#87f9ad", "#f1f5f2"] },
-    { id: "news", name: "Rádio News", description: "Portal jornalístico com manchetes, categorias e transmissão ao vivo.", colors: ["#d71920", "#18202c", "#ffc928", "#f4f5f7"] },
-    { id: "gospel", name: "Rádio Gospel", description: "Paleta acolhedora para programação cristã e comunidade.", colors: ["#6e45e2", "#211f3c", "#f6c85f", "#f8f5ff"] },
-    { id: "young", name: "Rádio Jovem", description: "Cores vibrantes para música, promoções, vídeos e redes sociais.", colors: ["#ff2c84", "#27184c", "#4ce6ff", "#f8f3ff"] },
-    { id: "custom", name: "Tema Personalizado", description: "Use as cores e imagens definidas na área Minha Rádio.", colors: ["#138a7e", "#111827", "#f59e0b", "#f5f7fb"] }
+    { id: "morada", layout: "morada", name: "Rádio Morada Moderna", description: "Estrutura completa de rádio, notícias, programação e conteúdo local. Mantida como a referência aprovada.", colors: ["#e31c45", "#121d31", "#f1a11a", "#f4f6f9"] },
+    { id: "spotify", layout: "music", name: "Rádio Music", description: "Experiência escura e imersiva, com player em destaque, capas grandes e foco em podcasts e música.", colors: ["#20d776", "#090b0f", "#b7ffcf", "#11151b"] },
+    { id: "news", layout: "portal", name: "Rádio News", description: "Portal editorial claro, manchetes em primeiro plano, tipografia forte e programação compacta.", colors: ["#c91424", "#172033", "#f6b81a", "#f3f5f8"] },
+    { id: "gospel", layout: "community", name: "Rádio Gospel", description: "Visual acolhedor e luminoso, com formas suaves, agenda, programação e comunidade em evidência.", colors: ["#7357c8", "#2d2346", "#d7a73b", "#fff9ef"] },
+    { id: "young", layout: "bento", name: "Rádio Jovem", description: "Composição vibrante em blocos, player flutuante, vídeos e promoções com mais impacto visual.", colors: ["#ff3d8d", "#241342", "#45e3ff", "#fff4fb"] },
+    { id: "custom", layout: "clean", name: "Tema Personalizado", description: "Estrutura limpa e institucional que usa as cores escolhidas em Minha Rádio.", colors: ["#138a7e", "#111827", "#f59e0b", "#f5f7fb"] }
   ];
 
   const schemas = {
     programacao: {
       title: "Programação", singular: "programa", imageProfile: "square",
-      description: "Organize a grade por dia e horário. O programa no ar é identificado automaticamente pelo horário.",
+      description: "Monte a grade semanal, vincule locutores e evite conflitos de horário.",
       fields: [
-        ["titulo", "Nome do programa", "text", true], ["dia", "Dia da semana", "select", true, ["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"]],
-        ["inicio", "Início", "time", true], ["fim", "Fim", "time", true], ["locutor", "Locutor/apresentador", "text"],
-        ["descricao", "Descrição", "textarea"], ["imagem", "Imagem do programa", "image", false, "square"], ["ativo", "Ativo", "checkbox"]
+        ["titulo", "Nome do programa", "text", true],
+        ["categoria", "Categoria", "select", true, ["Jornalismo","Musical","Entretenimento","Religioso","Esportivo","Variedades","Outro"]],
+        ["dias", "Dias da semana", "multicheck", true, ["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"]],
+        ["inicio", "Início", "time", true], ["fim", "Fim", "time", true],
+        ["locutor", "Locutor/apresentador", "locutor-select"],
+        ["descricao", "Descrição", "textarea"], ["imagem", "Imagem do programa", "image", false, "square"],
+        ["cor", "Cor de identificação", "color"], ["ativo", "Ativo", "checkbox"]
       ],
-      summary: item => `${item.dia || "Dia"} • ${item.inicio || "--:--"} às ${item.fim || "--:--"}`
+      summary: item => `${formatDays(item.dias || item.dia)} • ${item.inicio || "--:--"} às ${item.fim || "--:--"}`
     },
     locutores: {
-      title: "Locutores", singular: "locutor", imageProfile: "square", description: "Cadastre os comunicadores da emissora.",
-      fields: [["nome","Nome","text",true],["cargo","Programa ou função","text"],["bio","Biografia","textarea"],["foto","Foto","image",false,"square"],["instagram","Instagram","text"],["ativo","Ativo","checkbox"]],
-      summary: item => item.cargo || "Locutor"
+      title: "Locutores", singular: "locutor", imageProfile: "square", description: "Cadastre comunicadores, organize a exibição e vincule-os à programação.",
+      fields: [
+        ["nome","Nome","text",true], ["cargo","Programa ou função","text"], ["bio","Biografia","textarea"],
+        ["foto","Foto","image",false,"square"], ["email","E-mail público","email"], ["telefone","Telefone público","text"],
+        ["instagram","Instagram","text"], ["facebook","Facebook","text"], ["ordem","Ordem de exibição","number"], ["ativo","Ativo","checkbox"]
+      ],
+      summary: item => `${item.cargo || "Locutor"}${item.ordem ? ` • Ordem ${item.ordem}` : ""}`
     },
     noticias: {
-      title: "Notícias", singular: "notícia", imageProfile: "news", description: "Publique matérias próprias, com categoria, imagem e resumo.",
-      fields: [["titulo","Título","text",true],["categoria","Categoria","text",true],["data","Data","date",true],["resumo","Resumo","textarea",true],["conteudo","Conteúdo completo","textarea"],["imagem","Imagem de capa","image",false,"news"],["destaque","Notícia em destaque","checkbox"],["ativo","Publicada","checkbox"]],
-      summary: item => `${item.categoria || "Notícias"} • ${formatDate(item.data)}`
+      title: "Notícias", singular: "notícia", imageProfile: "news", description: "Produza, agende e publique matérias com destaque, autoria e organização editorial.",
+      fields: [
+        ["titulo","Título","text",true], ["slug","Endereço amigável (slug)","text"], ["categoria","Categoria","text",true],
+        ["tags","Tags separadas por vírgula","text"], ["autor","Autor","locutor-select"], ["data","Data de publicação","date",true],
+        ["hora","Horário","time"], ["status","Situação editorial","select",true,["Rascunho","Agendada","Publicada","Arquivada"]],
+        ["resumo","Resumo","textarea",true], ["conteudo","Conteúdo completo","richtext"], ["imagem","Imagem de capa","image",false,"news"],
+        ["destaque","Notícia em destaque","checkbox"], ["ativo","Exibir no site quando publicada","checkbox"]
+      ],
+      summary: item => `${item.categoria || "Notícias"} • ${statusNewsLabel(item)} • ${formatDate(item.data)}`
     },
     podcasts: {
       title: "Podcasts", singular: "episódio", imageProfile: "square", description: "Organize programas gravados e episódios sob demanda.",
@@ -181,7 +195,7 @@
   function defaultState() {
     const today = new Date().toISOString().slice(0, 10);
     return {
-      version: "2.0.0",
+      version: "2.2.0",
       updatedAt: new Date().toISOString(),
       status: "rascunho",
       selectedTheme: "morada",
@@ -207,10 +221,10 @@
       modules: modulesCatalog.map(([id, label, description], index) => ({ id, label, description, enabled: !["eventos"].includes(id), order: index })),
       content: {
         programacao: [
-          { id: uid("prog"), titulo: "Amanhecer da Cidade", dia: "Segunda", inicio: "06:00", fim: "09:00", locutor: "Equipe Cidade", descricao: "Música, informação e prestação de serviço.", ativo: true },
-          { id: uid("prog"), titulo: "Jornal da Manhã", dia: "Segunda", inicio: "09:00", fim: "11:00", locutor: "Redação", descricao: "As principais notícias locais e do Brasil.", ativo: true },
-          { id: uid("prog"), titulo: "Tarde Sertaneja", dia: "Segunda", inicio: "14:00", fim: "17:00", locutor: "Central Rádios", descricao: "Os sucessos do sertanejo.", ativo: true },
-          { id: uid("prog"), titulo: "Noite Popular", dia: "Segunda", inicio: "19:00", fim: "22:00", locutor: "Equipe", descricao: "Participação dos ouvintes.", ativo: true }
+          { id: uid("prog"), titulo: "Amanhecer da Cidade", categoria: "Variedades", dias: ["Segunda","Terça","Quarta","Quinta","Sexta"], inicio: "06:00", fim: "09:00", locutor: "Equipe Cidade", descricao: "Música, informação e prestação de serviço.", ativo: true },
+          { id: uid("prog"), titulo: "Jornal da Manhã", categoria: "Jornalismo", dias: ["Segunda","Terça","Quarta","Quinta","Sexta"], inicio: "09:00", fim: "11:00", locutor: "Redação", descricao: "As principais notícias locais e do Brasil.", ativo: true },
+          { id: uid("prog"), titulo: "Tarde Sertaneja", categoria: "Musical", dias: ["Segunda","Terça","Quarta","Quinta","Sexta"], inicio: "14:00", fim: "17:00", locutor: "Central Rádios", descricao: "Os sucessos do sertanejo.", ativo: true },
+          { id: uid("prog"), titulo: "Noite Popular", categoria: "Entretenimento", dias: ["Segunda","Terça","Quarta","Quinta","Sexta"], inicio: "19:00", fim: "22:00", locutor: "Equipe", descricao: "Participação dos ouvintes.", ativo: true }
         ],
         locutores: [
           { id: uid("loc"), nome: "Apresentador 01", cargo: "Manhã da Cidade", bio: "Comunicador da emissora.", foto: "", ativo: true },
@@ -218,9 +232,9 @@
           { id: uid("loc"), nome: "Apresentador 03", cargo: "Tarde Sertaneja", bio: "Música e participação.", foto: "", ativo: true }
         ],
         noticias: [
-          { id: uid("news"), titulo: "Portal Cidade RV amplia cobertura de notícias locais", categoria: "Cidade", data: today, resumo: "Nova fase reforça informação, serviço e participação da comunidade.", conteudo: "", imagem: "", destaque: true, ativo: true },
-          { id: uid("news"), titulo: "Programação ganha novos espaços de música e jornalismo", categoria: "Rádio", data: today, resumo: "A emissora prepara novidades para os ouvintes.", imagem: "", destaque: false, ativo: true },
-          { id: uid("news"), titulo: "Comércio local participa de campanha promocional", categoria: "Economia", data: today, resumo: "Ação aproxima empresas e audiência.", imagem: "", destaque: false, ativo: true }
+          { id: uid("news"), titulo: "Portal Cidade RV amplia cobertura de notícias locais", categoria: "Cidade", data: today, resumo: "Nova fase reforça informação, serviço e participação da comunidade.", slug: "portal-cidade-rv-amplia-cobertura", status: "Publicada", autor: "Equipe Cidade", hora: "09:00", conteudo: "", imagem: "", destaque: true, ativo: true },
+          { id: uid("news"), titulo: "Programação ganha novos espaços de música e jornalismo", categoria: "Rádio", data: today, resumo: "A emissora prepara novidades para os ouvintes.", slug: "programacao-ganha-novos-espacos", status: "Publicada", autor: "Redação", hora: "10:00", imagem: "", destaque: false, ativo: true },
+          { id: uid("news"), titulo: "Comércio local participa de campanha promocional", categoria: "Economia", data: today, resumo: "Ação aproxima empresas e audiência.", slug: "comercio-local-participa-de-campanha", status: "Publicada", autor: "Equipe Comercial", hora: "11:00", imagem: "", destaque: false, ativo: true }
         ],
         podcasts: [
           { id: uid("pod"), titulo: "Entrevista da Semana", programa: "Cidade em Pauta", data: today, descricao: "Conversa com convidados sobre os assuntos da cidade.", audio: "", imagem: "", ativo: true },
@@ -267,6 +281,8 @@
   let currentPage = "dashboard";
   let editing = null;
   let searchTerm = "";
+  let collectionFilter = "todos";
+  let collectionSort = "recentes";
 
   function loadState() { return defaultState(); }
 
@@ -353,6 +369,8 @@
   function navigate(page) {
     currentPage = page;
     searchTerm = "";
+    collectionFilter = "todos";
+    collectionSort = "recentes";
     renderNav();
     renderPage();
     if (window.innerWidth <= 980) $("#sidebar").classList.remove("open");
@@ -422,7 +440,7 @@
       </div>
       <div class="grid-2 equal" style="margin-top:18px">
         <section class="card"><header class="card-header"><div><h3>Dados reais, sem números inventados</h3><p>Audiência e ouvintes.</p></div></header><div class="card-body"><div class="notice">O painel não exibe audiência fictícia. O número de ouvintes só será mostrado quando existir uma fonte técnica confiável do streaming.</div></div></section>
-        <section class="card"><header class="card-header"><div><h3>Integração ativa</h3><p>Ambiente utilizado nesta instalação.</p></div></header><div class="card-body"><div class="code-box">Portal: ${escapeHTML(CONFIG.VERSION || "2.0.0")}\nWorker: ${escapeHTML(CONFIG.WORKER_URL || "—")}\nPersistência: Cloudflare D1\nMídias: API do site\nPublicação: supervisionada pela Central</div></div></section>
+        <section class="card"><header class="card-header"><div><h3>Integração ativa</h3><p>Ambiente utilizado nesta instalação.</p></div></header><div class="card-body"><div class="code-box">Portal: ${escapeHTML(CONFIG.VERSION || "2.2.0")}\nWorker: ${escapeHTML(CONFIG.WORKER_URL || "—")}\nPersistência: Cloudflare D1\nMídias: API do site\nPublicação: supervisionada pela Central</div></div></section>
       </div>`;
     bindGoButtons(root);
   }
@@ -638,40 +656,107 @@
     });
   }
 
+  function themeLayoutLabel(layout) {
+    return ({morada:"rádio completa",music:"música e podcasts",portal:"portal de notícias",community:"comunidade",bento:"jovem em blocos",clean:"institucional limpa"})[layout] || layout;
+  }
+
+  function themeShotMarkup(theme) {
+    const layout = theme.layout || theme.id;
+    if (layout === "music") return `<div class="theme-shot-browser layout-music"><div class="theme-shot-top"></div><div class="theme-shot-music"><span></span><div></div></div><div class="theme-shot-rail"><i></i><i></i><i></i><i></i></div></div>`;
+    if (layout === "portal") return `<div class="theme-shot-browser layout-portal"><div class="theme-shot-top"></div><div class="theme-shot-headlines"><b></b><span></span><span></span></div><div class="theme-shot-ticker"></div></div>`;
+    if (layout === "community") return `<div class="theme-shot-browser layout-community"><div class="theme-shot-top"></div><div class="theme-shot-community"><b></b><span></span></div><div class="theme-shot-cards"><span></span><span></span><span></span></div></div>`;
+    if (layout === "bento") return `<div class="theme-shot-browser layout-bento"><div class="theme-shot-top"></div><div class="theme-shot-bento"><b></b><span></span><i></i><em></em></div></div>`;
+    if (layout === "clean") return `<div class="theme-shot-browser layout-clean"><div class="theme-shot-top"></div><div class="theme-shot-clean"><b></b><span></span></div><div class="theme-shot-cards"><span></span><span></span><span></span></div></div>`;
+    return `<div class="theme-shot-browser layout-morada"><div class="theme-shot-top"></div><div class="theme-shot-hero"></div><div class="theme-shot-cards"><span></span><span></span><span></span></div></div>`;
+  }
+
   function renderThemes(root) {
-    root.innerHTML = `${pageHeader("Temas", "Todos os temas usam o mesmo banco de conteúdo. A troca altera apenas apresentação e organização visual.")}
+    root.innerHTML = `${pageHeader("Temas", "Todos usam o mesmo conteúdo. Cada tema possui composição, hierarquia e identidade visual próprias.")}
       <div class="theme-grid">${themes.map(theme => {
         const [accent,dark,highlight,bg] = theme.colors;
-        return `<article class="theme-card ${theme.id === state.selectedTheme ? "selected" : ""}" data-theme-card="${theme.id}">${theme.id === state.selectedTheme ? `<span class="theme-selected-tag">Tema ativo</span>` : ""}<div class="theme-shot" style="--shot-bg:${bg};--shot-dark:${dark};--shot-accent:${accent};--shot-muted:${highlight}22"><div class="theme-shot-browser"><div class="theme-shot-top"></div><div class="theme-shot-hero"></div><div class="theme-shot-cards"><span></span><span></span><span></span></div></div></div><div class="theme-meta"><h3>${escapeHTML(theme.name)}</h3><p>${escapeHTML(theme.description)}</p><button class="button ${theme.id === state.selectedTheme ? "secondary" : "primary"} small" data-select-theme="${theme.id}" type="button">${theme.id === state.selectedTheme ? "Selecionado" : "Usar este tema"}</button> <button class="button ghost small" data-theme-preview="${theme.id}" type="button">Visualizar</button></div></article>`;
+        return `<article class="theme-card ${theme.id === state.selectedTheme ? "selected" : ""}" data-theme-card="${theme.id}">${theme.id === state.selectedTheme ? `<span class="theme-selected-tag">Tema ativo</span>` : ""}<div class="theme-shot" style="--shot-bg:${bg};--shot-dark:${dark};--shot-accent:${accent};--shot-highlight:${highlight};--shot-muted:${highlight}22">${themeShotMarkup(theme)}</div><div class="theme-meta"><span class="theme-layout-label">Composição ${escapeHTML(themeLayoutLabel(theme.layout))}</span><h3>${escapeHTML(theme.name)}</h3><p>${escapeHTML(theme.description)}</p><button class="button ${theme.id === state.selectedTheme ? "secondary" : "primary"} small" data-select-theme="${theme.id}" type="button">${theme.id === state.selectedTheme ? "Selecionado" : "Usar este tema"}</button> <button class="button ghost small" data-theme-preview="${theme.id}" type="button">Visualizar</button></div></article>`;
       }).join("")}</div>`;
     $$('[data-select-theme]', root).forEach(button => button.addEventListener("click", () => { state.selectedTheme = button.dataset.selectTheme; persist(); renderPage(); }));
     $$('[data-theme-preview]', root).forEach(button => button.addEventListener("click", () => { const old = state.selectedTheme; state.selectedTheme = button.dataset.themePreview; openPreview(); state.selectedTheme = old; }));
   }
 
+  function editorialStats(key, items) {
+    const active = items.filter(item => item.ativo !== false).length;
+    if (key === "noticias") {
+      const scheduled = items.filter(item => newsStatusValue(item) === "agendada").length;
+      const featured = items.filter(item => item.destaque && item.ativo !== false).length;
+      return [["Total",items.length],["Publicadas",items.filter(isNewsVisible).length],["Agendadas",scheduled],["Destaques",featured]];
+    }
+    if (key === "programacao") {
+      const days = new Set(items.flatMap(item => normalizeDays(item.dias || item.dia)));
+      return [["Programas",items.length],["Ativos",active],["Dias cobertos",days.size],["Locutores",new Set(items.map(i=>i.locutor).filter(Boolean)).size]];
+    }
+    if (key === "locutores") return [["Locutores",items.length],["Ativos",active],["Com foto",items.filter(i=>i.foto).length],["Na programação",new Set(state.content.programacao.map(i=>i.locutor).filter(Boolean)).size]];
+    return [];
+  }
+
+  function collectionFilters(key, allItems) {
+    const base = `<select id="collection-filter"><option value="todos" ${collectionFilter === "todos" ? "selected" : ""}>Todos os status</option><option value="ativos" ${collectionFilter === "ativos" ? "selected" : ""}>Ativos</option><option value="inativos" ${collectionFilter === "inativos" ? "selected" : ""}>Inativos</option></select>`;
+    if (key === "programacao") return `${base}<select id="collection-context-filter"><option value="todos">Todos os dias</option>${weekOrder.map(day=>`<option value="dia:${day}" ${collectionFilter === `dia:${day}` ? "selected" : ""}>${day}</option>`).join("")}</select>`;
+    if (key === "noticias") return `<select id="collection-filter"><option value="todos" ${collectionFilter === "todos" ? "selected" : ""}>Todas as situações</option>${["publicada","agendada","rascunho","arquivada"].map(value=>`<option value="news:${value}" ${collectionFilter === `news:${value}` ? "selected" : ""}>${value[0].toUpperCase()+value.slice(1)}</option>`).join("")}</select>`;
+    return base;
+  }
+
+  function filterAndSortCollection(key, source) {
+    let items = source.filter(item => !searchTerm || JSON.stringify(item).toLowerCase().includes(searchTerm.toLowerCase()));
+    if (collectionFilter === "ativos") items = items.filter(item => item.ativo !== false);
+    else if (collectionFilter === "inativos") items = items.filter(item => item.ativo === false);
+    else if (collectionFilter.startsWith("dia:")) items = items.filter(item => normalizeDays(item.dias || item.dia).includes(collectionFilter.slice(4)));
+    else if (collectionFilter.startsWith("news:")) items = items.filter(item => newsStatusValue(item) === collectionFilter.slice(5));
+    items = [...items];
+    if (key === "programacao") items.sort((a,b)=>Math.min(...normalizeDays(a.dias||a.dia).map(d=>weekOrder.indexOf(d)).filter(i=>i>=0),99)-Math.min(...normalizeDays(b.dias||b.dia).map(d=>weekOrder.indexOf(d)).filter(i=>i>=0),99) || compareTime(a.inicio,b.inicio));
+    else if (key === "locutores") items.sort((a,b)=>Number(a.ordem||999)-Number(b.ordem||999) || String(a.nome||"").localeCompare(String(b.nome||"")));
+    else if (key === "noticias") items.sort((a,b)=>Number(Boolean(b.destaque))-Number(Boolean(a.destaque)) || String(`${b.data||""} ${b.hora||""}`).localeCompare(String(`${a.data||""} ${a.hora||""}`)));
+    return items;
+  }
+
   function renderCollection(root,key) {
     const schema = schemas[key];
-    const items = (state.content[key] || []).filter(item => !searchTerm || JSON.stringify(item).toLowerCase().includes(searchTerm.toLowerCase()));
-    root.innerHTML = `${pageHeader(schema.title, schema.description, `<button class="button primary" id="new-item" type="button">+ Novo ${schema.singular}</button>`)}
-      <section class="table-card"><div class="table-toolbar"><div class="search-input"><input id="collection-search" type="search" placeholder="Buscar em ${schema.title.toLowerCase()}" value="${escapeHTML(searchTerm)}"></div><span class="badge info">${items.length} registro(s)</span></div>
-      ${items.length ? `<table class="data-table"><thead><tr><th>${schema.singular}</th><th>Resumo</th><th>Status</th><th style="text-align:right">Ações</th></tr></thead><tbody>${items.map(item => collectionRow(schema,key,item)).join("")}</tbody></table>` : `<div class="empty-state"><strong>Nenhum registro encontrado</strong><span>Use o botão “Novo” para começar.</span></div>`}</section>`;
+    const source = state.content[key] || [];
+    const items = filterAndSortCollection(key, source);
+    const stats = editorialStats(key, source);
+    const newItemLabel = key === "noticias" ? "+ Nova notícia" : `+ Novo ${schema.singular}`;
+    root.innerHTML = `${pageHeader(schema.title, schema.description, `<button class="button secondary" data-preview type="button">Ver no site</button><button class="button primary" id="new-item" type="button">${newItemLabel}</button>`)}
+      ${stats.length ? `<div class="editorial-kpis">${stats.map(([label,value])=>`<article><span>${escapeHTML(label)}</span><strong>${value}</strong></article>`).join("")}</div>` : ""}
+      <section class="table-card"><div class="table-toolbar editorial-toolbar"><div class="search-input"><input id="collection-search" type="search" placeholder="Buscar em ${schema.title.toLowerCase()}" value="${escapeHTML(searchTerm)}"></div><div class="collection-filters">${collectionFilters(key,source)}</div><span class="badge info">${items.length} de ${source.length}</span></div>
+      ${items.length ? `<div class="table-scroll"><table class="data-table"><thead><tr><th>${schema.singular}</th><th>Resumo</th><th>Status</th><th style="text-align:right">Ações</th></tr></thead><tbody>${items.map(item => collectionRow(schema,key,item)).join("")}</tbody></table></div>` : `<div class="empty-state"><strong>Nenhum registro encontrado</strong><span>Ajuste os filtros ou use o botão “Novo”.</span></div>`}</section>`;
     $("#new-item").addEventListener("click", () => openItemModal(key));
+    $$('[data-preview]',root).forEach(button=>button.addEventListener("click",openPreview));
     $("#collection-search").addEventListener("input", event => { searchTerm = event.target.value; renderCollection(root,key); $("#collection-search")?.focus(); });
+    $("#collection-filter")?.addEventListener("change", event => { collectionFilter=event.target.value; renderCollection(root,key); });
+    $("#collection-context-filter")?.addEventListener("change", event => { collectionFilter=event.target.value; renderCollection(root,key); });
     $$('[data-edit-item]', root).forEach(button => button.addEventListener("click", () => openItemModal(key,button.dataset.editItem)));
+    $$('[data-duplicate-item]', root).forEach(button => button.addEventListener("click", () => duplicateItem(key,button.dataset.duplicateItem)));
     $$('[data-delete-item]', root).forEach(button => button.addEventListener("click", () => deleteItem(key,button.dataset.deleteItem)));
     $$('[data-toggle-item]', root).forEach(button => button.addEventListener("click", () => toggleItem(key,button.dataset.toggleItem)));
   }
 
+  function collectionStatus(key,item) {
+    if (key === "noticias") {
+      const status = newsStatusValue(item);
+      return `<span class="badge status-${status}">${escapeHTML(statusNewsLabel(item))}</span>`;
+    }
+    return `<button class="badge ${item.ativo === false ? "inactive" : "active"}" data-toggle-item="${item.id}" type="button">${item.ativo === false ? "Inativo" : "Ativo"}</button>`;
+  }
+
   function collectionRow(schema,key,item) {
     const imageKey = ["imagem","foto","logo"].find(name => item[name]);
-    return `<tr><td><div class="row-main">${imageKey ? `<img class="row-thumb" src="${item[imageKey]}" alt="">` : `<span class="row-thumb" style="display:grid;place-items:center;font-weight:900;color:#94a3b8">${escapeHTML((item.titulo || item.nome || "CR").slice(0,2).toUpperCase())}</span>`}<div><strong>${escapeHTML(item.titulo || item.nome || "Sem título")}</strong><small>${escapeHTML(item.descricao || item.resumo || item.bio || "Sem descrição")}</small></div></div></td><td>${escapeHTML(schema.summary ? schema.summary(item) : "—")}</td><td><button class="badge ${item.ativo === false ? "inactive" : "active"}" data-toggle-item="${item.id}" type="button">${item.ativo === false ? "Inativo" : "Ativo"}</button></td><td><div class="row-actions"><button class="button small secondary" data-edit-item="${item.id}" type="button">Editar</button><button class="button small danger" data-delete-item="${item.id}" type="button">Excluir</button></div></td></tr>`;
+    const description = item.descricao || item.resumo || item.bio || (key === "noticias" ? item.tags : "") || "Sem descrição";
+    return `<tr><td><div class="row-main">${imageKey ? `<img class="row-thumb" src="${item[imageKey]}" alt="">` : `<span class="row-thumb row-thumb-placeholder">${escapeHTML((item.titulo || item.nome || "CR").slice(0,2).toUpperCase())}</span>`}<div><strong>${escapeHTML(item.titulo || item.nome || "Sem título")}</strong><small>${escapeHTML(description)}</small></div></div></td><td>${escapeHTML(schema.summary ? schema.summary(item) : "—")}</td><td>${collectionStatus(key,item)}</td><td><div class="row-actions"><button class="button small secondary" data-edit-item="${item.id}" type="button">Editar</button><button class="button small ghost" data-duplicate-item="${item.id}" type="button">Duplicar</button><button class="button small danger" data-delete-item="${item.id}" type="button">Excluir</button></div></td></tr>`;
   }
 
   function openItemModal(key,id=null) {
     const schema = schemas[key];
-    const item = id ? state.content[key].find(entry => entry.id === id) : { ativo: true };
+    const base = key === "noticias" ? { ativo:true, status:"Rascunho", data:new Date().toISOString().slice(0,10) } : key === "programacao" ? { ativo:true, dias:["Segunda","Terça","Quarta","Quinta","Sexta"], cor:"#e31c45" } : { ativo:true };
+    const item = id ? state.content[key].find(entry => entry.id === id) : base;
     editing = { key, id };
     $("#modal-eyebrow").textContent = schema.title;
-    $("#modal-title").textContent = id ? `Editar ${schema.singular}` : `Novo ${schema.singular}`;
+    $("#modal-title").textContent = id ? `Editar ${schema.singular}` : (key === "noticias" ? "Nova notícia" : `Novo ${schema.singular}`);
     $("#modal-fields").innerHTML = `<div class="form-grid">${schema.fields.map(field => modalFieldHTML(field,item)).join("")}</div>`;
     bindImageInputs($("#modal-fields"));
     $("#editor-modal").showModal();
@@ -680,11 +765,34 @@
   function modalFieldHTML(field,item) {
     const [name,label,type,required,extra] = field;
     const value = item[name] ?? "";
-    if (type === "textarea") return `<div class="field full"><label>${escapeHTML(label)}</label><textarea name="${name}" ${required ? "required" : ""}>${escapeHTML(value)}</textarea></div>`;
-    if (type === "select") return `<div class="field"><label>${escapeHTML(label)}</label><select name="${name}" ${required ? "required" : ""}><option value="">Selecione</option>${extra.map(option => `<option value="${escapeHTML(option)}" ${option === value ? "selected" : ""}>${escapeHTML(option)}</option>`).join("")}</select></div>`;
-    if (type === "checkbox") return `<div class="field"><span class="field-label">${escapeHTML(label)}</span><div class="toggle-row"><div><strong>${value === false ? "Desativado" : "Ativado"}</strong><small>Altere o status deste registro.</small></div><label class="switch"><input type="checkbox" name="${name}" ${value === false ? "" : "checked"}><span></span></label></div></div>`;
+    const inputId = `modal-field-${name}`;
+    if (type === "textarea" || type === "richtext") return `<div class="field full"><label for="${inputId}">${escapeHTML(label)}</label><textarea id="${inputId}" class="${type === "richtext" ? "rich-editor" : ""}" name="${name}" ${required ? "required" : ""}>${escapeHTML(value)}</textarea>${type === "richtext" ? `<small class="field-help">Use parágrafos curtos. A formatação avançada será incorporada na etapa do editor editorial.</small>` : ""}</div>`;
+    if (type === "select") return `<div class="field"><label for="${inputId}">${escapeHTML(label)}</label><select id="${inputId}" name="${name}" ${required ? "required" : ""}><option value="">Selecione</option>${extra.map(option => `<option value="${escapeHTML(option)}" ${String(option).toLowerCase() === String(value).toLowerCase() ? "selected" : ""}>${escapeHTML(option)}</option>`).join("")}</select></div>`;
+    if (type === "locutor-select") { const options=state.content.locutores.filter(i=>i.ativo!==false); return `<div class="field"><label for="${inputId}">${escapeHTML(label)}</label><select id="${inputId}" name="${name}"><option value="">Sem vínculo</option>${options.map(loc=>`<option value="${escapeHTML(loc.nome)}" ${loc.nome === value ? "selected" : ""}>${escapeHTML(loc.nome)}${loc.cargo?` — ${escapeHTML(loc.cargo)}`:""}</option>`).join("")}</select></div>`; }
+    if (type === "multicheck") { const selected=normalizeDays(value); return `<fieldset class="field full checkbox-fieldset"><legend>${escapeHTML(label)}${required?" *":""}</legend><div class="checkbox-grid">${extra.map(option=>`<label><input type="checkbox" name="${name}" value="${escapeHTML(option)}" ${selected.includes(option)?"checked":""}><span>${escapeHTML(option)}</span></label>`).join("")}</div></fieldset>`; }
+    if (type === "checkbox") return `<div class="field"><span class="field-label">${escapeHTML(label)}</span><div class="toggle-row"><div><strong>${value === false ? "Desativado" : "Ativado"}</strong><small>Altere o status deste registro.</small></div><label class="switch"><input aria-label="${escapeHTML(label)}" type="checkbox" name="${name}" ${value === false ? "" : "checked"}><span></span></label></div></div>`;
     if (type === "image") return mediaFieldHTML(name,label,extra || "news",value);
-    return `<div class="field"><label>${escapeHTML(label)}</label><input name="${name}" type="${type}" value="${escapeHTML(value)}" ${required ? "required" : ""}></div>`;
+    return `<div class="field"><label for="${inputId}">${escapeHTML(label)}</label><input id="${inputId}" name="${name}" type="${type}" value="${escapeHTML(value)}" ${required ? "required" : ""}></div>`;
+  }
+
+  function validateEditorialItem(key,item,id) {
+    if (key === "programacao") {
+      const days=normalizeDays(item.dias);
+      if (!days.length) return "Selecione ao menos um dia da semana.";
+      if (!item.inicio || !item.fim || item.inicio >= item.fim) return "O horário final deve ser posterior ao horário inicial.";
+      const conflict=state.content.programacao.find(other=>other.id!==id && other.ativo!==false && item.ativo!==false && normalizeDays(other.dias||other.dia).some(day=>days.includes(day)) && item.inicio < other.fim && item.fim > other.inicio);
+      if (conflict) return `Conflito com “${conflict.titulo}” (${formatDays(conflict.dias||conflict.dia)}, ${conflict.inicio}–${conflict.fim}).`;
+    }
+    if (key === "noticias") {
+      item.slug=slugify(item.slug || item.titulo);
+      const duplicate=state.content.noticias.find(other=>other.id!==id && slugify(other.slug||other.titulo)===item.slug);
+      if (duplicate) return "Já existe uma notícia com o mesmo endereço amigável.";
+      item.status=statusNewsLabel(item);
+      if (item.status === "Agendada" && (!item.data || !item.hora)) return "Informe data e horário para uma notícia agendada.";
+      item.ativo = item.status === "Publicada" ? item.ativo !== false : item.ativo !== false;
+    }
+    if (key === "locutores") item.ordem=Number(item.ordem||0);
+    return "";
   }
 
   function saveModal(event) {
@@ -693,14 +801,30 @@
     if (!editing) return;
     const { key,id } = editing, schema = schemas[key], form = new FormData($("#editor-form"));
     if (!$("#editor-form").checkValidity()) { $("#editor-form").reportValidity(); return; }
-    const item = id ? state.content[key].find(entry => entry.id === id) : { id: uid(key) };
-    schema.fields.forEach(([name,,type]) => item[name] = type === "checkbox" ? form.has(name) : String(form.get(name) || "").trim());
+    const item = id ? state.content[key].find(entry => entry.id === id) : { id: uid(key), criadoEm:new Date().toISOString() };
+    schema.fields.forEach(([name,,type]) => {
+      if (type === "checkbox") item[name]=form.has(name);
+      else if (type === "multicheck") item[name]=form.getAll(name).map(value=>String(value));
+      else if (type === "number") item[name]=Number(form.get(name)||0);
+      else item[name]=String(form.get(name)||"").trim();
+    });
+    item.atualizadoEm=new Date().toISOString();
+    const validation=validateEditorialItem(key,item,id);
+    if (validation) return notify(validation,"error");
     if (!id) state.content[key].unshift(item);
     persist(false);
-    $("#editor-modal").close();
-    editing = null;
-    renderPage();
+    $("#editor-modal").close(); editing=null; renderPage();
     notify(id ? "Registro atualizado." : "Registro criado.", "success");
+  }
+
+  function duplicateItem(key,id) {
+    const source=state.content[key].find(entry=>entry.id===id); if(!source)return;
+    const clone=JSON.parse(JSON.stringify(source)); clone.id=uid(key); clone.criadoEm=new Date().toISOString(); clone.atualizadoEm=clone.criadoEm;
+    if (clone.titulo) clone.titulo=`${clone.titulo} — cópia`;
+    if (clone.nome) clone.nome=`${clone.nome} — cópia`;
+    if (key === "noticias") { clone.slug=slugify(`${clone.slug||clone.titulo}-copia`); clone.status="Rascunho"; clone.destaque=false; }
+    if (key === "programacao") { clone.ativo=false; }
+    state.content[key].unshift(clone); persist(false); renderPage(); notify("Cópia criada para revisão.","success");
   }
 
   function deleteItem(key,id) {
@@ -828,7 +952,7 @@
         <section class="card"><div class="card-body"><h3>Exportar JSON</h3><p class="field-help">Baixa configurações, módulos, temas e conteúdos.</p><button class="button primary" id="export-backup" type="button">Baixar backup</button></div></section>
         <section class="card"><div class="card-body"><h3>Importar JSON</h3><p class="field-help">Carrega o arquivo no editor; clique em Salvar rascunho para gravar no D1.</p><button class="button secondary" id="import-backup" type="button">Selecionar arquivo</button></div></section>
         <section class="card"><div class="card-body"><h3>Recarregar do servidor</h3><p class="field-help">Descarta alterações ainda não salvas e recarrega o último rascunho do servidor.</p><button class="button danger" id="reset-demo" type="button">Recarregar dados</button></div></section>
-      </div><section class="card" style="margin-top:18px"><header class="card-header"><div><h3>Sobre esta instalação</h3><p>Informações técnicas.</p></div></header><div class="card-body"><div class="code-box">Modo: produção integrada\nVersão: ${CONFIG.VERSION || "2.0.0"}\nPersistência: Cloudflare D1\nAPI: ${CONFIG.WORKER_URL || "não configurada"}\nÚltima alteração: ${formatDateTime(state.updatedAt)}</div></div></section>`;
+      </div><section class="card" style="margin-top:18px"><header class="card-header"><div><h3>Sobre esta instalação</h3><p>Informações técnicas.</p></div></header><div class="card-body"><div class="code-box">Modo: produção integrada\nVersão: ${CONFIG.VERSION || "2.2.0"}\nPersistência: Cloudflare D1\nAPI: ${CONFIG.WORKER_URL || "não configurada"}\nÚltima alteração: ${formatDateTime(state.updatedAt)}</div></div></section>`;
     $("#export-backup").addEventListener("click",exportBackup);
     $("#import-backup").addEventListener("click",()=>$("#backup-import").click());
     $("#reset-demo").addEventListener("click",()=>{if(confirm("Descartar alterações não salvas e recarregar o rascunho do servidor?")) loadAll();});
@@ -854,9 +978,41 @@
 
   function themeById(id) { return themes.find(theme=>theme.id===id) || themes[0]; }
 
+  const weekOrder = ["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"];
+  function normalizeDays(value) {
+    if (Array.isArray(value)) return value.filter(Boolean);
+    if (!value) return [];
+    return String(value).split(",").map(item => item.trim()).filter(Boolean);
+  }
+  function formatDays(value) {
+    const days = normalizeDays(value);
+    if (!days.length) return "Sem dia definido";
+    if (days.length === 7) return "Todos os dias";
+    if (days.length === 5 && ["Segunda","Terça","Quarta","Quinta","Sexta"].every(day => days.includes(day))) return "Segunda a sexta";
+    return days.join(", ");
+  }
+  function slugify(value) {
+    return String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+  }
+  function newsStatusValue(item) {
+    return String(item.status || (item.ativo === false ? "Rascunho" : "Publicada")).toLowerCase();
+  }
+  function statusNewsLabel(item) {
+    const value = newsStatusValue(item);
+    return ({rascunho:"Rascunho",agendada:"Agendada",publicada:"Publicada",arquivada:"Arquivada"})[value] || "Publicada";
+  }
+  function isNewsVisible(item) {
+    if (item.ativo === false) return false;
+    const status = newsStatusValue(item);
+    if (["rascunho","arquivada"].includes(status)) return false;
+    const date = item.data ? new Date(`${item.data}T${item.hora || "00:00"}:00`) : null;
+    if (status === "agendada") return Boolean(date && !Number.isNaN(date.getTime()) && date.getTime() <= Date.now());
+    return status === "publicada";
+  }
+  function compareTime(a,b) { return String(a || "99:99").localeCompare(String(b || "99:99")); }
+
   function renderSitePreview(container) {
     if (!container) return;
-    const theme = themeById(state.selectedTheme);
     const r = state.radio;
     const customStyle = state.selectedTheme === "custom" ? `--site-primary:${r.cores.primaria};--site-secondary:${r.cores.secundaria};--site-accent:${r.cores.destaque};--site-bg:${r.cores.fundo};` : "";
     const enabled = new Set(activeModules().map(m=>m.id));
@@ -864,9 +1020,17 @@
     const sections = {
       hero: () => siteHero(r), player: () => sitePlayer(r), programacao: () => siteProgramming(), noticias: () => siteNews(), promocoes: () => sitePromotions(), podcasts: () => sitePodcasts(), videos: () => siteVideos(), equipe: () => siteTeam(), galeria: () => siteGallery(), eventos: () => siteEvents(), publicidade: () => siteAdvertising(), parceiros: () => sitePartners(), aplicativo: () => siteApp(), contato: () => siteContact()
     };
-    container.innerHTML = `<div class="site-preview theme-${state.selectedTheme}" style="${customStyle}${r.hero ? `--hero-image:url('${r.hero}')` : ""}">${siteHeader(r)}${ordered.filter(id=>enabled.has(id)&&sections[id]).map(id=>sections[id]()).join("")}${siteFooter(r)}</div>`;
-    const play = $("[data-site-play]",container);
-    play?.addEventListener("click",()=>toggleAudio(play));
+    const section=(id)=>enabled.has(id)&&sections[id]?sections[id]():"";
+    const rest=(skip)=>ordered.filter(id=>!skip.has(id)&&enabled.has(id)&&sections[id]).map(id=>sections[id]()).join("");
+    let body="";
+    if (state.selectedTheme === "spotify") body=`${siteHeader(r)}<div class="theme-stage theme-stage-music">${section("player")}${section("hero")}</div>${section("podcasts")}${rest(new Set(["hero","player","podcasts"]))}`;
+    else if (state.selectedTheme === "news") body=`${siteHeader(r)}<div class="theme-stage theme-stage-news">${section("hero")}${section("noticias")}</div>${section("player")}${rest(new Set(["hero","noticias","player"]))}`;
+    else if (state.selectedTheme === "gospel") body=`${siteHeader(r)}${section("hero")}<div class="theme-stage theme-stage-community">${section("player")}${section("programacao")}</div>${rest(new Set(["hero","player","programacao"]))}`;
+    else if (state.selectedTheme === "young") body=`${siteHeader(r)}<div class="theme-stage theme-stage-young">${section("player")}${section("hero")}</div><div class="theme-young-featured">${section("promocoes")}${section("videos")}</div>${rest(new Set(["hero","player","promocoes","videos"]))}`;
+    else if (state.selectedTheme === "custom") body=`${siteHeader(r)}<div class="theme-stage theme-stage-clean">${section("hero")}${section("player")}</div>${rest(new Set(["hero","player"]))}`;
+    else body=`${siteHeader(r)}${ordered.filter(id=>enabled.has(id)&&sections[id]).map(id=>sections[id]()).join("")}`;
+    container.innerHTML = `<div class="site-preview theme-${state.selectedTheme}" style="${customStyle}${r.hero ? `--hero-image:url('${r.hero}')` : ""}">${body}${siteFooter(r)}</div>`;
+    $$('[data-site-play]',container).forEach(play=>play.addEventListener("click",()=>toggleAudio(play)));
   }
 
   function siteHeader(r) {
@@ -875,12 +1039,12 @@
 
   function siteHero(r) { return `<section class="site-hero"><div class="site-hero-content"><span class="site-kicker">● Rádio e notícias de ${escapeHTML(r.cidade)}</span><h1>${escapeHTML(r.slogan || r.nome)}</h1><p>${escapeHTML(r.descricao)}</p><div class="site-hero-actions"><button class="primary" data-site-play type="button">▶ Ouvir agora</button><button class="secondary" type="button">Conheça a programação</button></div></div></section>`; }
   function sitePlayer(r) { return `<div class="site-player-wrap"><section class="site-player"><div class="site-cover">${r.playerImage?`<img src="${r.playerImage}" alt="Capa do player">`:`♫`}</div><div class="site-track"><span>Ao vivo agora</span><strong>${escapeHTML(r.musicaAtual||"Transmissão ao vivo")}</strong><small>${escapeHTML(r.locutorAtual||"Programação da rádio")}</small></div><div class="site-player-controls"><button class="site-app" type="button">Baixar app</button><button class="site-play" data-site-play type="button">▶</button></div></section></div>`; }
-  function siteProgramming() { const items=state.content.programacao.filter(i=>i.ativo!==false).slice(0,4); return `<section class="site-section"><div class="site-section-head"><div><span>No ar e próximos</span><h2>Programação</h2><p>Conteúdo organizado por dia e horário.</p></div><strong class="site-section-link">Ver grade completa →</strong></div><div class="site-program-grid">${items.map((i,index)=>`<article class="site-program-card ${index===0?"live":""}"><div class="site-program-time">${index===0?"AGORA":escapeHTML(i.inicio||"")}</div><strong>${escapeHTML(i.titulo)}</strong><small>${escapeHTML(i.locutor||i.dia||"")}</small></article>`).join("")}</div></section>`; }
-  function siteNews() { const items=state.content.noticias.filter(i=>i.ativo!==false).slice(0,3); return `<section class="site-section alt"><div class="site-section-head"><div><span>Informação</span><h2>Últimas notícias</h2><p>Cidade, esporte, agronegócio e os assuntos do dia.</p></div><strong class="site-section-link">Todas as notícias →</strong></div><div class="site-news-grid">${items.map((i,index)=>`<article class="site-news-card ${index===0?"featured":""}"><div class="site-news-image">${i.imagem?`<img src="${i.imagem}" alt="">`:""}</div><div class="site-news-body"><span>${escapeHTML(i.categoria||"Notícias")}</span><h3>${escapeHTML(i.titulo)}</h3><p>${escapeHTML(i.resumo||"")}</p></div></article>`).join("")}</div></section>`; }
+  function siteProgramming() { const items=[...state.content.programacao].filter(i=>i.ativo!==false).sort((a,b)=>compareTime(a.inicio,b.inicio)).slice(0,4); return `<section class="site-section"><div class="site-section-head"><div><span>No ar e próximos</span><h2>Programação</h2><p>Conteúdo organizado por dia e horário.</p></div><strong class="site-section-link">Ver grade completa →</strong></div><div class="site-program-grid">${items.map((i,index)=>`<article class="site-program-card ${index===0?"live":""}" style="${i.cor?`--program-color:${i.cor}`:""}"><div class="site-program-time">${index===0?"AGORA":escapeHTML(i.inicio||"")}</div><strong>${escapeHTML(i.titulo)}</strong><small>${escapeHTML(i.locutor||formatDays(i.dias||i.dia))}</small></article>`).join("")}</div></section>`; }
+  function siteNews() { const items=[...state.content.noticias].filter(isNewsVisible).sort((a,b)=>Number(Boolean(b.destaque))-Number(Boolean(a.destaque)) || String(`${b.data||""}${b.hora||""}`).localeCompare(String(`${a.data||""}${a.hora||""}`))).slice(0,4); return `<section class="site-section alt"><div class="site-section-head"><div><span>Informação</span><h2>Últimas notícias</h2><p>Cidade, esporte, agronegócio e os assuntos do dia.</p></div><strong class="site-section-link">Todas as notícias →</strong></div><div class="site-news-grid">${items.map((i,index)=>`<article class="site-news-card ${index===0?"featured":""}"><div class="site-news-image">${i.imagem?`<img src="${i.imagem}" alt="">`:""}</div><div class="site-news-body"><span>${escapeHTML(i.categoria||"Notícias")}</span><h3>${escapeHTML(i.titulo)}</h3><p>${escapeHTML(i.resumo||"")}</p><small class="site-news-meta">${escapeHTML(i.autor||"")} ${i.data?`• ${formatDate(i.data)}`:""}</small></div></article>`).join("")}</div></section>`; }
   function sitePromotions() { const items=state.content.promocoes.filter(i=>i.ativo!==false).slice(0,3); if(!items.length)return ""; return `<section class="site-section"><div class="site-section-head"><div><span>Participe</span><h2>Promoções</h2><p>Ações para aproximar a rádio e seus ouvintes.</p></div></div><div class="site-promo-grid">${items.map(i=>`<article class="site-promo-card" style="${i.imagem?`--card-image:url('${i.imagem}')`:""}"><span>Promoção</span><strong>${escapeHTML(i.titulo)}</strong><small>${escapeHTML(i.descricao||"")}</small></article>`).join("")}</div></section>`; }
   function sitePodcasts() { const items=state.content.podcasts.filter(i=>i.ativo!==false).slice(0,3); if(!items.length)return ""; return `<section class="site-section dark"><div class="site-section-head"><div><span>Ouça quando quiser</span><h2>Podcasts</h2><p>Entrevistas, boletins e programas gravados.</p></div></div><div class="site-podcast-grid">${items.map(i=>`<article class="site-podcast-card"><div class="site-podcast-cover">${i.imagem?`<img src="${i.imagem}" alt="">`:`◉`}</div><div><strong>${escapeHTML(i.titulo)}</strong><small>${escapeHTML(i.programa||i.descricao||"")}</small></div></article>`).join("")}</div></section>`; }
   function siteVideos() { const items=state.content.videos.filter(i=>i.ativo!==false).slice(0,3); if(!items.length)return ""; return `<section class="site-section alt"><div class="site-section-head"><div><span>Assista</span><h2>Vídeos</h2><p>Entrevistas, música e bastidores.</p></div></div><div class="site-news-grid">${items.map((i,index)=>`<article class="site-news-card ${index===0?"featured":""}"><div class="site-news-image">${i.imagem?`<img src="${i.imagem}" alt="">`:""}</div><div class="site-news-body"><span>${escapeHTML(i.categoria||"Vídeo")}</span><h3>▶ ${escapeHTML(i.titulo)}</h3><p>${escapeHTML(i.descricao||"")}</p></div></article>`).join("")}</div></section>`; }
-  function siteTeam() { const items=[...state.content.locutores,...state.content.equipe].filter(i=>i.ativo!==false).slice(0,5); if(!items.length)return ""; return `<section class="site-section"><div class="site-section-head"><div><span>Quem faz</span><h2>Nossa equipe</h2><p>As vozes e profissionais da emissora.</p></div></div><div class="site-team-grid">${items.map(i=>`<article class="site-team-card"><div class="site-team-photo">${i.foto?`<img src="${i.foto}" alt="">`:""}</div><strong>${escapeHTML(i.nome)}</strong><small>${escapeHTML(i.cargo||"")}</small></article>`).join("")}</div></section>`; }
+  function siteTeam() { const items=[...state.content.locutores].sort((a,b)=>Number(a.ordem||999)-Number(b.ordem||999)).concat(state.content.equipe).filter(i=>i.ativo!==false).slice(0,5); if(!items.length)return ""; return `<section class="site-section"><div class="site-section-head"><div><span>Quem faz</span><h2>Nossa equipe</h2><p>As vozes e profissionais da emissora.</p></div></div><div class="site-team-grid">${items.map(i=>`<article class="site-team-card"><div class="site-team-photo">${i.foto?`<img src="${i.foto}" alt="">`:""}</div><strong>${escapeHTML(i.nome)}</strong><small>${escapeHTML(i.cargo||"")}</small></article>`).join("")}</div></section>`; }
   function siteGallery() { const items=state.content.galeria.filter(i=>i.ativo!==false).slice(0,5); if(!items.length)return ""; return `<section class="site-section alt"><div class="site-section-head"><div><span>Imagens</span><h2>Galeria</h2><p>Eventos, bastidores e momentos da rádio.</p></div></div><div class="site-gallery-grid">${items.map(i=>`<div>${i.imagem?`<img src="${i.imagem}" alt="${escapeHTML(i.titulo)}">`:""}</div>`).join("")}</div></section>`; }
   function siteEvents() { const items=state.content.eventos.filter(i=>i.ativo!==false).slice(0,3); if(!items.length)return ""; return `<section class="site-section"><div class="site-section-head"><div><span>Agenda</span><h2>Próximos eventos</h2></div></div><div class="site-promo-grid">${items.map(i=>`<article class="site-promo-card" style="${i.imagem?`--card-image:url('${i.imagem}')`:""}"><span>${formatDate(i.data)}</span><strong>${escapeHTML(i.titulo)}</strong><small>${escapeHTML(i.local||"")}</small></article>`).join("")}</div></section>`; }
   function siteAdvertising() { const item=state.content.publicidade.find(i=>i.ativo!==false); if(!item)return ""; return `<section class="site-section"><div class="site-sponsor" style="height:80px">${item.imagem?`<img src="${item.imagem}" alt="Publicidade">`:`ESPAÇO PUBLICITÁRIO`}</div></section>`; }
@@ -964,14 +1128,14 @@
 
   function mapRemoteToState(site,dashboard) {
     const fresh=defaultState(), content=site.conteudoRascunho || site.conteudoPublicado || {}, texts=content.textos_institucionais || {}, cms=texts.cms_v2 || {}, contacts=content.contatos || {}, whats=typeof content.whatsapp === "string" ? {numero:content.whatsapp} : (content.whatsapp || {}), colors=content.cores || {}, apps=content.links_aplicativos || {}, banners=content.banners || {};
-    fresh.version="2.0.0"; fresh.updatedAt=versions[0]?.criado_em || new Date().toISOString(); fresh.status=site.status_publicacao || "sem_rascunho"; fresh.selectedTheme=cms.selectedTheme || "morada";
+    fresh.version="2.2.0"; fresh.updatedAt=versions[0]?.criado_em || new Date().toISOString(); fresh.status=site.status_publicacao || "sem_rascunho"; fresh.selectedTheme=cms.selectedTheme || "morada";
     fresh.radio={...fresh.radio,nome:content.nome || site.nome_site || dashboard?.cliente?.nome_radio || "Minha rádio",slogan:content.slogan || "",descricao:content.descricao || texts.sobre || "",cidade:contacts.cidade || dashboard?.cliente?.cidade || "",estado:contacts.estado || dashboard?.cliente?.estado || "",email:contacts.email || dashboard?.cliente?.email || "",telefone:contacts.telefone || "",whatsapp:whats.numero || "",endereco:contacts.endereco || "",streamUrl:site.stream_url || "",musicaAtual:texts.player?.titulo || "Transmissão ao vivo",locutorAtual:texts.player?.subtitulo || "Programação da rádio",logo:content.logo || "",hero:content.capa || "",playerImage:texts.player?.imagem || "",cores:{primaria:colors.primaria || "#e31c45",secundaria:colors.secundaria || "#121d31",destaque:colors.destaque || "#f1a11a",fundo:colors.fundo || "#f4f6f9"},listenersEnabled:false};
     const moduleValues=texts.modulos || {}; const savedModules=safeArray(cms.modules);
     fresh.modules=modulesCatalog.map(([id,label,description],index)=>{const saved=savedModules.find(m=>m.id===id);return{id,label,description,enabled:saved? saved.enabled!==false : moduleValues[id]!==false,order:Number(saved?.order ?? index)};});
     fresh.content={
-      programacao:ensureIds(safeArray(content.programacao).map(i=>({...i,titulo:i.titulo||i.programa||"",locutor:i.locutor||i.apresentador||"",ativo:i.ativo!==false})),"prog"),
-      locutores:ensureIds(safeArray(content.locutores).map(i=>({...i,cargo:i.cargo||i.funcao||"",bio:i.bio||i.descricao||"",ativo:i.ativo!==false})),"loc"),
-      noticias:ensureIds(safeArray(content.noticias).map(i=>({...i,ativo:i.ativo!==false})),"news"),
+      programacao:ensureIds(safeArray(content.programacao).map(i=>({...i,titulo:i.titulo||i.programa||"",locutor:i.locutor||i.apresentador||"",dias:normalizeDays(i.dias||i.dia),categoria:i.categoria||"Variedades",cor:i.cor||"#e31c45",ativo:i.ativo!==false})),"prog"),
+      locutores:ensureIds(safeArray(content.locutores).map((i,index)=>({...i,cargo:i.cargo||i.funcao||"",bio:i.bio||i.descricao||"",ordem:Number(i.ordem||index+1),ativo:i.ativo!==false})),"loc"),
+      noticias:ensureIds(safeArray(content.noticias).map(i=>({...i,slug:i.slug||slugify(i.titulo),status:i.status|| (i.ativo===false?"Rascunho":"Publicada"),hora:i.hora||"",ativo:i.ativo!==false})),"news"),
       podcasts:ensureIds(texts.podcasts,"pod"), videos:ensureIds(texts.videos,"vid"), promocoes:ensureIds(texts.promocoes,"promo"), galeria:ensureIds(texts.galeria,"foto"), eventos:ensureIds(texts.eventos,"evento"),
       equipe:ensureIds(cms.content?.equipe,"team"), publicidade:ensureIds(banners.publicidades,"ad"),
       parceiros:ensureIds(safeArray(content.patrocinadores).map(i=>({...i,link:i.link||i.site||"",ativo:i.ativo!==false})),"part"),
@@ -995,13 +1159,13 @@
     if(can("contatos"))content.contatos={...(content.contatos||{}),email:state.radio.email,telefone:state.radio.telefone,endereco:state.radio.endereco,cidade:state.radio.cidade,estado:state.radio.estado};
     if(can("whatsapp"))content.whatsapp={...(typeof content.whatsapp==="object"?content.whatsapp:{}),numero:state.integrations.whatsapp.numero||state.radio.whatsapp,mensagem:state.integrations.whatsapp.mensagem,flutuante:state.integrations.whatsapp.flutuante};
     if(can("redes_sociais"))content.redes_sociais={instagram:state.integrations.redes.instagram,facebook:state.integrations.redes.facebook,youtube:state.integrations.redes.youtube,tiktok:state.integrations.redes.tiktok,xTwitter:state.integrations.redes.x,spotify:state.integrations.redes.spotify};
-    if(can("programacao"))content.programacao=state.content.programacao.map(i=>({...i,programa:i.titulo,apresentador:i.locutor}));
+    if(can("programacao"))content.programacao=state.content.programacao.map(i=>({...i,dia:normalizeDays(i.dias||i.dia)[0]||"",programa:i.titulo,apresentador:i.locutor}));
     if(can("locutores"))content.locutores=state.content.locutores.map(i=>({...i,funcao:i.cargo,descricao:i.bio}));
     if(can("noticias"))content.noticias=state.content.noticias;
     if(can("patrocinadores"))content.patrocinadores=state.content.parceiros.map(i=>({...i,site:i.link}));
     if(can("banners"))content.banners={...(content.banners||{}),destaques:state.content.banners,publicidades:state.content.publicidade};
     if(can("links_aplicativos"))content.links_aplicativos={...(content.links_aplicativos||{}),android:state.integrations.aplicativo.android,ios:state.integrations.aplicativo.ios,pwa:state.integrations.aplicativo.pwa,qr:state.integrations.aplicativo.qrcode};
-    if(can("textos_institucionais"))content.textos_institucionais={...texts,sobre:state.radio.descricao,player:{...(texts.player||{}),titulo:state.radio.musicaAtual,subtitulo:state.radio.locutorAtual,imagem:state.radio.playerImage},seo:state.integrations.seo,podcasts:state.content.podcasts,videos:state.content.videos,promocoes:state.content.promocoes,galeria:state.content.galeria,eventos:state.content.eventos,modulos:Object.fromEntries(state.modules.map(m=>[m.id,m.enabled])),pedidosMusica:{...(texts.pedidosMusica||{}),ativo:state.integrations.whatsapp.pedidos},acessibilidade:{...(texts.acessibilidade||{}),leitorTela:state.integrations.configuracoes.acessibilidade},cms_v2:{...cms,schemaVersion:1,selectedTheme:state.selectedTheme,modules:state.modules,content:{equipe:state.content.equipe,popups:state.content.popups},aplicativo:{icone:state.integrations.aplicativo.icone},configuracoes:state.integrations.configuracoes,updatedAt:new Date().toISOString()}};
+    if(can("textos_institucionais"))content.textos_institucionais={...texts,sobre:state.radio.descricao,player:{...(texts.player||{}),titulo:state.radio.musicaAtual,subtitulo:state.radio.locutorAtual,imagem:state.radio.playerImage},seo:state.integrations.seo,podcasts:state.content.podcasts,videos:state.content.videos,promocoes:state.content.promocoes,galeria:state.content.galeria,eventos:state.content.eventos,modulos:Object.fromEntries(state.modules.map(m=>[m.id,m.enabled])),pedidosMusica:{...(texts.pedidosMusica||{}),ativo:state.integrations.whatsapp.pedidos},acessibilidade:{...(texts.acessibilidade||{}),leitorTela:state.integrations.configuracoes.acessibilidade},cms_v2:{...cms,schemaVersion:2,selectedTheme:state.selectedTheme,modules:state.modules,content:{equipe:state.content.equipe,popups:state.content.popups},aplicativo:{icone:state.integrations.aplicativo.icone},configuracoes:state.integrations.configuracoes,updatedAt:new Date().toISOString()}};
     return content;
   }
 
@@ -1015,6 +1179,7 @@
     $$('[data-preview-device]').forEach(button=>button.addEventListener("click",()=>{ $$('[data-preview-device]').forEach(i=>i.classList.remove("active"));button.classList.add("active");$("#preview-canvas").className=`preview-canvas ${button.dataset.previewDevice}`;}));
     $("#menu-toggle").addEventListener("click",()=>{const sidebar=$("#sidebar");sidebar.classList.toggle("open");$("#menu-toggle").setAttribute("aria-expanded",String(sidebar.classList.contains("open")));});
     $("#editor-form").addEventListener("submit",saveModal);
+    $$('#editor-modal [value="cancel"]').forEach(button=>button.addEventListener("click",event=>{event.preventDefault();editing=null;$("#editor-modal").close();}));
     $("#backup-import").addEventListener("change",event=>{const file=event.target.files?.[0];if(file)importBackup(file);event.target.value="";});
     document.addEventListener("keydown",event=>{if(event.key==="Escape"&&$("#preview-dialog").open)$("#preview-dialog").close();});
     resumeSession();

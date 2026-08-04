@@ -1,32 +1,17 @@
-# Portal do Cliente v2.0.0 — CMS Multitema Integrado
+# Portal do Cliente v2.2.0 — Etapa 2 Editorial e Temas
 
-Esta versão combina o Portal do Cliente já publicado com o protótipo CMS Multitema.
+Evolução da base v2.0.0 aprovada pelo usuário.
 
-## Compatibilidade
-- Cloudflare Worker principal: v1.15.0
-- Admin Central: v3.10.0
-- GitHub Pages: compatível
-- Banco: D1 existente
+## Entregas
 
-## Recursos integrados
-- login, sessão e logout reais;
-- cliente, contrato e faturas reais;
-- site e permissões atuais;
-- rascunho e histórico no D1;
-- solicitação de publicação supervisionada;
-- upload de imagens pela API existente;
-- dashboard, editor visual, temas e prévia multitema;
-- CRUD de programação, locutores, notícias, podcasts, vídeos, promoções, galeria, eventos, equipe, publicidade, parceiros, banners e popups;
-- backup JSON;
-- troca de senha.
+- Programação com vários dias, categorias, vínculo de locutor, cor e bloqueio de conflito de horário.
+- Locutores com ordenação, contatos e redes sociais.
+- Notícias com slug, autoria, tags, situação editorial, agendamento, destaque e validação de duplicidade.
+- Busca, filtros, indicadores, duplicação e visualização no site.
+- Seis temas com o mesmo conteúdo e composições visualmente diferentes.
+- Tema Morada mantido na estrutura aprovada.
+- Compatível com Worker 1.15.0 e Admin 3.10.0; sem migração SQL.
 
 ## Instalação
-Substitua os arquivos da raiz do repositório `CentralRadiosBrasil-Portal-Cliente` por estes arquivos e publique pelo GitHub Pages.
 
-## Segurança dos dados
-A versão preserva o formato atual de `conteudoRascunho`. Os dados adicionais do CMS ficam em `textos_institucionais.cms_v2`, sem exigir migração SQL.
-
-## Limitações conhecidas
-- usuários adicionais continuam controlados pela Central, pois o Worker atual não expõe CRUD de usuários;
-- domínio e URL técnica do stream são somente leitura;
-- audiência só aparecerá depois de uma integração real com o streaming.
+Substitua os arquivos do repositório `CentralRadiosBrasil-Portal-Cliente` pelos arquivos desta pasta e atualize com Ctrl+F5.

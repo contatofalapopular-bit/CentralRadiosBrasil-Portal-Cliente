@@ -1,0 +1,993 @@
+{
+  "version": "2.5.0-final",
+  "schemaVersion": 8,
+  "executedAt": "2026-08-04T08:44:00-03:00",
+  "environment": "Chromium headless com API Worker simulada; nenhum dado de produção alterado",
+  "total": 190,
+  "passed": 190,
+  "failed": 0,
+  "phases": [
+    {
+      "phase": "navigation-content-a",
+      "total": 74,
+      "passed": 74,
+      "failed": 0,
+      "results": [
+        {
+          "name": "Aplicação autenticada",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "30 áreas no menu",
+          "ok": true,
+          "detail": "30"
+        },
+        {
+          "name": "Abrir área dashboard",
+          "ok": true,
+          "detail": "(None, 'Dashboard')"
+        },
+        {
+          "name": "Abrir área radio",
+          "ok": true,
+          "detail": "(None, 'Minha Rádio')"
+        },
+        {
+          "name": "Abrir área editor",
+          "ok": true,
+          "detail": "(None, 'Editor Visual')"
+        },
+        {
+          "name": "Abrir área themes",
+          "ok": true,
+          "detail": "(None, 'Temas')"
+        },
+        {
+          "name": "Abrir área programacao",
+          "ok": true,
+          "detail": "(None, 'Programação')"
+        },
+        {
+          "name": "Abrir área locutores",
+          "ok": true,
+          "detail": "(None, 'Locutores')"
+        },
+        {
+          "name": "Abrir área noticias",
+          "ok": true,
+          "detail": "(None, 'Notícias')"
+        },
+        {
+          "name": "Abrir área podcasts",
+          "ok": true,
+          "detail": "(None, 'Podcasts')"
+        },
+        {
+          "name": "Abrir área videos",
+          "ok": true,
+          "detail": "(None, 'Vídeos')"
+        },
+        {
+          "name": "Abrir área promocoes",
+          "ok": true,
+          "detail": "(None, 'Promoções')"
+        },
+        {
+          "name": "Abrir área galeria",
+          "ok": true,
+          "detail": "(None, 'Galeria')"
+        },
+        {
+          "name": "Abrir área eventos",
+          "ok": true,
+          "detail": "(None, 'Eventos')"
+        },
+        {
+          "name": "Abrir área equipe",
+          "ok": true,
+          "detail": "(None, 'Equipe')"
+        },
+        {
+          "name": "Abrir área anunciantes",
+          "ok": true,
+          "detail": "(None, 'Anunciantes')"
+        },
+        {
+          "name": "Abrir área publicidade",
+          "ok": true,
+          "detail": "(None, 'Campanhas')"
+        },
+        {
+          "name": "Abrir área parceiros",
+          "ok": true,
+          "detail": "(None, 'Parceiros')"
+        },
+        {
+          "name": "Abrir área banners",
+          "ok": true,
+          "detail": "(None, 'Banners')"
+        },
+        {
+          "name": "Abrir área popups",
+          "ok": true,
+          "detail": "(None, 'Popups')"
+        },
+        {
+          "name": "Abrir área whatsapp",
+          "ok": true,
+          "detail": "(None, 'WhatsApp')"
+        },
+        {
+          "name": "Abrir área redes",
+          "ok": true,
+          "detail": "(None, 'Redes Sociais')"
+        },
+        {
+          "name": "Abrir área seo",
+          "ok": true,
+          "detail": "(None, 'SEO')"
+        },
+        {
+          "name": "Abrir área dominio",
+          "ok": true,
+          "detail": "(None, 'Domínio')"
+        },
+        {
+          "name": "Abrir área aplicativo",
+          "ok": true,
+          "detail": "(None, 'Aplicativo')"
+        },
+        {
+          "name": "Abrir área configuracoes",
+          "ok": true,
+          "detail": "(None, 'Configurações')"
+        },
+        {
+          "name": "Abrir área usuarios",
+          "ok": true,
+          "detail": "(None, 'Usuários e acesso')"
+        },
+        {
+          "name": "Abrir área auditoria",
+          "ok": true,
+          "detail": "(None, 'Auditoria')"
+        },
+        {
+          "name": "Abrir área publicacao",
+          "ok": true,
+          "detail": "(None, 'Publicação')"
+        },
+        {
+          "name": "Abrir área faturas",
+          "ok": true,
+          "detail": "(None, 'Faturas')"
+        },
+        {
+          "name": "Abrir área contrato",
+          "ok": true,
+          "detail": "(None, 'Contrato')"
+        },
+        {
+          "name": "Abrir área backup",
+          "ok": true,
+          "detail": "(None, 'Backup')"
+        },
+        {
+          "name": "programacao: conteúdo listado",
+          "ok": true,
+          "detail": "1"
+        },
+        {
+          "name": "programacao: visualizar conteúdo salvo",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "programacao: abrir edição",
+          "ok": true,
+          "detail": "(None, True, None)"
+        },
+        {
+          "name": "programacao: abrir novo cadastro",
+          "ok": true,
+          "detail": "(None, True, None)"
+        },
+        {
+          "name": "programacao: duplicar e excluir cópia",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "programacao: ativar/desativar",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "locutores: conteúdo listado",
+          "ok": true,
+          "detail": "1"
+        },
+        {
+          "name": "locutores: visualizar conteúdo salvo",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "locutores: abrir edição",
+          "ok": true,
+          "detail": "(None, True, None)"
+        },
+        {
+          "name": "locutores: abrir novo cadastro",
+          "ok": true,
+          "detail": "(None, True, None)"
+        },
+        {
+          "name": "locutores: duplicar e excluir cópia",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "locutores: ativar/desativar",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "noticias: conteúdo listado",
+          "ok": true,
+          "detail": "1"
+        },
+        {
+          "name": "noticias: visualizar conteúdo salvo",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "noticias: abrir edição",
+          "ok": true,
+          "detail": "(None, True, None)"
+        },
+        {
+          "name": "noticias: abrir novo cadastro",
+          "ok": true,
+          "detail": "(None, True, None)"
+        },
+        {
+          "name": "noticias: duplicar e excluir cópia",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "podcasts: conteúdo listado",
+          "ok": true,
+          "detail": "1"
+        },
+        {
+          "name": "podcasts: visualizar conteúdo salvo",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "podcasts: abrir edição",
+          "ok": true,
+          "detail": "(None, True, None)"
+        },
+        {
+          "name": "podcasts: abrir novo cadastro",
+          "ok": true,
+          "detail": "(None, True, None)"
+        },
+        {
+          "name": "podcasts: duplicar e excluir cópia",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "podcasts: ativar/desativar",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "videos: conteúdo listado",
+          "ok": true,
+          "detail": "1"
+        },
+        {
+          "name": "videos: visualizar conteúdo salvo",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "videos: abrir edição",
+          "ok": true,
+          "detail": "(None, True, None)"
+        },
+        {
+          "name": "videos: abrir novo cadastro",
+          "ok": true,
+          "detail": "(None, True, None)"
+        },
+        {
+          "name": "videos: duplicar e excluir cópia",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "videos: ativar/desativar",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "promocoes: conteúdo listado",
+          "ok": true,
+          "detail": "1"
+        },
+        {
+          "name": "promocoes: visualizar conteúdo salvo",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "promocoes: abrir edição",
+          "ok": true,
+          "detail": "(None, True, None)"
+        },
+        {
+          "name": "promocoes: abrir novo cadastro",
+          "ok": true,
+          "detail": "(None, True, None)"
+        },
+        {
+          "name": "promocoes: duplicar e excluir cópia",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "promocoes: ativar/desativar",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "galeria: conteúdo listado",
+          "ok": true,
+          "detail": "1"
+        },
+        {
+          "name": "galeria: visualizar conteúdo salvo",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "galeria: abrir edição",
+          "ok": true,
+          "detail": "(None, True, None)"
+        },
+        {
+          "name": "galeria: abrir novo cadastro",
+          "ok": true,
+          "detail": "(None, True, None)"
+        },
+        {
+          "name": "galeria: duplicar e excluir cópia",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "galeria: ativar/desativar",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "Fase 1 sem exceções",
+          "ok": true,
+          "detail": ""
+        }
+      ]
+    },
+    {
+      "phase": "content-b-preview",
+      "total": 64,
+      "passed": 64,
+      "failed": 0,
+      "results": [
+        {
+          "name": "eventos: conteúdo listado",
+          "ok": true,
+          "detail": "1"
+        },
+        {
+          "name": "eventos: visualizar conteúdo salvo",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "eventos: abrir edição",
+          "ok": true,
+          "detail": "(None, True, None)"
+        },
+        {
+          "name": "eventos: abrir novo cadastro",
+          "ok": true,
+          "detail": "(None, True, None)"
+        },
+        {
+          "name": "eventos: duplicar e excluir cópia",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "eventos: ativar/desativar",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "equipe: conteúdo listado",
+          "ok": true,
+          "detail": "1"
+        },
+        {
+          "name": "equipe: visualizar conteúdo salvo",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "equipe: abrir edição",
+          "ok": true,
+          "detail": "(None, True, None)"
+        },
+        {
+          "name": "equipe: abrir novo cadastro",
+          "ok": true,
+          "detail": "(None, True, None)"
+        },
+        {
+          "name": "equipe: duplicar e excluir cópia",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "equipe: ativar/desativar",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "anunciantes: conteúdo listado",
+          "ok": true,
+          "detail": "1"
+        },
+        {
+          "name": "anunciantes: visualizar conteúdo salvo",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "anunciantes: abrir edição",
+          "ok": true,
+          "detail": "(None, True, None)"
+        },
+        {
+          "name": "anunciantes: abrir novo cadastro",
+          "ok": true,
+          "detail": "(None, True, None)"
+        },
+        {
+          "name": "anunciantes: duplicar e excluir cópia",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "anunciantes: ativar/desativar",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "publicidade: conteúdo listado",
+          "ok": true,
+          "detail": "1"
+        },
+        {
+          "name": "publicidade: visualizar conteúdo salvo",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "publicidade: abrir edição",
+          "ok": true,
+          "detail": "(None, True, None)"
+        },
+        {
+          "name": "publicidade: abrir novo cadastro",
+          "ok": true,
+          "detail": "(None, True, None)"
+        },
+        {
+          "name": "publicidade: duplicar e excluir cópia",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "publicidade: ativar/desativar",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "parceiros: conteúdo listado",
+          "ok": true,
+          "detail": "1"
+        },
+        {
+          "name": "parceiros: visualizar conteúdo salvo",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "parceiros: abrir edição",
+          "ok": true,
+          "detail": "(None, True, None)"
+        },
+        {
+          "name": "parceiros: abrir novo cadastro",
+          "ok": true,
+          "detail": "(None, True, None)"
+        },
+        {
+          "name": "parceiros: duplicar e excluir cópia",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "parceiros: ativar/desativar",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "banners: conteúdo listado",
+          "ok": true,
+          "detail": "1"
+        },
+        {
+          "name": "banners: visualizar conteúdo salvo",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "banners: abrir edição",
+          "ok": true,
+          "detail": "(None, True, None)"
+        },
+        {
+          "name": "banners: abrir novo cadastro",
+          "ok": true,
+          "detail": "(None, True, None)"
+        },
+        {
+          "name": "banners: duplicar e excluir cópia",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "banners: ativar/desativar",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "popups: conteúdo listado",
+          "ok": true,
+          "detail": "1"
+        },
+        {
+          "name": "popups: visualizar conteúdo salvo",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "popups: abrir edição",
+          "ok": true,
+          "detail": "(None, True, None)"
+        },
+        {
+          "name": "popups: abrir novo cadastro",
+          "ok": true,
+          "detail": "(None, True, None)"
+        },
+        {
+          "name": "popups: duplicar e excluir cópia",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "popups: ativar/desativar",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "Editor: alterar tema",
+          "ok": true,
+          "detail": "(['spotify'], None)"
+        },
+        {
+          "name": "Editor: alternar bloco",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "Temas: seis opções",
+          "ok": true,
+          "detail": "6"
+        },
+        {
+          "name": "Temas: selecionar",
+          "ok": true,
+          "detail": "(None, None)"
+        },
+        {
+          "name": "Prévia: abrir",
+          "ok": true,
+          "detail": "(None, None)"
+        },
+        {
+          "name": "Prévia aberta",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "Prévia desktop",
+          "ok": true,
+          "detail": "(None, None)"
+        },
+        {
+          "name": "Prévia tablet",
+          "ok": true,
+          "detail": "(None, None)"
+        },
+        {
+          "name": "Prévia mobile",
+          "ok": true,
+          "detail": "(None, None)"
+        },
+        {
+          "name": "Prévia: abrir programacao",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "Prévia: abrir noticias",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "Prévia: abrir promocoes",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "Prévia: abrir podcasts",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "Prévia: abrir videos",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "Prévia: abrir locutores",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "Prévia: abrir equipe",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "Prévia: abrir galeria",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "Prévia: abrir eventos",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "Prévia: abrir parceiros",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "Prévia: atualizar",
+          "ok": true,
+          "detail": "(None, None)"
+        },
+        {
+          "name": "Prévia: fechar",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "Fase 2 sem exceções",
+          "ok": true,
+          "detail": ""
+        }
+      ]
+    },
+    {
+      "phase": "system-backup-audit",
+      "total": 32,
+      "passed": 32,
+      "failed": 0,
+      "results": [
+        {
+          "name": "Usuários CRUD completo",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "Alterar senha",
+          "ok": true,
+          "detail": "(None, None, None, None, None)"
+        },
+        {
+          "name": "Executar auditoria interna",
+          "ok": true,
+          "detail": "(None, None)"
+        },
+        {
+          "name": "Auditoria sem falhas",
+          "ok": true,
+          "detail": "0"
+        },
+        {
+          "name": "Auditoria com verificações",
+          "ok": true,
+          "detail": "82"
+        },
+        {
+          "name": "Exportar auditoria CSV",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "Filtrar auditoria",
+          "ok": true,
+          "detail": "['success']"
+        },
+        {
+          "name": "Criar ponto de restauração",
+          "ok": true,
+          "detail": "(None, None)"
+        },
+        {
+          "name": "Ponto listado",
+          "ok": true,
+          "detail": "1"
+        },
+        {
+          "name": "Exportar backup íntegro",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "Baixar ponto",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "Restaurar ponto",
+          "ok": true,
+          "detail": "(None, None)"
+        },
+        {
+          "name": "Importar backup validado",
+          "ok": true,
+          "detail": "(None, None)"
+        },
+        {
+          "name": "Configurar automação",
+          "ok": true,
+          "detail": "(None, None, None)"
+        },
+        {
+          "name": "Excluir ponto",
+          "ok": true,
+          "detail": "(None, None)"
+        },
+        {
+          "name": "Salvar Minha Rádio",
+          "ok": true,
+          "detail": "(None, None)"
+        },
+        {
+          "name": "Salvar whatsapp",
+          "ok": true,
+          "detail": "(None, None)"
+        },
+        {
+          "name": "Salvar redes",
+          "ok": true,
+          "detail": "(None, None)"
+        },
+        {
+          "name": "Salvar seo",
+          "ok": true,
+          "detail": "(None, None)"
+        },
+        {
+          "name": "Salvar aplicativo",
+          "ok": true,
+          "detail": "(None, None)"
+        },
+        {
+          "name": "Salvar configuracoes",
+          "ok": true,
+          "detail": "(None, None)"
+        },
+        {
+          "name": "Salvar na publicação",
+          "ok": true,
+          "detail": "(None, None)"
+        },
+        {
+          "name": "Solicitar publicação",
+          "ok": true,
+          "detail": "(None, None)"
+        },
+        {
+          "name": "Salvar pelo topo",
+          "ok": true,
+          "detail": "(None, None)"
+        },
+        {
+          "name": "Worker simulado recebeu rascunho",
+          "ok": true,
+          "detail": "11"
+        },
+        {
+          "name": "Schema 8",
+          "ok": true,
+          "detail": "8"
+        },
+        {
+          "name": "Release 2.5.0",
+          "ok": true,
+          "detail": "2.5.0-final"
+        },
+        {
+          "name": "Security persistida",
+          "ok": true,
+          "detail": "1"
+        },
+        {
+          "name": "Audit persistida",
+          "ok": true,
+          "detail": "24"
+        },
+        {
+          "name": "Backup persistido",
+          "ok": true,
+          "detail": "3"
+        },
+        {
+          "name": "Botões sem rótulo",
+          "ok": true,
+          "detail": "0"
+        },
+        {
+          "name": "Fase 3 sem exceções",
+          "ok": true,
+          "detail": ""
+        }
+      ]
+    },
+    {
+      "phase": "permissions",
+      "total": 20,
+      "passed": 20,
+      "failed": 0,
+      "results": [
+        {
+          "name": "Redator vê conteúdo",
+          "ok": true,
+          "detail": "['dashboard', 'programacao', 'locutores', 'noticias', 'podcasts', 'videos', 'promocoes', 'galeria', 'eventos', 'equipe']"
+        },
+        {
+          "name": "Redator não vê comercial",
+          "ok": true,
+          "detail": "['dashboard', 'programacao', 'locutores', 'noticias', 'podcasts', 'videos', 'promocoes', 'galeria', 'eventos', 'equipe']"
+        },
+        {
+          "name": "Redator não vê usuários",
+          "ok": true,
+          "detail": "['dashboard', 'programacao', 'locutores', 'noticias', 'podcasts', 'videos', 'promocoes', 'galeria', 'eventos', 'equipe']"
+        },
+        {
+          "name": "Redator não vê backup",
+          "ok": true,
+          "detail": "['dashboard', 'programacao', 'locutores', 'noticias', 'podcasts', 'videos', 'promocoes', 'galeria', 'eventos', 'equipe']"
+        },
+        {
+          "name": "Redator não vê publicação",
+          "ok": true,
+          "detail": "['dashboard', 'programacao', 'locutores', 'noticias', 'podcasts', 'videos', 'promocoes', 'galeria', 'eventos', 'equipe']"
+        },
+        {
+          "name": "Redator pode criar",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "Redator pode editar",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "Redator não pode excluir",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "Redator não pode ativar/desativar",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "Redator sem erros",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "Leitura vê painel",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "Leitura não cria",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "Leitura não edita",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "Leitura visualiza",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "Leitura não salva topo",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "Leitura sem erros",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "Comercial vê campanhas",
+          "ok": true,
+          "detail": "['dashboard', 'anunciantes', 'publicidade', 'parceiros', 'banners', 'popups']"
+        },
+        {
+          "name": "Comercial não vê notícias",
+          "ok": true,
+          "detail": "['dashboard', 'anunciantes', 'publicidade', 'parceiros', 'banners', 'popups']"
+        },
+        {
+          "name": "Comercial pode editar campanha",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "Comercial sem erros",
+          "ok": true,
+          "detail": ""
+        }
+      ]
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 {
-  "name": "Portal do Cliente — Central Rádios Brasil",
-  "short_name": "Portal CRB",
+  "name": "Portal do Cliente — Central Rádios Brasil v2.5.0",
+  "short_name": "CRB Portal 2.5",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#111827",

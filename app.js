@@ -67,6 +67,7 @@
     { section: "Sistema" },
     { id: "configuracoes", label: "Configurações", icon: "⚙" },
     { id: "usuarios", label: "Usuários e acesso", icon: "♙" },
+    { id: "auditoria", label: "Auditoria", icon: "◫" },
     { id: "publicacao", label: "Publicação", icon: "✓" },
     { id: "faturas", label: "Faturas", icon: "$" },
     { id: "contrato", label: "Contrato", icon: "▤" },
@@ -271,7 +272,7 @@
   function defaultState() {
     const today = new Date().toISOString().slice(0, 10);
     return {
-      version: "2.4.0-final",
+      version: "2.5.0-final",
       updatedAt: new Date().toISOString(),
       status: "rascunho",
       selectedTheme: "morada",
@@ -553,6 +554,7 @@
         <article class="kpi-card"><span>Imagens armazenadas</span><strong>${mediaCount}</strong><small>arquivos vinculados ao site</small></article>
         <article class="kpi-card"><span>Faturas em aberto</span><strong>${openInvoices.length}</strong><small>${contract ? `Contrato ${escapeHTML(contract.numero || "ativo")}` : "Nenhum contrato"}</small></article>
       </div>
+      <section class="card" style="margin-bottom:18px"><header class="card-header"><div><h3>Sistema v2.5.0 — Segurança e rastreabilidade</h3><p>Usuários, permissões, auditoria integrada e recuperação com pontos de restauração.</p></div><span class="badge active">Consolidada</span></header><div class="card-body"><div class="module-health"><div class="health-row"><div><strong><span class="health-dot"></span>Usuários e permissões</strong><span>${state.security?.users?.length||1} acesso(s) configurado(s)</span></div><button class="button small secondary" data-go="usuarios" type="button">Gerenciar</button></div><div class="health-row"><div><strong><span class="health-dot"></span>Auditoria integrada</strong><span>${state.audit?.entries?.length||0} evento(s) registrado(s)</span></div><button class="button small secondary" data-go="auditoria" type="button">Auditar</button></div><div class="health-row"><div><strong><span class="health-dot"></span>Backup e recuperação</strong><span>${state.backup?.snapshots?.length||0} ponto(s) disponível(is)</span></div><button class="button small secondary" data-go="backup" type="button">Proteger</button></div></div></div></section>
       <section class="card" style="margin-bottom:18px"><header class="card-header"><div><h3>Comercial v2.4.0 — Final Consolidada</h3><p>Publicidade, banners, parceiros e popups integrados, com posições reais, prioridades e auditoria de conflitos.</p></div><span class="badge active">Consolidada</span></header><div class="card-body"><div class="module-health">${[["anunciantes","Anunciantes",state.content.anunciantes.length],["publicidade","Campanhas",state.content.publicidade.length],["banners","Banners",state.content.banners.length],["parceiros","Parceiros",state.content.parceiros.length],["popups","Popups",state.content.popups.length]].map(([id,label,total])=>`<div class="health-row"><div><strong><span class="health-dot"></span>${label}</strong><span>${total} registro${total===1?"":"s"} no rascunho</span></div><button class="button small secondary" data-go="${id}" type="button">Revisar</button></div>`).join("")}</div>${commercialAuditHTML()}<div class="notice" style="margin-top:14px">A prévia respeita posições e prioridades, mas não registra impressão, clique ou frequência real. A coleta e a frequência pública permanecem sob responsabilidade do Portal Público/Worker.</div></div></section>
       <div class="grid-2">
         <section class="card"><header class="card-header"><div><h3>Estrutura do site</h3><p>Módulos ativados no editor visual.</p></div><button class="button small secondary" data-go="editor" type="button">Organizar</button></header><div class="card-body"><div class="module-health">${activeModules().slice(0,10).map(module => `<div class="health-row"><div><strong><span class="health-dot"></span>${escapeHTML(module.label)}</strong><span>${escapeHTML(module.description)}</span></div><span class="badge active">Ativo</span></div>`).join("") || `<div class="empty-state"><strong>Nenhum módulo ativo</strong></div>`}</div></div></section>
@@ -564,7 +566,7 @@
       </div>
       <div class="grid-2 equal" style="margin-top:18px">
         <section class="card"><header class="card-header"><div><h3>Dados reais, sem números inventados</h3><p>Audiência e ouvintes.</p></div></header><div class="card-body"><div class="notice">O painel não exibe audiência fictícia. O número de ouvintes só será mostrado quando existir uma fonte técnica confiável do streaming.</div></div></section>
-        <section class="card"><header class="card-header"><div><h3>Integração ativa</h3><p>Ambiente utilizado nesta instalação.</p></div></header><div class="card-body"><div class="code-box">Portal: ${escapeHTML(CONFIG.VERSION || "2.4.0-final")}\nWorker: ${escapeHTML(CONFIG.WORKER_URL || "—")}\nPersistência: Cloudflare D1\nMídias: API do site\nPublicação: supervisionada pela Central</div></div></section>
+        <section class="card"><header class="card-header"><div><h3>Integração ativa</h3><p>Ambiente utilizado nesta instalação.</p></div></header><div class="card-body"><div class="code-box">Portal: ${escapeHTML(CONFIG.VERSION || "2.5.0-final")}\nWorker: ${escapeHTML(CONFIG.WORKER_URL || "—")}\nPersistência: Cloudflare D1\nMídias: API do site\nPublicação: supervisionada pela Central</div></div></section>
       </div>`;
     bindGoButtons(root);
   }
@@ -1260,7 +1262,7 @@
         <section class="card"><div class="card-body"><h3>Exportar JSON</h3><p class="field-help">Baixa configurações, módulos, temas e conteúdos.</p><button class="button primary" id="export-backup" type="button">Baixar backup</button></div></section>
         <section class="card"><div class="card-body"><h3>Importar JSON</h3><p class="field-help">Carrega o arquivo no editor; clique em Salvar rascunho para gravar no D1.</p><button class="button secondary" id="import-backup" type="button">Selecionar arquivo</button></div></section>
         <section class="card"><div class="card-body"><h3>Recarregar do servidor</h3><p class="field-help">Descarta alterações ainda não salvas e recarrega o último rascunho do servidor.</p><button class="button danger" id="reset-demo" type="button">Recarregar dados</button></div></section>
-      </div><section class="card" style="margin-top:18px"><header class="card-header"><div><h3>Sobre esta instalação</h3><p>Informações técnicas.</p></div></header><div class="card-body"><div class="code-box">Modo: produção integrada\nVersão: ${CONFIG.VERSION || "2.4.0-final"}\nPersistência: Cloudflare D1\nAPI: ${CONFIG.WORKER_URL || "não configurada"}\nÚltima alteração: ${formatDateTime(state.updatedAt)}</div></div></section>`;
+      </div><section class="card" style="margin-top:18px"><header class="card-header"><div><h3>Sobre esta instalação</h3><p>Informações técnicas.</p></div></header><div class="card-body"><div class="code-box">Modo: produção integrada\nVersão: ${CONFIG.VERSION || "2.5.0-final"}\nPersistência: Cloudflare D1\nAPI: ${CONFIG.WORKER_URL || "não configurada"}\nÚltima alteração: ${formatDateTime(state.updatedAt)}</div></div></section>`;
     $("#export-backup").addEventListener("click",exportBackup);
     $("#import-backup").addEventListener("click",()=>$("#backup-import").click());
     $("#reset-demo").addEventListener("click",()=>{if(confirm("Descartar alterações não salvas e recarregar o rascunho do servidor?")) loadAll();});
@@ -1907,8 +1909,8 @@
       dashboardData=dash; remoteSite=siteResult?.site || null; versions=siteResult?.versoes || [];
       if (remoteSite) {
         const media = await api("/api/cliente/site/midias").catch(()=>({midias:[]})); mediaLibrary=media.midias || [];
-        state=mapRemoteToState(remoteSite,dashboardData);
-      } else { state=defaultState(); state.radio.nome=dash?.cliente?.nome_radio || dash?.cliente?.nome || "Minha rádio"; }
+        state=mapRemoteToState(remoteSite,dashboardData); ensureV250State();
+      } else { state=defaultState(); state.radio.nome=dash?.cliente?.nome_radio || dash?.cliente?.nome || "Minha rádio"; ensureV250State(); }
       currentPage="dashboard"; searchTerm="";
       updateAccount();
       if (!$("#app-shell").classList.contains("hidden")) { renderNav(); updateChrome(); renderPage(); }
@@ -1922,7 +1924,7 @@
 
   function mapRemoteToState(site,dashboard) {
     const fresh=defaultState(), content=site.conteudoRascunho || site.conteudoPublicado || {}, texts=content.textos_institucionais || {}, cms=texts.cms_v2 || {}, contacts=content.contatos || {}, whats=typeof content.whatsapp === "string" ? {numero:content.whatsapp} : (content.whatsapp || {}), colors=content.cores || {}, apps=content.links_aplicativos || {}, banners=content.banners || {};
-    fresh.version="2.4.0-final"; fresh.updatedAt=versions[0]?.criado_em || new Date().toISOString(); fresh.status=site.status_publicacao || "sem_rascunho"; fresh.selectedTheme=cms.selectedTheme || "morada";
+    fresh.version="2.5.0-final"; fresh.updatedAt=versions[0]?.criado_em || new Date().toISOString(); fresh.status=site.status_publicacao || "sem_rascunho"; fresh.selectedTheme=cms.selectedTheme || "morada";
     fresh.radio={...fresh.radio,nome:content.nome || site.nome_site || dashboard?.cliente?.nome_radio || "Minha rádio",slogan:content.slogan || "",descricao:content.descricao || texts.sobre || "",cidade:contacts.cidade || dashboard?.cliente?.cidade || "",estado:contacts.estado || dashboard?.cliente?.estado || "",email:contacts.email || dashboard?.cliente?.email || "",telefone:contacts.telefone || "",whatsapp:whats.numero || "",endereco:contacts.endereco || "",streamUrl:site.stream_url || "",musicaAtual:texts.player?.titulo || "Transmissão ao vivo",locutorAtual:texts.player?.subtitulo || "Programação da rádio",logo:content.logo || "",hero:content.capa || "",playerImage:texts.player?.imagem || "",cores:{primaria:colors.primaria || "#e31c45",secundaria:colors.secundaria || "#121d31",destaque:colors.destaque || "#f1a11a",fundo:colors.fundo || "#f4f6f9"},listenersEnabled:false};
     const moduleValues=texts.modulos || {}; const savedModules=safeArray(cms.modules);
     fresh.modules=modulesCatalog.map(([id,label,description],index)=>{const saved=savedModules.find(m=>m.id===id);return{id,label,description,enabled:saved? saved.enabled!==false : moduleValues[id]!==false,order:Number(saved?.order ?? index)};});
@@ -1950,6 +1952,9 @@
       aplicativo:{android:apps.android||"",ios:apps.ios||"",pwa:Boolean(apps.pwa),icone:cms.aplicativo?.icone||"",qrcode:apps.qr||""},
       configuracoes:{idioma:cms.configuracoes?.idioma||"pt-BR",timezone:cms.configuracoes?.timezone||"America/Sao_Paulo",moderacao:cms.configuracoes?.moderacao!==false,acessibilidade:texts.acessibilidade?.leitorTela!==false,cookies:cms.configuracoes?.cookies!==false}
     };
+    fresh.security=cms.security || fresh.security;
+    fresh.audit=cms.audit || fresh.audit;
+    fresh.backup=cms.backup || fresh.backup;
     return fresh;
   }
 
@@ -1966,9 +1971,381 @@
     if(can("patrocinadores"))content.patrocinadores=state.content.parceiros.map(i=>({...i,site:i.link}));
     if(can("banners"))content.banners={...(content.banners||{}),destaques:state.content.banners,publicidades:state.content.publicidade};
     if(can("links_aplicativos"))content.links_aplicativos={...(content.links_aplicativos||{}),android:state.integrations.aplicativo.android,ios:state.integrations.aplicativo.ios,pwa:state.integrations.aplicativo.pwa,qr:state.integrations.aplicativo.qrcode};
-    if(can("textos_institucionais"))content.textos_institucionais={...texts,sobre:state.radio.descricao,player:{...(texts.player||{}),titulo:state.radio.musicaAtual,subtitulo:state.radio.locutorAtual,imagem:state.radio.playerImage},seo:state.integrations.seo,podcasts:state.content.podcasts,videos:state.content.videos,promocoes:state.content.promocoes,galeria:state.content.galeria,eventos:state.content.eventos,modulos:Object.fromEntries(state.modules.map(m=>[m.id,m.enabled])),pedidosMusica:{...(texts.pedidosMusica||{}),ativo:state.integrations.whatsapp.pedidos},acessibilidade:{...(texts.acessibilidade||{}),leitorTela:state.integrations.configuracoes.acessibilidade},cms_v2:{...cms,schemaVersion:7,release:"2.4.0-final",selectedTheme:state.selectedTheme,modules:state.modules,content:{equipe:state.content.equipe,popups:state.content.popups,anunciantes:state.content.anunciantes},aplicativo:{icone:state.integrations.aplicativo.icone},configuracoes:state.integrations.configuracoes,updatedAt:new Date().toISOString()}};
+    if(can("textos_institucionais"))content.textos_institucionais={...texts,sobre:state.radio.descricao,player:{...(texts.player||{}),titulo:state.radio.musicaAtual,subtitulo:state.radio.locutorAtual,imagem:state.radio.playerImage},seo:state.integrations.seo,podcasts:state.content.podcasts,videos:state.content.videos,promocoes:state.content.promocoes,galeria:state.content.galeria,eventos:state.content.eventos,modulos:Object.fromEntries(state.modules.map(m=>[m.id,m.enabled])),pedidosMusica:{...(texts.pedidosMusica||{}),ativo:state.integrations.whatsapp.pedidos},acessibilidade:{...(texts.acessibilidade||{}),leitorTela:state.integrations.configuracoes.acessibilidade},cms_v2:{...cms,schemaVersion:8,release:"2.5.0-final",security:state.security,audit:{entries:(state.audit?.entries||[]).slice(0,500),functionalRuns:(state.audit?.functionalRuns||[]).slice(0,10)},backup:{settings:state.backup?.settings||{},snapshots:(state.backup?.snapshots||[]).slice(0,5)},selectedTheme:state.selectedTheme,modules:state.modules,content:{equipe:state.content.equipe,popups:state.content.popups,anunciantes:state.content.anunciantes},aplicativo:{icone:state.integrations.aplicativo.icone},configuracoes:state.integrations.configuracoes,updatedAt:new Date().toISOString()}};
     return content;
   }
+
+
+  // ---------------------------------------------------------------------------
+  // v2.5.0 — Usuários, permissões, auditoria e backup
+  // ---------------------------------------------------------------------------
+  const V250_ROLE_PROFILES = Object.freeze({
+    "Administrador": { label:"Administrador", description:"Controle total do CMS, usuários, auditoria, backup e publicação.", areas:["*"], actions:["view","preview","create","edit","duplicate","toggle","delete","save","publish","manage_users","audit","backup","export"] },
+    "Editor": { label:"Editor", description:"Gerencia site e conteúdo, revisa a prévia e solicita publicação.", areas:["dashboard","site","conteudo","integracoes","publicacao"], actions:["view","preview","create","edit","duplicate","toggle","delete","save","publish","export"] },
+    "Redator": { label:"Redator", description:"Cria e edita conteúdo editorial, sem excluir ou publicar.", areas:["dashboard","conteudo"], actions:["view","preview","create","edit","duplicate","save","export"] },
+    "Comercial": { label:"Comercial", description:"Gerencia anunciantes, campanhas, banners, parceiros e popups.", areas:["dashboard","comercial"], actions:["view","preview","create","edit","duplicate","toggle","delete","save","export"] },
+    "Auditor": { label:"Auditor", description:"Consulta todas as áreas, executa auditorias e exporta relatórios.", areas:["*"], actions:["view","preview","audit","export"] },
+    "Somente leitura": { label:"Somente leitura", description:"Consulta o painel e a prévia sem alterar dados.", areas:["*"], actions:["view","preview","export"] }
+  });
+
+  const V250_PAGE_AREAS = Object.freeze({
+    dashboard:"dashboard", radio:"site", editor:"site", themes:"site",
+    programacao:"conteudo", locutores:"conteudo", noticias:"conteudo", podcasts:"conteudo", videos:"conteudo", promocoes:"conteudo", galeria:"conteudo", eventos:"conteudo", equipe:"conteudo",
+    anunciantes:"comercial", publicidade:"comercial", parceiros:"comercial", banners:"comercial", popups:"comercial",
+    whatsapp:"integracoes", redes:"integracoes", seo:"integracoes", dominio:"integracoes", aplicativo:"integracoes",
+    configuracoes:"sistema", usuarios:"usuarios", auditoria:"auditoria", publicacao:"publicacao", faturas:"financeiro", contrato:"financeiro", backup:"backup"
+  });
+
+  let accessEditingId = null;
+  let auditFilter = "todos";
+
+  function ensureV250State() {
+    if (!state || typeof state !== "object") state=defaultState();
+    state.version="2.5.0-final";
+    const client=dashboardData?.cliente || {};
+    const ownerEmail=String(client.email || state.radio?.email || "cliente@exemplo.com.br").trim().toLowerCase();
+    const ownerName=client.nome || client.nome_radio || state.radio?.nome || "Administrador do cliente";
+    const legacyUsers=safeArray(state.content?.usuarios);
+    state.security=state.security && typeof state.security === "object" ? state.security : {};
+    state.security.users=safeArray(state.security.users?.length ? state.security.users : legacyUsers).map((user,index)=>({
+      id:user.id || uid("user"), nome:user.nome || `Usuário ${index+1}`, email:String(user.email||"").trim().toLowerCase(), perfil:V250_ROLE_PROFILES[user.perfil]?user.perfil:"Somente leitura",
+      areas:Array.isArray(user.areas)?user.areas:String(user.areas||"").split(",").map(value=>value.trim()).filter(Boolean),
+      status:user.status || (user.ativo===false?"Suspenso":"Ativo"), ativo:user.ativo!==false && user.status!=="Suspenso", exigir2FA:Boolean(user.exigir2FA),
+      ultimoAcesso:user.ultimoAcesso||"", criadoEm:user.criadoEm||new Date().toISOString(), atualizadoEm:user.atualizadoEm||new Date().toISOString(), owner:Boolean(user.owner)
+    }));
+    let owner=state.security.users.find(user=>user.owner || (ownerEmail && user.email===ownerEmail));
+    if (!owner) {
+      owner={id:uid("owner"),nome:ownerName,email:ownerEmail,perfil:"Administrador",areas:["*"],status:"Ativo",ativo:true,exigir2FA:false,ultimoAcesso:"",criadoEm:new Date().toISOString(),atualizadoEm:new Date().toISOString(),owner:true};
+      state.security.users.unshift(owner);
+    } else {
+      owner.owner=true; owner.perfil="Administrador"; owner.status="Ativo"; owner.ativo=true; owner.areas=["*"];
+      if (!owner.nome) owner.nome=ownerName; if (!owner.email) owner.email=ownerEmail;
+    }
+    state.security.profiles=Object.fromEntries(Object.entries(V250_ROLE_PROFILES).map(([key,value])=>[key,{...value,areas:[...value.areas],actions:[...value.actions]}]));
+    state.security.require2FAForAdmins=state.security.require2FAForAdmins!==false;
+    state.security.sessionTimeoutMinutes=Math.max(15,Math.min(1440,Number(state.security.sessionTimeoutMinutes||120)));
+
+    state.audit=state.audit && typeof state.audit === "object" ? state.audit : {};
+    state.audit.entries=safeArray(state.audit.entries).slice(0,500);
+    state.audit.functionalRuns=safeArray(state.audit.functionalRuns).slice(0,10);
+
+    state.backup=state.backup && typeof state.backup === "object" ? state.backup : {};
+    state.backup.settings={autoBeforeImport:true,autoBeforePublication:true,maxSnapshots:5,...(state.backup.settings||{})};
+    state.backup.settings.maxSnapshots=Math.max(1,Math.min(10,Number(state.backup.settings.maxSnapshots||5)));
+    state.backup.snapshots=safeArray(state.backup.snapshots).slice(0,state.backup.settings.maxSnapshots);
+    if (state.content) state.content.usuarios=[];
+    return state;
+  }
+
+  function currentAccessUser() {
+    ensureV250State();
+    const email=String(dashboardData?.cliente?.email || "").trim().toLowerCase();
+    return state.security.users.find(user=>email && user.email===email) || state.security.users.find(user=>user.owner) || state.security.users[0];
+  }
+
+  function pageArea(page=currentPage) { return V250_PAGE_AREAS[page] || "sistema"; }
+  function permissionProfile(user=currentAccessUser()) { return V250_ROLE_PROFILES[user?.perfil] || V250_ROLE_PROFILES["Somente leitura"]; }
+  function userAreas(user=currentAccessUser()) {
+    const areas=Array.isArray(user?.areas)?user.areas:[];
+    return areas.length?areas:permissionProfile(user).areas;
+  }
+  function canAccess(action,page=currentPage) {
+    const user=currentAccessUser();
+    if (!user || user.ativo===false || user.status==="Suspenso") return false;
+    const profile=permissionProfile(user);
+    const allowedActions=new Set(profile.actions||[]);
+    if (!allowedActions.has(action)) return false;
+    const area=pageArea(page), areas=userAreas(user);
+    return areas.includes("*") || areas.includes(area) || profile.areas.includes("*") || profile.areas.includes(area);
+  }
+  function requirePermission(action,page=currentPage,message="Você não possui permissão para esta ação.") {
+    if (canAccess(action,page)) return true;
+    notify(message,"error");
+    recordAudit("permissao.negada",pageArea(page),page,`Ação bloqueada: ${action}`,"denied");
+    return false;
+  }
+
+  function auditActor() {
+    const user=currentAccessUser();
+    return {id:user?.id||"owner",nome:user?.nome||dashboardData?.cliente?.nome||"Cliente",email:user?.email||dashboardData?.cliente?.email||""};
+  }
+  function recordAudit(action,area,target,details="",result="success",metadata={}) {
+    ensureV250State();
+    const actor=auditActor();
+    state.audit.entries.unshift({id:uid("audit"),timestamp:new Date().toISOString(),action,area:area||"sistema",target:target||"",details:String(details||""),result,actor,metadata});
+    state.audit.entries=state.audit.entries.slice(0,500);
+  }
+
+  function visibleNavItems() {
+    const output=[];
+    let pendingSection=null;
+    navItems.forEach(item=>{
+      if (item.section) { pendingSection=item; return; }
+      if (!canAccess("view",item.id)) return;
+      if (pendingSection) { output.push(pendingSection); pendingSection=null; }
+      output.push(item);
+    });
+    return output;
+  }
+
+  function renderNav() {
+    ensureV250State();
+    const nav=$("#sidebar-nav");
+    nav.innerHTML=visibleNavItems().map(item=>item.section?`<span class="nav-section-label">${escapeHTML(item.section)}</span>`:`<button class="nav-link ${item.id===currentPage?"active":""}" data-page="${item.id}" type="button"><span class="nav-icon" aria-hidden="true">${item.icon}</span><span>${escapeHTML(item.label)}</span>${item.badge?`<span class="nav-badge">${item.badge}</span>`:""}</button>`).join("");
+    $$('[data-page]',nav).forEach(button=>button.addEventListener("click",()=>navigate(button.dataset.page)));
+  }
+
+  function navigate(page) {
+    if (!canAccess("view",page)) return requirePermission("view",page,"Seu perfil não permite abrir esta área.");
+    currentPage=page; searchTerm=""; collectionFilter="todos"; collectionContextFilter="todos"; collectionSort="padrao";
+    renderNav(); renderPage();
+    if (window.innerWidth<=980) $("#sidebar").classList.remove("open");
+    window.scrollTo({top:0,behavior:"smooth"});
+  }
+
+  function updateChrome() {
+    ensureV250State();
+    $("#sidebar-radio-name").textContent=state.radio.nome||"Minha rádio";
+    const status=$("#sidebar-status"); status.textContent=statusLabel(state.status); status.className=`status-pill ${state.status==="publicado"?"published":"draft"}`;
+    const save=$("#save-button"); if(save){save.disabled=!canAccess("save","radio");save.title=save.disabled?"Seu perfil não pode salvar alterações.":"Salvar alterações no rascunho";}
+    const preview=$("#preview-top-button"); if(preview)preview.disabled=!canAccess("preview","dashboard");
+  }
+
+  function updateAccount() {
+    ensureV250State();
+    const user=currentAccessUser(), client=dashboardData?.cliente||{}, name=user?.nome||client.nome_radio||client.nome||"Cliente";
+    $("#account-name").textContent=name; $("#account-avatar").textContent=initials(name); $("#account-role").textContent=user?.perfil||"Cliente autorizado";
+  }
+
+  function renderPage() {
+    ensureV250State();
+    if (!canAccess("view",currentPage)) currentPage="dashboard";
+    const item=navItems.find(entry=>entry.id===currentPage);
+    $("#page-title").textContent=item?.label||"Painel"; $("#page-eyebrow").textContent=pageEyebrow(currentPage);
+    const root=$("#page-root");
+    if(currentPage==="dashboard")renderDashboard(root); else if(currentPage==="radio")renderRadio(root); else if(currentPage==="editor")renderVisualEditor(root); else if(currentPage==="themes")renderThemes(root);
+    else if(currentPage==="usuarios")renderUsers(root); else if(currentPage==="auditoria")renderAudit(root); else if(currentPage==="publicacao")renderPublication(root);
+    else if(currentPage==="faturas")renderInvoices(root); else if(currentPage==="contrato")renderContract(root); else if(schemas[currentPage])renderCollection(root,currentPage); else renderIntegration(root,currentPage);
+    applyPermissionState(root,currentPage); bindGoButtons(root);
+  }
+
+  function pageEyebrow(page) {
+    if(["dashboard","radio","editor","themes"].includes(page))return"Gestão do site";
+    if(["programacao","locutores","noticias","podcasts","videos","promocoes","galeria","eventos","equipe"].includes(page))return"Conteúdo editorial";
+    if(["anunciantes","publicidade","parceiros","banners","popups"].includes(page))return"Comercial e monetização";
+    if(["whatsapp","redes","seo","dominio","aplicativo"].includes(page))return"Integrações";
+    if(page==="auditoria")return"Conformidade e rastreabilidade";
+    if(page==="backup")return"Proteção e recuperação";
+    return"Configuração do sistema";
+  }
+
+  function applyPermissionState(root,page) {
+    if (!root) return;
+    const map=[['[data-edit-item]',"edit"],['[data-duplicate-item]',"duplicate"],['[data-delete-item]',"delete"],['[data-toggle-item]',"toggle"],['#new-item',"create"]];
+    map.forEach(([selector,action])=>{$$(selector,root).forEach(button=>{if(!canAccess(action,page)){button.disabled=true;button.title="Ação não permitida para este perfil.";}})});
+    $$('form button[type="submit"]',root).forEach(button=>{if(!canAccess("save",page)&&page!=="usuarios"){button.disabled=true;button.title="Seu perfil não pode salvar nesta área.";}});
+  }
+
+  function persist(show=true) {
+    ensureV250State();
+    if(!canAccess("save",currentPage)){if(show)requirePermission("save",currentPage);return Promise.resolve();}
+    state.updatedAt=new Date().toISOString(); updateChrome(); clearTimeout(saveTimer);
+    if(show)return queueRemoteSave(true);
+    saveTimer=setTimeout(()=>queueRemoteSave(false),650); return Promise.resolve();
+  }
+
+  function queueRemoteSave(show=true) {
+    ensureV250State();
+    if(!canAccess("save",currentPage)){if(show)requirePermission("save",currentPage);return Promise.resolve();}
+    if(!remoteSite){if(show)notify("O site ainda não está preparado para edição.","error");return Promise.resolve();}
+    const content=mapStateToSiteContent();
+    saveQueue=saveQueue.catch(()=>{}).then(async()=>{
+      setSaving(true);
+      try{
+        const result=await api("/api/cliente/site/rascunho",{method:"PUT",body:JSON.stringify({conteudo:content})});
+        remoteSite.conteudoRascunho=result.conteudo||content; remoteSite.status_publicacao="rascunho"; state.status="rascunho";
+        if(result.versao)versions.unshift({numero:result.versao,status:"rascunho",autor_tipo:"cliente",criado_em:new Date().toISOString()});
+        recordAudit("rascunho.salvo","sistema","site",`Rascunho salvo${result.versao?` como versão ${result.versao}`:""}.`);
+        if(show)notify(`Rascunho salvo${result.versao?` como versão ${result.versao}`:""}.`,"success");
+      }catch(error){recordAudit("rascunho.falha","sistema","site",error.message||"Falha ao salvar","error");notify(error.message||"Não foi possível salvar o rascunho.","error");throw error;}
+      finally{setSaving(false);updateChrome();}
+    });
+    return saveQueue;
+  }
+
+  function openItemModal(key,id=null) {
+    const action=id?"edit":"create"; if(!requirePermission(action,key))return;
+    const schema=schemas[key],today=new Date().toISOString().slice(0,10);
+    const base=key==="noticias"?{ativo:true,status:"Rascunho",data:today}:key==="programacao"?{ativo:true,dias:["Segunda","Terça","Quarta","Quinta","Sexta"],cor:"#e31c45"}:key==="podcasts"?{ativo:true,destaque:false,data:today,temporada:1,episodio:0,duracaoMinutos:0}:key==="videos"?{ativo:true,destaque:false,data:today,tipo:"Automático",duracaoMinutos:0}:key==="promocoes"?{ativo:true,destaque:false,inicio:today,fim:"",situacao:"Automático pelas datas",participacao:"WhatsApp",mensagemWhatsApp:""}:key==="eventos"?{ativo:true,destaque:false,data:today,dataFim:"",situacao:"Automático pela data",tipo:"Evento da rádio"}:key==="publicidade"?{ativo:true,inicio:today,fim:"",horaInicio:"",horaFim:"",situacao:"Automático pelo período",posicao:"Entre seções",formato:"Banner horizontal",prioridade:10,textoBotao:"Saiba mais",metricas:{impressoes:0,cliques:0,fonte:""}}:key==="banners"?{ativo:true,inicio:today,fim:"",horaInicio:"",horaFim:"",situacao:"Automático pelo período",tipo:"Editorial",posicao:"Após o cabeçalho",prioridade:10,textoBotao:"Saiba mais"}:key==="parceiros"?{ativo:true,categoria:"Patrocinador",ordem:10,destaque:false}:key==="popups"?{ativo:true,inicio:today,fim:"",horaInicio:"",horaFim:"",situacao:"Automático pelo período",dispositivo:"Desktop e celular",frequencia:"Uma vez por sessão",atrasoSegundos:3,prioridade:10,textoBotao:""}:{ativo:true};
+    const item=id?state.content[key].find(entry=>entry.id===id):base; if(!item)return notify("Registro não encontrado.","error");
+    editing={key,id}; $("#modal-eyebrow").textContent=schema.title; $("#modal-title").textContent=id?`Editar ${schema.singular}`:(key==="noticias"?"Nova notícia":`Novo ${schema.singular}`);
+    $("#modal-fields").innerHTML=`<div class="form-grid">${schema.fields.map(field=>modalFieldHTML(field,item)).join("")}</div>`; bindImageInputs($("#modal-fields")); $("#editor-modal").showModal();
+  }
+
+  function saveModal(event) {
+    event.preventDefault(); if(event.submitter?.value==="cancel"){$("#editor-modal").close();return;} if(!editing)return;
+    const {key,id}=editing,action=id?"edit":"create"; if(!requirePermission(action,key))return;
+    const schema=schemas[key],form=new FormData($("#editor-form")); if(!$("#editor-form").checkValidity()){$("#editor-form").reportValidity();return;}
+    const item=id?state.content[key].find(entry=>entry.id===id):{id:uid(key),criadoEm:new Date().toISOString()};
+    schema.fields.forEach(([name,,type])=>{if(type==="checkbox")item[name]=form.has(name);else if(type==="multicheck")item[name]=form.getAll(name).map(String);else if(type==="number")item[name]=Number(form.get(name)||0);else item[name]=String(form.get(name)||"").trim();});
+    item.atualizadoEm=new Date().toISOString(); const validation=validateEditorialItem(key,item,id); if(validation)return notify(validation,"error");
+    if(!id)state.content[key].unshift(item); recordAudit(id?"conteudo.editado":"conteudo.criado",pageArea(key),key,item.titulo||item.nome||item.id); persist(false); $("#editor-modal").close(); editing=null; renderPage(); notify(id?"Registro atualizado.":"Registro criado.","success");
+  }
+
+  function duplicateItem(key,id) {
+    if(!requirePermission("duplicate",key))return; const source=state.content[key].find(entry=>entry.id===id);if(!source)return;
+    const clone=JSON.parse(JSON.stringify(source));clone.id=uid(key);clone.criadoEm=new Date().toISOString();clone.atualizadoEm=clone.criadoEm;
+    if(clone.titulo)clone.titulo=`${clone.titulo} — cópia`;if(clone.nome)clone.nome=`${clone.nome} — cópia`;
+    if(key==="noticias"){clone.slug=slugify(`${clone.slug||clone.titulo}-copia`);clone.status="Rascunho";clone.destaque=false;} if(key==="programacao")clone.ativo=false;
+    if(["podcasts","videos","promocoes","eventos","publicidade","banners","parceiros","popups"].includes(key)){clone.ativo=false;clone.destaque=false;}
+    if(key==="publicidade"){clone.situacao="Pausada";clone.metricas={impressoes:0,cliques:0,fonte:"",atualizadoEm:""};} if(key==="banners")clone.situacao="Pausado";if(key==="popups")clone.situacao="Pausado";if(key==="promocoes")clone.situacao="Automático pelas datas";if(key==="eventos")clone.situacao="Automático pela data";
+    state.content[key].unshift(clone);recordAudit("conteudo.duplicado",pageArea(key),key,source.titulo||source.nome||source.id);persist(false);renderPage();notify("Cópia criada para revisão.","success");
+  }
+
+  function deleteItem(key,id) {
+    if(!requirePermission("delete",key))return;const item=state.content[key].find(entry=>entry.id===id);if(!item)return;
+    if(key==="anunciantes"){const linked=(state.content.publicidade||[]).filter(c=>String(c.anuncianteId||"")===String(id));if(linked.length)return notify(`Este anunciante está vinculado a ${linked.length} campanha${linked.length===1?"":"s"}. Remova ou altere o vínculo antes de excluir.`,"error");}
+    if(!confirm(`Excluir “${item.titulo||item.nome||"este registro"}”?`))return;state.content[key]=state.content[key].filter(entry=>entry.id!==id);recordAudit("conteudo.excluido",pageArea(key),key,item.titulo||item.nome||id);persist(false);renderPage();notify("Registro excluído.","success");
+  }
+
+  function toggleItem(key,id) {
+    if(!requirePermission("toggle",key))return;const item=state.content[key].find(entry=>entry.id===id);if(!item)return;item.ativo=item.ativo===false;recordAudit("conteudo.status",pageArea(key),key,`${item.titulo||item.nome||id}: ${item.ativo?"ativo":"inativo"}`);persist(false);renderPage();
+  }
+
+  function renderCollection(root,key) {
+    const schema=schemas[key],source=state.content[key]||[],items=filterAndSortCollection(key,source),stats=editorialStats(key,source),newItemLabel=key==="noticias"?"+ Nova notícia":`+ Novo ${schema.singular}`;
+    root.innerHTML=`${pageHeader(schema.title,schema.description,`<button class="button secondary" data-preview type="button">Ver no site</button><button class="button primary" id="new-item" type="button">${newItemLabel}</button>`)}${stats.length?`<div class="editorial-kpis">${stats.map(([label,value])=>`<article><span>${escapeHTML(label)}</span><strong>${value}</strong></article>`).join("")}</div>`:""}<section class="table-card"><div class="table-toolbar editorial-toolbar"><div class="search-input"><input id="collection-search" type="search" placeholder="Buscar em ${schema.title.toLowerCase()}" value="${escapeHTML(searchTerm)}"></div><div class="collection-filters">${collectionFilters(key,source)}</div><span class="badge info">${items.length} de ${source.length}</span></div>${items.length?`<div class="table-scroll"><table class="data-table"><thead><tr><th>${schema.singular}</th><th>Resumo</th><th>Status</th><th style="text-align:right">Ações</th></tr></thead><tbody>${items.map(item=>collectionRow(schema,key,item)).join("")}</tbody></table></div>`:`<div class="empty-state"><strong>Nenhum registro encontrado</strong><span>Ajuste os filtros ou use o botão “Novo”.</span></div>`}</section>`;
+    $("#new-item")?.addEventListener("click",()=>openItemModal(key));$$('[data-preview]',root).forEach(button=>button.addEventListener("click",openPreview));
+    $("#collection-search")?.addEventListener("input",event=>{searchTerm=event.target.value;renderCollection(root,key);$("#collection-search")?.focus();});
+    $("#collection-filter")?.addEventListener("change",event=>{collectionFilter=event.target.value;renderCollection(root,key);});$("#collection-context-filter")?.addEventListener("change",event=>{collectionContextFilter=event.target.value;renderCollection(root,key);});$("#collection-sort")?.addEventListener("change",event=>{collectionSort=event.target.value;renderCollection(root,key);});
+    $$('[data-view-item]',root).forEach(button=>button.addEventListener("click",()=>openSiteDetail(key,button.dataset.viewItem)));$$('[data-edit-item]',root).forEach(button=>button.addEventListener("click",()=>openItemModal(key,button.dataset.editItem)));$$('[data-duplicate-item]',root).forEach(button=>button.addEventListener("click",()=>duplicateItem(key,button.dataset.duplicateItem)));$$('[data-delete-item]',root).forEach(button=>button.addEventListener("click",()=>deleteItem(key,button.dataset.deleteItem)));$$('[data-toggle-item]',root).forEach(button=>button.addEventListener("click",()=>toggleItem(key,button.dataset.toggleItem)));applyPermissionState(root,key);
+  }
+
+  function roleOptions(selected) { return Object.keys(V250_ROLE_PROFILES).map(role=>`<option value="${escapeHTML(role)}" ${role===selected?"selected":""}>${escapeHTML(role)}</option>`).join(""); }
+  function securityAreaOptions(selected=[]) {
+    const areas=[["site","Site e temas"],["conteudo","Conteúdo editorial"],["comercial","Comercial"],["integracoes","Integrações"],["publicacao","Publicação"],["financeiro","Faturas e contrato"],["auditoria","Auditoria"],["backup","Backup"],["usuarios","Usuários"]];
+    return `<fieldset class="field full checkbox-fieldset"><legend>Áreas permitidas</legend><div class="checkbox-grid permission-area-grid">${areas.map(([id,label])=>`<label><input type="checkbox" name="areas" value="${id}" ${selected.includes("*")||selected.includes(id)?"checked":""}><span>${label}</span></label>`).join("")}</div></fieldset>`;
+  }
+  function openAccessUserModal(id=null) {
+    if(!requirePermission("manage_users","usuarios"))return;ensureV250State();const user=id?state.security.users.find(entry=>entry.id===id):{perfil:"Editor",areas:[],status:"Convite pendente",ativo:true,exigir2FA:false};if(!user)return;
+    accessEditingId=id;$("#access-user-title").textContent=id?"Editar usuário":"Novo usuário";
+    $("#access-user-fields").innerHTML=`<div class="form-grid"><div class="field"><label for="access-name">Nome</label><input id="access-name" name="nome" value="${escapeHTML(user.nome||"")}" required></div><div class="field"><label for="access-email">E-mail</label><input id="access-email" name="email" type="email" value="${escapeHTML(user.email||"")}" required ${user.owner?"readonly":""}></div><div class="field"><label for="access-role">Perfil</label><select id="access-role" name="perfil" ${user.owner?"disabled":""}>${roleOptions(user.perfil)}</select></div><div class="field"><label for="access-status">Situação</label><select id="access-status" name="status" ${user.owner?"disabled":""}><option ${user.status==="Ativo"?"selected":""}>Ativo</option><option ${user.status==="Convite pendente"?"selected":""}>Convite pendente</option><option ${user.status==="Suspenso"?"selected":""}>Suspenso</option></select></div>${securityAreaOptions(user.areas||[])}<div class="field full"><div class="toggle-row"><div><strong>Exigir autenticação em duas etapas</strong><small>Recomendado para administradores e publicação.</small></div><label class="switch"><input type="checkbox" name="exigir2FA" ${user.exigir2FA?"checked":""}><span></span></label></div></div></div>`;
+    $("#access-user-modal").showModal();
+  }
+  function saveAccessUser(event) {
+    event.preventDefault();if(event.submitter?.value==="cancel"){$("#access-user-modal").close();return;}if(!requirePermission("manage_users","usuarios"))return;
+    const form=new FormData(event.currentTarget),email=String(form.get("email")||"").trim().toLowerCase(),nome=String(form.get("nome")||"").trim();if(!nome||!email)return notify("Informe nome e e-mail válidos.","error");
+    const duplicate=state.security.users.find(user=>user.id!==accessEditingId&&user.email===email);if(duplicate)return notify("Já existe um usuário com este e-mail.","error");
+    const existing=accessEditingId?state.security.users.find(user=>user.id===accessEditingId):null;const perfil=existing?.owner?"Administrador":String(form.get("perfil")||"Somente leitura"),status=existing?.owner?"Ativo":String(form.get("status")||"Convite pendente");
+    const user=existing||{id:uid("user"),criadoEm:new Date().toISOString(),owner:false};user.nome=nome;user.email=email;user.perfil=perfil;user.status=status;user.ativo=status!=="Suspenso";user.areas=existing?.owner?["*"]:form.getAll("areas").map(String);user.exigir2FA=form.has("exigir2FA");user.atualizadoEm=new Date().toISOString();
+    if(!existing)state.security.users.push(user);recordAudit(existing?"usuario.editado":"usuario.criado","usuarios","usuario",`${nome} • ${perfil}`);persist(false);$("#access-user-modal").close();accessEditingId=null;renderUsers($("#page-root"));notify(existing?"Usuário atualizado.":"Usuário configurado.","success");
+  }
+  function toggleAccessUser(id) {
+    if(!requirePermission("manage_users","usuarios"))return;const user=state.security.users.find(entry=>entry.id===id);if(!user||user.owner)return notify("O administrador principal não pode ser suspenso.","error");user.ativo=user.ativo===false;user.status=user.ativo?"Ativo":"Suspenso";user.atualizadoEm=new Date().toISOString();recordAudit("usuario.status","usuarios","usuario",`${user.email}: ${user.status}`);persist(false);renderUsers($("#page-root"));
+  }
+  function deleteAccessUser(id) {
+    if(!requirePermission("manage_users","usuarios"))return;const user=state.security.users.find(entry=>entry.id===id);if(!user||user.owner)return notify("O administrador principal não pode ser excluído.","error");if(!confirm(`Excluir o acesso de “${user.nome}”?`))return;state.security.users=state.security.users.filter(entry=>entry.id!==id);recordAudit("usuario.excluido","usuarios","usuario",user.email);persist(false);renderUsers($("#page-root"));notify("Usuário removido.","success");
+  }
+
+  function renderUsers(root) {
+    ensureV250State();const client=dashboardData?.cliente||{},current=currentAccessUser(),canManage=canAccess("manage_users","usuarios"),users=state.security.users;
+    root.innerHTML=`${pageHeader("Usuários e permissões","Controle perfis, áreas, situação, autenticação em duas etapas e acesso ao CMS.",canManage?`<button class="button primary" id="new-access-user" type="button">+ Novo usuário</button>`:"")}
+      <div class="editorial-kpis"><article><span>Usuários configurados</span><strong>${users.length}</strong></article><article><span>Acessos ativos</span><strong>${users.filter(user=>user.ativo!==false).length}</strong></article><article><span>Administradores</span><strong>${users.filter(user=>user.perfil==="Administrador"&&user.ativo!==false).length}</strong></article><article><span>2FA exigida</span><strong>${users.filter(user=>user.exigir2FA).length}</strong></article></div>
+      <div class="grid-2"><section class="card"><header class="card-header"><div><h3>Acesso atual</h3><p>Permissões aplicadas nesta sessão.</p></div><span class="badge active">${escapeHTML(current.perfil)}</span></header><div class="card-body"><div class="status-list"><div class="health-row"><div><strong>${escapeHTML(current.nome||client.nome||"Cliente")}</strong><span>${escapeHTML(current.email||client.email||"")}</span></div><span class="badge active">${escapeHTML(current.status||"Ativo")}</span></div><div class="notice">O administrador principal permanece protegido contra suspensão e exclusão. Contas adicionais são salvas no CMS para integração segura com o Worker.</div></div></div></section>
+      <form class="card" id="password-form"><header class="card-header"><div><h3>Alterar minha senha</h3><p>Use ao menos 8 caracteres.</p></div></header><div class="card-body"><div class="form-grid">${fieldHTML("senhaAtual","Senha atual","password","",true)}${fieldHTML("novaSenha","Nova senha","password","",true)}${fieldHTML("confirmacao","Confirmar nova senha","password","",true)}</div></div><footer class="card-footer"><button class="button primary" type="submit">Atualizar senha</button></footer></form></div>
+      <section class="table-card" style="margin-top:18px"><div class="table-toolbar"><div><strong>Equipe com acesso</strong><small>Perfis e áreas são aplicados ao menu e às ações do painel.</small></div><span class="badge info">${users.length} usuário${users.length===1?"":"s"}</span></div><div class="table-scroll"><table class="data-table"><thead><tr><th>Usuário</th><th>Perfil e áreas</th><th>Segurança</th><th>Situação</th><th style="text-align:right">Ações</th></tr></thead><tbody>${users.map(user=>`<tr><td><div class="row-main"><span class="row-thumb row-thumb-placeholder">${escapeHTML(initials(user.nome))}</span><div><strong>${escapeHTML(user.nome)}</strong><small>${escapeHTML(user.email)}</small></div></div></td><td><strong>${escapeHTML(user.perfil)}</strong><small>${escapeHTML((user.areas||[]).includes("*")?"Todas as áreas":(user.areas||[]).map(area=>statusLabel(area)).join(", ")||"Áreas do perfil")}</small></td><td><span class="badge ${user.exigir2FA?"active":"info"}">${user.exigir2FA?"2FA exigida":"2FA opcional"}</span><small>${user.ultimoAcesso?`Último acesso: ${formatDateTime(user.ultimoAcesso)}`:"Sem acesso registrado"}</small></td><td><span class="badge ${user.ativo!==false?"active":"inactive"}">${escapeHTML(user.status||"Ativo")}</span>${user.owner?`<small>Administrador principal</small>`:""}</td><td><div class="row-actions"><button class="button small secondary" data-access-edit="${user.id}" type="button">Editar</button>${user.owner?"":`<button class="button small ghost" data-access-toggle="${user.id}" type="button">${user.ativo!==false?"Suspender":"Ativar"}</button><button class="button small danger" data-access-delete="${user.id}" type="button">Excluir</button>`}</div></td></tr>`).join("")}</tbody></table></div></section>
+      <section class="card" style="margin-top:18px"><header class="card-header"><div><h3>Matriz de perfis</h3><p>Permissões padrão aplicadas a cada função.</p></div></header><div class="card-body"><div class="permission-profile-grid">${Object.values(V250_ROLE_PROFILES).map(profile=>`<article class="permission-profile-card"><strong>${escapeHTML(profile.label)}</strong><p>${escapeHTML(profile.description)}</p><div>${profile.actions.map(action=>`<span>${escapeHTML(action)}</span>`).join("")}</div></article>`).join("")}</div></div></section>`;
+    $("#new-access-user")?.addEventListener("click",()=>openAccessUserModal());$("#password-form")?.addEventListener("submit",changePassword);$$('[data-access-edit]',root).forEach(button=>button.addEventListener("click",()=>openAccessUserModal(button.dataset.accessEdit)));$$('[data-access-toggle]',root).forEach(button=>button.addEventListener("click",()=>toggleAccessUser(button.dataset.accessToggle)));$$('[data-access-delete]',root).forEach(button=>button.addEventListener("click",()=>deleteAccessUser(button.dataset.accessDelete)));applyPermissionState(root,"usuarios");
+  }
+
+  async function changePassword(event) {
+    event.preventDefault();const form=new FormData(event.currentTarget),nova=String(form.get("novaSenha")||""),confirmacao=String(form.get("confirmacao")||"");if(nova.length<8)return notify("A nova senha deve ter ao menos 8 caracteres.","error");if(nova!==confirmacao)return notify("A confirmação não corresponde à nova senha.","error");
+    try{const result=await api("/api/cliente/trocar-senha",{method:"POST",body:JSON.stringify({senhaAtual:form.get("senhaAtual"),novaSenha:nova})});event.currentTarget.reset();recordAudit("senha.alterada","usuarios","conta","Senha do usuário atual alterada.");notify(result.mensagem||"Senha atualizada.","success");}catch(error){recordAudit("senha.falha","usuarios","conta",error.message,"error");notify(error.message,"error");}
+  }
+
+  function stableBackupData() {
+    ensureV250State();const copy=JSON.parse(JSON.stringify(state));copy.backup={settings:{...state.backup.settings},snapshots:[]};return copy;
+  }
+  function checksumText(text) { let hash=2166136261;for(let i=0;i<text.length;i++){hash^=text.charCodeAt(i);hash=Math.imul(hash,16777619);}return(`00000000${(hash>>>0).toString(16)}`).slice(-8); }
+  function contentCounts(data=state) { const result={};Object.entries(data.content||{}).forEach(([key,value])=>{if(Array.isArray(value))result[key]=value.length;});return result; }
+  function createSnapshot(label="Ponto de restauração",source="manual") {
+    ensureV250State();const data=stableBackupData(),json=JSON.stringify(data),snapshot={id:uid("snapshot"),label,source,createdAt:new Date().toISOString(),checksum:checksumText(json),size:json.length,counts:contentCounts(data),data:json};state.backup.snapshots.unshift(snapshot);state.backup.snapshots=state.backup.snapshots.slice(0,state.backup.settings.maxSnapshots);recordAudit("backup.criado","backup","snapshot",`${label} • ${source}`);return snapshot;
+  }
+  function downloadBlob(filename,content,type="application/json") { const blob=new Blob([content],{type}),a=document.createElement("a"),url=URL.createObjectURL(blob);a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),0); }
+  function backupEnvelope(data=stableBackupData()) { const payload=JSON.stringify(data);return{format:"crb-cms-backup",version:"2.5.0-final",schemaVersion:8,generatedAt:new Date().toISOString(),checksum:checksumText(payload),counts:contentCounts(data),data}; }
+  function exportBackup() { if(!requirePermission("export","backup"))return;const envelope=backupEnvelope();downloadBlob(`crb-cms-backup-v2.5.0-${new Date().toISOString().slice(0,10)}.json`,JSON.stringify(envelope,null,2));recordAudit("backup.exportado","backup","arquivo",envelope.checksum);notify("Backup completo gerado.","success"); }
+  function downloadSnapshot(id) { if(!requirePermission("export","backup"))return;const snapshot=state.backup.snapshots.find(item=>item.id===id);if(!snapshot)return;const data=JSON.parse(snapshot.data);downloadBlob(`crb-ponto-${slugify(snapshot.label)}-${snapshot.createdAt.slice(0,10)}.json`,JSON.stringify(backupEnvelope(data),null,2));recordAudit("backup.snapshot_exportado","backup","snapshot",snapshot.label); }
+  function restoreSnapshot(id) { if(!requirePermission("backup","backup"))return;const snapshot=state.backup.snapshots.find(item=>item.id===id);if(!snapshot)return;if(checksumText(snapshot.data)!==snapshot.checksum)return notify("Este ponto de restauração está corrompido.","error");if(!confirm(`Restaurar “${snapshot.label}”? O estado atual será preservado em um novo ponto.`))return;const existing=[...state.backup.snapshots];createSnapshot("Antes da restauração","automático");const preserved=[...state.backup.snapshots];state=deepMerge(defaultState(),JSON.parse(snapshot.data));ensureV250State();state.backup.snapshots=preserved;recordAudit("backup.restaurado","backup","snapshot",snapshot.label);persist(false);renderPage();notify("Ponto de restauração carregado. Salve o rascunho para confirmar no servidor.","success"); }
+  function deleteSnapshot(id) { if(!requirePermission("backup","backup"))return;const snapshot=state.backup.snapshots.find(item=>item.id===id);if(!snapshot)return;if(!confirm(`Excluir o ponto “${snapshot.label}”?`))return;state.backup.snapshots=state.backup.snapshots.filter(item=>item.id!==id);recordAudit("backup.excluido","backup","snapshot",snapshot.label);persist(false);renderBackup($("#page-root")); }
+  function importBackup(file) {
+    if(!requirePermission("backup","backup"))return;const reader=new FileReader();reader.onload=()=>{try{const parsed=JSON.parse(reader.result),data=parsed?.format==="crb-cms-backup"?parsed.data:parsed;if(parsed?.format==="crb-cms-backup"){const actual=checksumText(JSON.stringify(data));if(parsed.checksum!==actual)throw new Error("A verificação de integridade do backup falhou.");}if(!data?.radio||!data?.modules||!data?.content)throw new Error("Estrutura inválida");if(confirm("Importar este backup e substituir o conteúdo atual no editor?")){if(state.backup.settings.autoBeforeImport)createSnapshot("Antes da importação","automático");const snapshots=[...state.backup.snapshots];state=deepMerge(defaultState(),data);ensureV250State();state.backup.snapshots=snapshots;recordAudit("backup.importado","backup","arquivo",file.name);persist(false);renderPage();notify("Backup importado e validado.","success");}}catch(error){recordAudit("backup.importacao_falhou","backup","arquivo",error.message,"error");notify(error.message||"Arquivo de backup inválido.","error");}};reader.readAsText(file);
+  }
+
+  function renderBackup(root) {
+    ensureV250State();const snapshots=state.backup.snapshots,totalSize=snapshots.reduce((sum,item)=>sum+Number(item.size||0),0);
+    root.innerHTML=`${pageHeader("Backup e recuperação","Exporte, valide, crie pontos de restauração e recupere o CMS com segurança.",canAccess("backup","backup")?`<button class="button primary" id="create-snapshot" type="button">Criar ponto agora</button>`:"")}
+      <div class="editorial-kpis"><article><span>Pontos disponíveis</span><strong>${snapshots.length}</strong></article><article><span>Limite configurado</span><strong>${state.backup.settings.maxSnapshots}</strong></article><article><span>Espaço estimado</span><strong>${Math.ceil(totalSize/1024)} KB</strong></article><article><span>Schema</span><strong>8</strong></article></div>
+      <div class="grid-3"><section class="card"><div class="card-body"><h3>Exportar backup completo</h3><p class="field-help">Arquivo com metadados, contagens e checksum de integridade.</p><button class="button primary" id="export-backup" type="button">Baixar backup</button></div></section><section class="card"><div class="card-body"><h3>Importar e validar</h3><p class="field-help">Confere estrutura e checksum antes de carregar os dados.</p><button class="button secondary" id="import-backup" type="button">Selecionar arquivo</button></div></section><section class="card"><div class="card-body"><h3>Recarregar do servidor</h3><p class="field-help">Descarta alterações locais e recupera o último rascunho do D1.</p><button class="button danger" id="reset-demo" type="button">Recarregar dados</button></div></section></div>
+      <section class="card" style="margin-top:18px"><header class="card-header"><div><h3>Automação de segurança</h3><p>Proteções antes de operações críticas.</p></div></header><div class="card-body"><form id="backup-settings" class="form-grid"><div class="field full"><div class="toggle-row"><div><strong>Ponto automático antes de importar</strong><small>Preserva o estado atual antes de substituir dados.</small></div><label class="switch"><input type="checkbox" name="autoBeforeImport" ${state.backup.settings.autoBeforeImport?"checked":""}><span></span></label></div><div class="toggle-row"><div><strong>Ponto automático antes de publicar</strong><small>Cria uma referência antes de enviar para revisão.</small></div><label class="switch"><input type="checkbox" name="autoBeforePublication" ${state.backup.settings.autoBeforePublication?"checked":""}><span></span></label></div></div><div class="field"><label for="max-snapshots">Máximo de pontos</label><input id="max-snapshots" name="maxSnapshots" type="number" min="1" max="10" value="${state.backup.settings.maxSnapshots}"></div><div class="field"><button class="button secondary" type="submit">Salvar automação</button></div></form></div></section>
+      <section class="table-card" style="margin-top:18px"><div class="table-toolbar"><div><strong>Pontos de restauração</strong><small>O conteúdo atual é preservado antes de restaurar outro ponto.</small></div><span class="badge info">${snapshots.length}</span></div>${snapshots.length?`<div class="table-scroll"><table class="data-table"><thead><tr><th>Ponto</th><th>Origem</th><th>Conteúdo</th><th>Integridade</th><th style="text-align:right">Ações</th></tr></thead><tbody>${snapshots.map(item=>`<tr><td><strong>${escapeHTML(item.label)}</strong><small>${formatDateTime(item.createdAt)}</small></td><td>${escapeHTML(item.source)}</td><td><small>${Object.values(item.counts||{}).reduce((a,b)=>a+Number(b||0),0)} registros • ${Math.ceil(Number(item.size||0)/1024)} KB</small></td><td><span class="badge ${checksumText(item.data||"")===item.checksum?"active":"inactive"}">${checksumText(item.data||"")===item.checksum?"Íntegro":"Corrompido"}</span></td><td><div class="row-actions"><button class="button small primary" data-snapshot-restore="${item.id}" type="button">Restaurar</button><button class="button small secondary" data-snapshot-download="${item.id}" type="button">Baixar</button><button class="button small danger" data-snapshot-delete="${item.id}" type="button">Excluir</button></div></td></tr>`).join("")}</tbody></table></div>`:`<div class="empty-state"><strong>Nenhum ponto criado</strong><span>Crie um ponto antes de grandes alterações.</span></div>`}</section>
+      <section class="card" style="margin-top:18px"><header class="card-header"><div><h3>Sobre esta instalação</h3><p>Informações técnicas.</p></div></header><div class="card-body"><div class="code-box">Modo: produção integrada\nVersão: ${CONFIG.VERSION||"2.5.0-final"}\nSchema: 8\nPersistência: Cloudflare D1\nAPI: ${CONFIG.WORKER_URL||"não configurada"}\nÚltima alteração: ${formatDateTime(state.updatedAt)}</div></div></section>`;
+    $("#create-snapshot")?.addEventListener("click",()=>{createSnapshot("Ponto manual","manual");persist(false);renderBackup(root);notify("Ponto de restauração criado.","success");});$("#export-backup")?.addEventListener("click",exportBackup);$("#import-backup")?.addEventListener("click",()=>$("#backup-import").click());$("#reset-demo")?.addEventListener("click",()=>{if(confirm("Descartar alterações não salvas e recarregar o rascunho do servidor?")){createSnapshot("Antes de recarregar servidor","automático");recordAudit("servidor.recarregado","backup","site","Recarga solicitada");loadAll();}});
+    $("#backup-settings")?.addEventListener("submit",event=>{event.preventDefault();if(!requirePermission("backup","backup"))return;const form=new FormData(event.currentTarget);state.backup.settings.autoBeforeImport=form.has("autoBeforeImport");state.backup.settings.autoBeforePublication=form.has("autoBeforePublication");state.backup.settings.maxSnapshots=Math.max(1,Math.min(10,Number(form.get("maxSnapshots")||5)));state.backup.snapshots=state.backup.snapshots.slice(0,state.backup.settings.maxSnapshots);recordAudit("backup.configurado","backup","configuracao",`Máximo ${state.backup.settings.maxSnapshots}`);persist(false);renderBackup(root);notify("Automação de backup atualizada.","success");});
+    $$('[data-snapshot-restore]',root).forEach(button=>button.addEventListener("click",()=>restoreSnapshot(button.dataset.snapshotRestore)));$$('[data-snapshot-download]',root).forEach(button=>button.addEventListener("click",()=>downloadSnapshot(button.dataset.snapshotDownload)));$$('[data-snapshot-delete]',root).forEach(button=>button.addEventListener("click",()=>deleteSnapshot(button.dataset.snapshotDelete)));applyPermissionState(root,"backup");
+  }
+
+  function auditCheck(id,label,status="pass",details="") { return {id,label,status,details}; }
+  function duplicateValues(values) { const seen=new Set(),duplicates=new Set();values.filter(Boolean).forEach(value=>{const key=String(value).trim().toLowerCase();if(seen.has(key))duplicates.add(key);seen.add(key);});return [...duplicates]; }
+  function runFunctionalAudit({save=true}={}) {
+    ensureV250State();const checks=[];
+    const requiredDom=["login-view","app-shell","sidebar-nav","page-root","editor-modal","preview-dialog","site-content-dialog","access-user-modal","backup-import"];requiredDom.forEach(id=>checks.push(auditCheck(`dom-${id}`,`Componente #${id}`,document.getElementById(id)?"pass":"fail",document.getElementById(id)?"Disponível":"Elemento ausente")));
+    const navIds=navItems.filter(item=>item.id).map(item=>item.id),navDup=duplicateValues(navIds);checks.push(auditCheck("nav-unique","Rotas do menu sem duplicidade",navDup.length?"fail":"pass",navDup.length?navDup.join(", "):`${navIds.length} áreas registradas`));
+    navIds.forEach(id=>checks.push(auditCheck(`route-${id}`,`Rota ${id}`,(["dashboard","radio","editor","themes","usuarios","auditoria","publicacao","faturas","contrato"].includes(id)||schemas[id]||["whatsapp","redes","seo","dominio","aplicativo","configuracoes","backup"].includes(id))?"pass":"fail","Renderizador disponível")));
+    Object.entries(state.content||{}).forEach(([key,items])=>{if(!Array.isArray(items))return;const ids=items.map(item=>item.id),dups=duplicateValues(ids);checks.push(auditCheck(`ids-${key}`,`${schemas[key]?.title||key}: identificadores únicos`,dups.length?"fail":"pass",`${items.length} registro(s)`));const missing=items.filter(item=>!String(item.titulo||item.nome||"").trim());checks.push(auditCheck(`title-${key}`,`${schemas[key]?.title||key}: conteúdo nomeado`,missing.length?"warning":"pass",missing.length?`${missing.length} sem título/nome`:"Todos identificados"));});
+    const moduleDup=duplicateValues(state.modules.map(item=>item.id));checks.push(auditCheck("modules","Blocos do editor visual",moduleDup.length?"fail":"pass",`${state.modules.length} blocos, ${activeModules().length} ativos`));
+    const programConflicts=[];(state.content.programacao||[]).forEach((a,index)=>(state.content.programacao||[]).slice(index+1).forEach(b=>{if(a.ativo===false||b.ativo===false)return;const shared=normalizeDays(a.dias||a.dia).some(day=>normalizeDays(b.dias||b.dia).includes(day));if(shared&&a.inicio<b.fim&&a.fim>b.inicio)programConflicts.push(`${a.titulo} × ${b.titulo}`);}));checks.push(auditCheck("program-conflicts","Programação sem conflitos",programConflicts.length?"warning":"pass",programConflicts.slice(0,5).join("; ")||"Nenhum conflito"));
+    const slugs=duplicateValues((state.content.noticias||[]).map(item=>slugify(item.slug||item.titulo)));checks.push(auditCheck("news-slugs","Notícias com endereços únicos",slugs.length?"fail":"pass",slugs.length?slugs.join(", "):"Sem duplicidades"));
+    const videoUrls=duplicateValues((state.content.videos||[]).map(item=>normalizeComparableURL(item.url)));checks.push(auditCheck("video-urls","Vídeos sem URLs duplicadas",videoUrls.length?"warning":"pass",videoUrls.length?`${videoUrls.length} duplicidade(s)`:"Sem duplicidades"));
+    const orphan=(state.content.publicidade||[]).filter(item=>item.anuncianteId&&!String(item.anuncianteId).startsWith("legacy:")&&!(state.content.anunciantes||[]).some(ad=>String(ad.id)===String(item.anuncianteId)));checks.push(auditCheck("campaign-advertiser","Campanhas vinculadas a anunciantes",orphan.length?"fail":"pass",orphan.length?`${orphan.length} vínculo(s) inválido(s)`:"Todos os vínculos válidos"));
+    const invalidLinks=[];const linkFields={videos:["url"],promocoes:["linkParticipacao"],eventos:["linkMapa","linkInformacoes"],anunciantes:["site"],publicidade:["link"],parceiros:["link","instagram","facebook","youtube"],banners:["link"],popups:["link"]};Object.entries(linkFields).forEach(([key,fields])=>(state.content[key]||[]).forEach(item=>fields.forEach(field=>{if(item[field]&&!absoluteHttpURL(item[field]))invalidLinks.push(`${key}/${item.titulo||item.nome}/${field}`);})));checks.push(auditCheck("links","Links públicos válidos",invalidLinks.length?"fail":"pass",invalidLinks.slice(0,8).join("; ")||"Todos os links preenchidos são válidos"));
+    const emails=duplicateValues(state.security.users.map(user=>user.email));checks.push(auditCheck("users-email","Usuários com e-mails únicos",emails.length?"fail":"pass",`${state.security.users.length} usuário(s)`));checks.push(auditCheck("users-admin","Administrador ativo disponível",state.security.users.some(user=>user.perfil==="Administrador"&&user.ativo!==false)?"pass":"fail","Proteção contra bloqueio total"));
+    const badSnapshots=state.backup.snapshots.filter(item=>checksumText(item.data||"")!==item.checksum);checks.push(auditCheck("backup-integrity","Pontos de restauração íntegros",badSnapshots.length?"fail":"pass",`${state.backup.snapshots.length-badSnapshots.length}/${state.backup.snapshots.length} íntegros`));
+    const temp=document.createElement("div");temp.className="preview-canvas desktop";try{renderSitePreview(temp);clearPreviewPopupTimer();const unlabeled=$$('button,[role="button"]',temp).filter(el=>!String(el.textContent||"").trim()&&!el.getAttribute("aria-label")&&!el.getAttribute("title"));checks.push(auditCheck("preview-buttons","Botões e cards da prévia identificados",unlabeled.length?"fail":"pass",unlabeled.length?`${unlabeled.length} sem rótulo`:`${$$('button,[role="button"]',temp).length} controles auditados`));const brokenOpen=$$('[data-site-open]',temp).filter(el=>!contentItem(el.dataset.siteOpen,el.dataset.siteId));checks.push(auditCheck("preview-content","Cards da prévia abrem conteúdo existente",brokenOpen.length?"fail":"pass",brokenOpen.length?`${brokenOpen.length} alvo(s) ausente(s)`:"Todos os alvos encontrados"));}catch(error){checks.push(auditCheck("preview-render","Renderização da prévia","fail",error.message));}
+    const pageButtons=$$('button',document).filter(button=>!String(button.textContent||"").trim()&&!button.getAttribute("aria-label")&&!button.getAttribute("title"));checks.push(auditCheck("page-buttons","Botões da tela atual identificados",pageButtons.length?"fail":"pass",pageButtons.length?`${pageButtons.length} sem rótulo`:`${$$('button',document).length} botões verificados`));
+    const totals={pass:checks.filter(c=>c.status==="pass").length,warning:checks.filter(c=>c.status==="warning").length,fail:checks.filter(c=>c.status==="fail").length};const run={id:uid("run"),timestamp:new Date().toISOString(),version:"2.5.0-final",checks,totals};
+    if(save){state.audit.functionalRuns.unshift(run);state.audit.functionalRuns=state.audit.functionalRuns.slice(0,10);recordAudit("auditoria.executada","auditoria","sistema",`${totals.pass} aprovadas, ${totals.warning} alertas, ${totals.fail} falhas`,totals.fail?"error":totals.warning?"warning":"success");persist(false);}return run;
+  }
+  function exportAuditCSV() { if(!requirePermission("export","auditoria"))return;const rows=[["Data/hora","Resultado","Ação","Área","Alvo","Usuário","Detalhes"],...state.audit.entries.map(item=>[item.timestamp,item.result,item.action,item.area,item.target,item.actor?.email||item.actor?.nome||"",item.details])];const csv=rows.map(row=>row.map(value=>`"${String(value??"").replaceAll('"','""')}"`).join(";")).join("\n");downloadBlob(`crb-auditoria-${new Date().toISOString().slice(0,10)}.csv`,`\ufeff${csv}`,"text/csv;charset=utf-8");recordAudit("auditoria.exportada","auditoria","csv",`${state.audit.entries.length} eventos`); }
+  function renderAudit(root) {
+    ensureV250State();const last=state.audit.functionalRuns[0]||null,entries=state.audit.entries.filter(item=>auditFilter==="todos"||item.result===auditFilter);
+    root.innerHTML=`${pageHeader("Auditoria integrada","Verifique botões, conteúdos, vínculos, rotas, permissões, backups e registre todas as alterações.",`<button class="button secondary" id="export-audit" type="button">Exportar CSV</button><button class="button primary" id="run-audit" type="button">Executar auditoria completa</button>`)}
+      <div class="editorial-kpis"><article><span>Verificações aprovadas</span><strong>${last?.totals.pass||0}</strong></article><article><span>Alertas</span><strong>${last?.totals.warning||0}</strong></article><article><span>Falhas</span><strong>${last?.totals.fail||0}</strong></article><article><span>Eventos registrados</span><strong>${state.audit.entries.length}</strong></article></div>
+      <section class="card"><header class="card-header"><div><h3>Última auditoria funcional</h3><p>${last?`Executada em ${formatDateTime(last.timestamp)}`:"Ainda não executada nesta base."}</p></div>${last?`<span class="badge ${last.totals.fail?"inactive":last.totals.warning?"info":"active"}">${last.totals.fail?"Requer correção":last.totals.warning?"Com alertas":"Aprovada"}</span>`:""}</header><div class="card-body">${last?`<div class="audit-check-grid">${last.checks.map(check=>`<article class="audit-check ${check.status}"><span aria-hidden="true">${check.status==="pass"?"✓":check.status==="warning"?"!":"×"}</span><div><strong>${escapeHTML(check.label)}</strong><small>${escapeHTML(check.details||"")}</small></div></article>`).join("")}</div>`:`<div class="empty-state"><strong>Execute a auditoria completa</strong><span>Ela verifica estrutura, conteúdo, links, cards, botões, usuários e backups.</span></div>`}</div></section>
+      <section class="table-card" style="margin-top:18px"><div class="table-toolbar"><div><strong>Histórico de atividades</strong><small>Alterações e operações críticas registradas no rascunho.</small></div><div class="collection-filters"><select id="audit-filter"><option value="todos">Todos os resultados</option><option value="success" ${auditFilter==="success"?"selected":""}>Sucesso</option><option value="warning" ${auditFilter==="warning"?"selected":""}>Alertas</option><option value="error" ${auditFilter==="error"?"selected":""}>Erros</option><option value="denied" ${auditFilter==="denied"?"selected":""}>Permissão negada</option></select>${canAccess("audit","auditoria")?`<button class="button small danger" id="clear-audit" type="button">Limpar histórico</button>`:""}</div></div>${entries.length?`<div class="table-scroll"><table class="data-table"><thead><tr><th>Data</th><th>Ação</th><th>Usuário</th><th>Resultado</th><th>Detalhes</th></tr></thead><tbody>${entries.slice(0,250).map(item=>`<tr><td><strong>${formatDateTime(item.timestamp)}</strong><small>${escapeHTML(item.area)}</small></td><td>${escapeHTML(item.action)}</td><td><strong>${escapeHTML(item.actor?.nome||"Cliente")}</strong><small>${escapeHTML(item.actor?.email||"")}</small></td><td><span class="badge ${item.result==="success"?"active":item.result==="warning"?"info":"inactive"}">${escapeHTML(item.result)}</span></td><td>${escapeHTML(item.details||item.target||"—")}</td></tr>`).join("")}</tbody></table></div>`:`<div class="empty-state"><strong>Nenhum evento neste filtro</strong></div>`}</section>`;
+    $("#run-audit")?.addEventListener("click",()=>{if(!requirePermission("audit","auditoria"))return;runFunctionalAudit();renderAudit(root);notify("Auditoria completa concluída.","success");});$("#export-audit")?.addEventListener("click",exportAuditCSV);$("#audit-filter")?.addEventListener("change",event=>{auditFilter=event.target.value;renderAudit(root);});$("#clear-audit")?.addEventListener("click",()=>{if(!confirm("Limpar o histórico de auditoria?"))return;state.audit.entries=[];recordAudit("auditoria.historico_limpo","auditoria","historico","Histórico reiniciado");persist(false);renderAudit(root);});applyPermissionState(root,"auditoria");
+  }
+
+  function renderPublication(root) {
+    const status=remoteSite?.status_publicacao||state.status,canPublish=canAccess("publish","publicacao");
+    root.innerHTML=`${pageHeader("Publicação","Revise a prévia, gere um ponto de segurança e envie o rascunho para aprovação da Central.",`<button class="button secondary" data-preview type="button">Abrir prévia</button>`)}<div class="grid-2"><section class="card"><header class="card-header"><div><h3>Situação atual</h3><p>Fluxo real de publicação.</p></div></header><div class="card-body"><div class="status-list"><div class="health-row"><div><strong>${escapeHTML(statusLabel(status))}</strong><span>${remoteSite?.solicitacao_publicacao_em?`Solicitado em ${formatDateTime(remoteSite.solicitacao_publicacao_em)}`:remoteSite?.ultima_publicacao_em?`Publicado em ${formatDateTime(remoteSite.ultima_publicacao_em)}`:"Ainda não publicado"}</span></div><span class="badge ${status==="publicado"?"active":"info"}">${escapeHTML(statusLabel(status))}</span></div><div class="notice">Salvar o rascunho não altera o site público. A publicação é revisada pela Central Rádios Brasil.</div>${state.backup.settings.autoBeforePublication?`<div class="notice" style="margin-top:10px">Um ponto de restauração será criado automaticamente antes da solicitação.</div>`:""}</div></div><footer class="card-footer"><div class="page-actions"><button class="button secondary" id="publication-save" type="button">Salvar rascunho</button><button class="button primary" id="publication-request" type="button" ${status==="aguardando_publicacao"||!canPublish?"disabled":""}>Solicitar publicação</button></div></footer></section><section class="card"><header class="card-header"><div><h3>Histórico de versões</h3><p>Últimas versões registradas no D1.</p></div></header><div class="card-body"><div class="activity-list">${versions.slice(0,12).map(v=>`<div class="activity-item"><span class="activity-dot"></span><div><strong>Versão ${Number(v.numero)}</strong><p>${escapeHTML(statusLabel(v.status))} • ${escapeHTML(statusLabel(v.autor_tipo))}</p></div><span class="activity-time">${formatDateTime(v.criado_em)}</span></div>`).join("")||`<div class="empty-state"><strong>Nenhuma versão registrada</strong></div>`}</div></div></section></div>`;
+    $$('[data-preview]',root).forEach(button=>button.addEventListener("click",openPreview));$("#publication-save")?.addEventListener("click",()=>persist(true));$("#publication-request")?.addEventListener("click",requestPublication);applyPermissionState(root,"publicacao");
+  }
+  async function requestPublication() {
+    if(!requirePermission("publish","publicacao"))return;if(!remoteSite)return;if(!confirm("Enviar o rascunho atual para revisão e publicação pela Central Rádios Brasil?"))return;
+    try{if(state.backup.settings.autoBeforePublication)createSnapshot("Antes da solicitação de publicação","automático");await queueRemoteSave(false);const result=await api("/api/cliente/site/solicitar-publicacao",{method:"POST",body:"{}"});remoteSite.status_publicacao=result.statusPublicacao||"aguardando_publicacao";remoteSite.solicitacao_publicacao_em=new Date().toISOString();state.status=remoteSite.status_publicacao;recordAudit("publicacao.solicitada","publicacao","site",result.mensagem||"Solicitação enviada");renderPage();updateChrome();notify(result.mensagem||"Solicitação enviada.","success");}catch(error){recordAudit("publicacao.falha","publicacao","site",error.message,"error");notify(error.message,"error");}
+  }
+
+  async function loadAll() {
+    if(isLoading)return;isLoading=true;resetAudio();
+    try{const[dash,siteResult]=await Promise.all([api("/api/cliente/dashboard"),api("/api/cliente/site").catch(error=>error.status===404?null:Promise.reject(error))]);dashboardData=dash;remoteSite=siteResult?.site||null;versions=siteResult?.versoes||[];if(remoteSite){const media=await api("/api/cliente/site/midias").catch(()=>({midias:[]}));mediaLibrary=media.midias||[];state=mapRemoteToState(remoteSite,dashboardData);}else{state=defaultState();state.radio.nome=dash?.cliente?.nome_radio||dash?.cliente?.nome||"Minha rádio";}ensureV250State();currentPage="dashboard";searchTerm="";updateAccount();if(!$("#app-shell").classList.contains("hidden")){renderNav();updateChrome();renderPage();}}finally{isLoading=false;}
+  }
+
+  function setupV250() {
+    ensureV250State();
+    $("#access-user-form")?.addEventListener("submit",saveAccessUser);
+    $$('#access-user-modal [value="cancel"]').forEach(button=>button.addEventListener("click",event=>{event.preventDefault();accessEditingId=null;$("#access-user-modal").close();}));
+  }
+
 
   function setup() {
     $("#login-form").addEventListener("submit",login);
@@ -1989,5 +2366,6 @@
     resumeSession();
   }
 
+  setupV250();
   setup();
 })();

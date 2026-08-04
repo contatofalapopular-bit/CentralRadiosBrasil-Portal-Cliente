@@ -1,46 +1,68 @@
 # Portal do Cliente — Central Rádios Brasil
 
-## v2.4.0 — Final Consolidada
+## v2.5.0 — Usuários, permissões, auditoria e backup
 
-Base consolidada sobre a v2.4.0 Etapa 2. Reúne os módulos de anunciantes, campanhas publicitárias, banners, parceiros e popups, preservando integralmente as entregas editoriais da v2.3.0.
+Versão consolidada construída sobre a **v2.4.0 Final Consolidada**. Preserva os módulos editoriais e comerciais já aprovados e acrescenta controle de acesso, rastreabilidade e recuperação segura do rascunho.
 
-### Comercial consolidado
+### Usuários e permissões
 
-- Cadastro reutilizável de anunciantes.
-- Campanhas vinculadas a anunciantes, com período, situação, prioridade, formato, peças desktop/mobile, destino e métricas reais recebidas do Worker.
-- Banners editoriais, institucionais e comerciais, com período, prioridade e peças responsivas.
-- Parceiros com categoria, descrição, logomarca, contatos, redes sociais, ordem e destaque.
-- Popups com período, prioridade, dispositivo, frequência, atraso, CTA e fechamento acessível.
+- Administrador principal protegido contra exclusão e suspensão.
+- Cadastro de usuários adicionais com nome, e-mail, perfil, situação e exigência de autenticação em duas etapas.
+- Perfis prontos: Administrador, Editor, Redator, Comercial, Auditor e Somente leitura.
+- Restrição do menu por área permitida.
+- Restrição de ações: visualizar, criar, editar, duplicar, ativar/desativar, excluir, salvar, publicar, gerenciar usuários, auditar, exportar e restaurar backup.
+- E-mails duplicados são bloqueados.
+- Perfis sem permissão veem ações bloqueadas ou não enxergam as áreas correspondentes.
 
-### Correções da consolidação final
+### Auditoria integrada
 
-- As posições das campanhas agora são respeitadas na prévia.
-- Campanhas e banners concorrem pela prioridade em cada posição, sem duplicação do mesmo módulo.
-- “Entre seções” é inserido entre conteúdos, e não no final da página.
-- “Após o player”, “Antes de notícias” e “Antes do rodapé” aparecem no ponto correto.
-- Banners de “Página interna” aparecem ao abrir notícias e outros conteúdos completos.
-- O Dashboard informa conflitos de prioridade, peças ausentes, anunciantes inválidos e excesso de popups ativos.
-- Anunciantes vinculados a campanhas não podem ser excluídos acidentalmente.
-- Campanhas publicadas não podem utilizar anunciante desativado.
-- O popup possui identificação acessível, foco inicial, retenção de foco por Tab, fechamento por Esc, botão ou clique externo.
-- A abertura da prévia foi ajustada para preservar o foco do popup.
+- Histórico com usuário, data/hora, ação, área, alvo, resultado e detalhes.
+- Registro de criação, edição, duplicação, exclusão, alteração de status, salvamento, publicação, usuários, senhas, auditorias e backups.
+- Auditoria funcional interna de rotas, elementos essenciais, identificadores, conteúdos, links, programação, notícias, vídeos, campanhas, usuários, backups, botões e cards da prévia.
+- Exportação do histórico em CSV.
+- Filtros por sucesso, alerta, erro e permissão negada.
 
-### Integração e dados
+### Backup e recuperação
 
-- Versão interna: `2.4.0-final`.
-- Schema interno: `7`.
-- Nenhuma migração SQL necessária.
-- O rascunho continua sendo salvo pelo Worker/D1 já utilizado pelo Portal do Cliente.
-- A prévia não cria impressões, cliques ou frequência fictícia.
-- Métricas e controle de frequência no site público dependem da integração do Portal Público/Worker.
+- Exportação de backup completo em envelope versionado.
+- Checksum para verificar integridade antes da importação.
+- Compatibilidade com backups legados que possuem `radio`, `modules` e `content`.
+- Pontos de restauração manuais e automáticos.
+- Ponto automático antes de importar e antes de solicitar publicação.
+- Download, restauração e exclusão de pontos.
+- Preservação automática do estado atual antes de restaurar outro ponto.
+- Limite configurável entre 1 e 10 pontos.
+
+### Integração de dados
+
+- Versão interna: `2.5.0-final`.
+- Schema interno: `8`.
+- Dados novos gravados em `textos_institucionais.cms_v2.security`, `audit` e `backup`.
+- Nenhuma migração SQL obrigatória.
+- O rascunho continua sendo salvo pelo endpoint já existente do Worker/D1.
+
+### Observação de segurança
+
+O Portal aplica as permissões no menu e nas ações e persiste a configuração no CMS. Para que usuários adicionais tenham credenciais independentes e para que a proteção seja também validada no servidor, o Worker deve autenticar cada usuário e conferir o perfil/permissão em todos os endpoints de escrita. O contrato esperado está documentado em `INTEGRACAO-WORKER-v2.5.0.md`.
+
+### Auditoria de navegador
+
+Foram executadas **190 verificações em Chromium**, divididas em quatro baterias:
+
+- Navegação e conteúdo editorial: 74/74.
+- Comercial, editor, temas e prévia: 64/64.
+- Usuários, auditoria, backup, configurações e publicação: 32/32.
+- Perfis e bloqueios de permissão: 20/20.
+
+Resultado: **190/190 aprovadas**, com **0 exceções JavaScript** e **0 erros de console**. A API foi simulada para não alterar produção.
 
 ### Instalação
 
-1. Faça backup da versão atualmente publicada.
+1. Faça backup da **v2.4.0 Final Consolidada**.
 2. Descompacte este pacote.
-3. Publique os arquivos sobre a v2.4.0 Etapa 2.
-4. Preserve a configuração do Worker em `config.js`, caso o seu ambiente use uma URL diferente.
+3. Publique os arquivos sobre a versão atual do Portal do Cliente.
+4. Preserve a URL correta do Worker em `config.js`.
 5. Limpe o cache com `Ctrl + F5`.
-6. Teste login, salvamento, prévia, publicidade, banners, parceiros e popups.
+6. Teste login, salvamento, usuários, auditoria, backup e publicação.
 
-A próxima versão do roadmap é **v2.5.0 — Usuários, permissões, auditoria e backup**.
+A próxima versão do roadmap é **v2.6.0 — Editor visual e temas consolidados**.

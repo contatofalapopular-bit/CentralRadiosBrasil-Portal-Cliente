@@ -1,0 +1,168 @@
+{
+  "phase": "system-backup-audit",
+  "total": 32,
+  "passed": 32,
+  "failed": 0,
+  "results": [
+    {
+      "name": "Usuários CRUD completo",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Alterar senha",
+      "ok": true,
+      "detail": "(None, None, None, None, None)"
+    },
+    {
+      "name": "Executar auditoria interna",
+      "ok": true,
+      "detail": "(None, None)"
+    },
+    {
+      "name": "Auditoria sem falhas",
+      "ok": true,
+      "detail": "0"
+    },
+    {
+      "name": "Auditoria com verificações",
+      "ok": true,
+      "detail": "82"
+    },
+    {
+      "name": "Exportar auditoria CSV",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Filtrar auditoria",
+      "ok": true,
+      "detail": "['success']"
+    },
+    {
+      "name": "Criar ponto de restauração",
+      "ok": true,
+      "detail": "(None, None)"
+    },
+    {
+      "name": "Ponto listado",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "name": "Exportar backup íntegro",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Baixar ponto",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Restaurar ponto",
+      "ok": true,
+      "detail": "(None, None)"
+    },
+    {
+      "name": "Importar backup validado",
+      "ok": true,
+      "detail": "(None, None)"
+    },
+    {
+      "name": "Configurar automação",
+      "ok": true,
+      "detail": "(None, None, None)"
+    },
+    {
+      "name": "Excluir ponto",
+      "ok": true,
+      "detail": "(None, None)"
+    },
+    {
+      "name": "Salvar Minha Rádio",
+      "ok": true,
+      "detail": "(None, None)"
+    },
+    {
+      "name": "Salvar whatsapp",
+      "ok": true,
+      "detail": "(None, None)"
+    },
+    {
+      "name": "Salvar redes",
+      "ok": true,
+      "detail": "(None, None)"
+    },
+    {
+      "name": "Salvar seo",
+      "ok": true,
+      "detail": "(None, None)"
+    },
+    {
+      "name": "Salvar aplicativo",
+      "ok": true,
+      "detail": "(None, None)"
+    },
+    {
+      "name": "Salvar configuracoes",
+      "ok": true,
+      "detail": "(None, None)"
+    },
+    {
+      "name": "Salvar na publicação",
+      "ok": true,
+      "detail": "(None, None)"
+    },
+    {
+      "name": "Solicitar publicação",
+      "ok": true,
+      "detail": "(None, None)"
+    },
+    {
+      "name": "Salvar pelo topo",
+      "ok": true,
+      "detail": "(None, None)"
+    },
+    {
+      "name": "Worker simulado recebeu rascunho",
+      "ok": true,
+      "detail": "11"
+    },
+    {
+      "name": "Schema 8",
+      "ok": true,
+      "detail": "8"
+    },
+    {
+      "name": "Release 2.5.0",
+      "ok": true,
+      "detail": "2.5.0-final"
+    },
+    {
+      "name": "Security persistida",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "name": "Audit persistida",
+      "ok": true,
+      "detail": "24"
+    },
+    {
+      "name": "Backup persistido",
+      "ok": true,
+      "detail": "3"
+    },
+    {
+      "name": "Botões sem rótulo",
+      "ok": true,
+      "detail": "0"
+    },
+    {
+      "name": "Fase 3 sem exceções",
+      "ok": true,
+      "detail": ""
+    }
+  ]
+}

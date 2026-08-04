@@ -1,0 +1,108 @@
+{
+  "phase": "permissions",
+  "total": 20,
+  "passed": 20,
+  "failed": 0,
+  "results": [
+    {
+      "name": "Redator vê conteúdo",
+      "ok": true,
+      "detail": "['dashboard', 'programacao', 'locutores', 'noticias', 'podcasts', 'videos', 'promocoes', 'galeria', 'eventos', 'equipe']"
+    },
+    {
+      "name": "Redator não vê comercial",
+      "ok": true,
+      "detail": "['dashboard', 'programacao', 'locutores', 'noticias', 'podcasts', 'videos', 'promocoes', 'galeria', 'eventos', 'equipe']"
+    },
+    {
+      "name": "Redator não vê usuários",
+      "ok": true,
+      "detail": "['dashboard', 'programacao', 'locutores', 'noticias', 'podcasts', 'videos', 'promocoes', 'galeria', 'eventos', 'equipe']"
+    },
+    {
+      "name": "Redator não vê backup",
+      "ok": true,
+      "detail": "['dashboard', 'programacao', 'locutores', 'noticias', 'podcasts', 'videos', 'promocoes', 'galeria', 'eventos', 'equipe']"
+    },
+    {
+      "name": "Redator não vê publicação",
+      "ok": true,
+      "detail": "['dashboard', 'programacao', 'locutores', 'noticias', 'podcasts', 'videos', 'promocoes', 'galeria', 'eventos', 'equipe']"
+    },
+    {
+      "name": "Redator pode criar",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Redator pode editar",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Redator não pode excluir",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Redator não pode ativar/desativar",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Redator sem erros",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Leitura vê painel",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Leitura não cria",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Leitura não edita",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Leitura visualiza",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Leitura não salva topo",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Leitura sem erros",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Comercial vê campanhas",
+      "ok": true,
+      "detail": "['dashboard', 'anunciantes', 'publicidade', 'parceiros', 'banners', 'popups']"
+    },
+    {
+      "name": "Comercial não vê notícias",
+      "ok": true,
+      "detail": "['dashboard', 'anunciantes', 'publicidade', 'parceiros', 'banners', 'popups']"
+    },
+    {
+      "name": "Comercial pode editar campanha",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Comercial sem erros",
+      "ok": true,
+      "detail": ""
+    }
+  ]
+}

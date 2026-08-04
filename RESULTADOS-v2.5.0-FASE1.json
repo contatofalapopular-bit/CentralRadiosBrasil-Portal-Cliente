@@ -1,0 +1,378 @@
+{
+  "phase": "navigation-content-a",
+  "total": 74,
+  "passed": 74,
+  "failed": 0,
+  "results": [
+    {
+      "name": "Aplicação autenticada",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "30 áreas no menu",
+      "ok": true,
+      "detail": "30"
+    },
+    {
+      "name": "Abrir área dashboard",
+      "ok": true,
+      "detail": "(None, 'Dashboard')"
+    },
+    {
+      "name": "Abrir área radio",
+      "ok": true,
+      "detail": "(None, 'Minha Rádio')"
+    },
+    {
+      "name": "Abrir área editor",
+      "ok": true,
+      "detail": "(None, 'Editor Visual')"
+    },
+    {
+      "name": "Abrir área themes",
+      "ok": true,
+      "detail": "(None, 'Temas')"
+    },
+    {
+      "name": "Abrir área programacao",
+      "ok": true,
+      "detail": "(None, 'Programação')"
+    },
+    {
+      "name": "Abrir área locutores",
+      "ok": true,
+      "detail": "(None, 'Locutores')"
+    },
+    {
+      "name": "Abrir área noticias",
+      "ok": true,
+      "detail": "(None, 'Notícias')"
+    },
+    {
+      "name": "Abrir área podcasts",
+      "ok": true,
+      "detail": "(None, 'Podcasts')"
+    },
+    {
+      "name": "Abrir área videos",
+      "ok": true,
+      "detail": "(None, 'Vídeos')"
+    },
+    {
+      "name": "Abrir área promocoes",
+      "ok": true,
+      "detail": "(None, 'Promoções')"
+    },
+    {
+      "name": "Abrir área galeria",
+      "ok": true,
+      "detail": "(None, 'Galeria')"
+    },
+    {
+      "name": "Abrir área eventos",
+      "ok": true,
+      "detail": "(None, 'Eventos')"
+    },
+    {
+      "name": "Abrir área equipe",
+      "ok": true,
+      "detail": "(None, 'Equipe')"
+    },
+    {
+      "name": "Abrir área anunciantes",
+      "ok": true,
+      "detail": "(None, 'Anunciantes')"
+    },
+    {
+      "name": "Abrir área publicidade",
+      "ok": true,
+      "detail": "(None, 'Campanhas')"
+    },
+    {
+      "name": "Abrir área parceiros",
+      "ok": true,
+      "detail": "(None, 'Parceiros')"
+    },
+    {
+      "name": "Abrir área banners",
+      "ok": true,
+      "detail": "(None, 'Banners')"
+    },
+    {
+      "name": "Abrir área popups",
+      "ok": true,
+      "detail": "(None, 'Popups')"
+    },
+    {
+      "name": "Abrir área whatsapp",
+      "ok": true,
+      "detail": "(None, 'WhatsApp')"
+    },
+    {
+      "name": "Abrir área redes",
+      "ok": true,
+      "detail": "(None, 'Redes Sociais')"
+    },
+    {
+      "name": "Abrir área seo",
+      "ok": true,
+      "detail": "(None, 'SEO')"
+    },
+    {
+      "name": "Abrir área dominio",
+      "ok": true,
+      "detail": "(None, 'Domínio')"
+    },
+    {
+      "name": "Abrir área aplicativo",
+      "ok": true,
+      "detail": "(None, 'Aplicativo')"
+    },
+    {
+      "name": "Abrir área configuracoes",
+      "ok": true,
+      "detail": "(None, 'Configurações')"
+    },
+    {
+      "name": "Abrir área usuarios",
+      "ok": true,
+      "detail": "(None, 'Usuários e acesso')"
+    },
+    {
+      "name": "Abrir área auditoria",
+      "ok": true,
+      "detail": "(None, 'Auditoria')"
+    },
+    {
+      "name": "Abrir área publicacao",
+      "ok": true,
+      "detail": "(None, 'Publicação')"
+    },
+    {
+      "name": "Abrir área faturas",
+      "ok": true,
+      "detail": "(None, 'Faturas')"
+    },
+    {
+      "name": "Abrir área contrato",
+      "ok": true,
+      "detail": "(None, 'Contrato')"
+    },
+    {
+      "name": "Abrir área backup",
+      "ok": true,
+      "detail": "(None, 'Backup')"
+    },
+    {
+      "name": "programacao: conteúdo listado",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "name": "programacao: visualizar conteúdo salvo",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "programacao: abrir edição",
+      "ok": true,
+      "detail": "(None, True, None)"
+    },
+    {
+      "name": "programacao: abrir novo cadastro",
+      "ok": true,
+      "detail": "(None, True, None)"
+    },
+    {
+      "name": "programacao: duplicar e excluir cópia",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "programacao: ativar/desativar",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "locutores: conteúdo listado",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "name": "locutores: visualizar conteúdo salvo",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "locutores: abrir edição",
+      "ok": true,
+      "detail": "(None, True, None)"
+    },
+    {
+      "name": "locutores: abrir novo cadastro",
+      "ok": true,
+      "detail": "(None, True, None)"
+    },
+    {
+      "name": "locutores: duplicar e excluir cópia",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "locutores: ativar/desativar",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "noticias: conteúdo listado",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "name": "noticias: visualizar conteúdo salvo",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "noticias: abrir edição",
+      "ok": true,
+      "detail": "(None, True, None)"
+    },
+    {
+      "name": "noticias: abrir novo cadastro",
+      "ok": true,
+      "detail": "(None, True, None)"
+    },
+    {
+      "name": "noticias: duplicar e excluir cópia",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "podcasts: conteúdo listado",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "name": "podcasts: visualizar conteúdo salvo",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "podcasts: abrir edição",
+      "ok": true,
+      "detail": "(None, True, None)"
+    },
+    {
+      "name": "podcasts: abrir novo cadastro",
+      "ok": true,
+      "detail": "(None, True, None)"
+    },
+    {
+      "name": "podcasts: duplicar e excluir cópia",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "podcasts: ativar/desativar",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "videos: conteúdo listado",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "name": "videos: visualizar conteúdo salvo",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "videos: abrir edição",
+      "ok": true,
+      "detail": "(None, True, None)"
+    },
+    {
+      "name": "videos: abrir novo cadastro",
+      "ok": true,
+      "detail": "(None, True, None)"
+    },
+    {
+      "name": "videos: duplicar e excluir cópia",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "videos: ativar/desativar",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "promocoes: conteúdo listado",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "name": "promocoes: visualizar conteúdo salvo",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "promocoes: abrir edição",
+      "ok": true,
+      "detail": "(None, True, None)"
+    },
+    {
+      "name": "promocoes: abrir novo cadastro",
+      "ok": true,
+      "detail": "(None, True, None)"
+    },
+    {
+      "name": "promocoes: duplicar e excluir cópia",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "promocoes: ativar/desativar",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "galeria: conteúdo listado",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "name": "galeria: visualizar conteúdo salvo",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "galeria: abrir edição",
+      "ok": true,
+      "detail": "(None, True, None)"
+    },
+    {
+      "name": "galeria: abrir novo cadastro",
+      "ok": true,
+      "detail": "(None, True, None)"
+    },
+    {
+      "name": "galeria: duplicar e excluir cópia",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "galeria: ativar/desativar",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Fase 1 sem exceções",
+      "ok": true,
+      "detail": ""
+    }
+  ]
+}

@@ -1,18 +1,32 @@
-# Central Rádios Brasil — Portal do Cliente v1.3.0
+# Portal do Cliente v2.0.0 — CMS Multitema Integrado
 
-Parte 2 do Commit 22.18: Configurações e biblioteca de imagens.
+Esta versão combina o Portal do Cliente já publicado com o protótipo CMS Multitema.
 
-## Incluído
-- estrutura visual inspirada no painel de referência aprovado;
-- revisão global de espaçamentos;
-- Configurações: Principal, Redes Sociais, Player, Google e Fale Conosco;
-- upload real de imagens com otimização automática;
-- biblioteca de imagens por site;
-- upload em todos os campos visuais já existentes;
-- rascunho, prévia, publicação, contrato e faturas preservados.
+## Compatibilidade
+- Cloudflare Worker principal: v1.15.0
+- Admin Central: v3.10.0
+- GitHub Pages: compatível
+- Banco: D1 existente
 
-## Dependência
-Requer Worker v1.15.0. Publique o Worker antes deste Portal.
+## Recursos integrados
+- login, sessão e logout reais;
+- cliente, contrato e faturas reais;
+- site e permissões atuais;
+- rascunho e histórico no D1;
+- solicitação de publicação supervisionada;
+- upload de imagens pela API existente;
+- dashboard, editor visual, temas e prévia multitema;
+- CRUD de programação, locutores, notícias, podcasts, vídeos, promoções, galeria, eventos, equipe, publicidade, parceiros, banners e popups;
+- backup JSON;
+- troca de senha.
 
-## Observação técnica
-Nesta etapa as mídias são armazenadas no D1, com limite de 25 MB por site. Uma migração futura para Cloudflare R2 poderá ampliar a capacidade sem mudar o painel.
+## Instalação
+Substitua os arquivos da raiz do repositório `CentralRadiosBrasil-Portal-Cliente` por estes arquivos e publique pelo GitHub Pages.
+
+## Segurança dos dados
+A versão preserva o formato atual de `conteudoRascunho`. Os dados adicionais do CMS ficam em `textos_institucionais.cms_v2`, sem exigir migração SQL.
+
+## Limitações conhecidas
+- usuários adicionais continuam controlados pela Central, pois o Worker atual não expõe CRUD de usuários;
+- domínio e URL técnica do stream são somente leitura;
+- audiência só aparecerá depois de uma integração real com o streaming.

@@ -1,477 +1,91 @@
-<!DOCTYPE html>
-
+<!doctype html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
-<meta content="#3f9292" name="theme-color"/>
-<meta content="Painel administrativo do cliente para configurar, organizar e publicar o site da rádio." name="description"/>
-<meta content="default-src 'self'; connect-src 'self' https://broken-bar-45e2.contatofalapopular.workers.dev; img-src 'self' data: https:; media-src https:; style-src 'self' 'unsafe-inline'; script-src 'self'; font-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'" http-equiv="Content-Security-Policy"/>
-<title>Painel do Site — Central Rádios Brasil</title>
-<link href="styles.css" rel="stylesheet"/>
-<link href="manifest.webmanifest" rel="manifest"/>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#111827">
+  <meta name="description" content="Portal do Cliente da Central Rádios Brasil — CMS multitema integrado.">
+  <title>Portal do Cliente — Central Rádios Brasil</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
-<section class="auth-shell" id="login-view">
-<div aria-hidden="true" class="brand-card">
-<div class="brand-mark">CRB</div>
-<span>Central Rádios Brasil</span>
-<h1>O site da sua rádio sob seu controle.</h1>
-<p>Atualize conteúdo, aparência, programação, equipe, notícias e módulos em um painel moderno e seguro.</p>
-</div>
-<main class="login-card" id="login-content">
-<span class="eyebrow">Área segura</span>
-<h2>Portal do Cliente</h2>
-<p class="muted">Entre com o e-mail cadastrado e sua senha.</p>
-<form id="login-form" novalidate="">
-<label>E-mail<input autocomplete="username" id="login-email" name="email" required="" type="email"/></label>
-<label>Senha<input autocomplete="current-password" id="login-password" minlength="8" name="senha" required="" type="password"/></label>
-<button class="primary" id="login-button" type="submit">Entrar</button>
-</form>
-<div class="message hidden" id="login-message" role="alert"></div>
-<small>O acesso é individual. Nunca compartilhe sua senha.</small>
-</main>
-</section>
-<div class="app-shell hidden" id="app-view"><header class="client-header">
-<div class="client-header-left">
-<button aria-controls="client-sidebar" aria-expanded="false" aria-label="Abrir menu" class="icon-button sidebar-toggle" id="sidebar-toggle" type="button">☰</button>
-<div class="brand-inline">
-<span class="brand-mark small">CRB</span>
-<div><strong>Administração do Site</strong><small>Central Rádios Brasil</small></div>
-</div>
-</div>
-<div aria-live="polite" class="client-header-center">
-<span class="header-site-label">Licenciado para</span>
-<strong id="header-site-name">Meu site</strong>
-<span class="header-status" id="header-site-status">Rascunho</span>
-</div>
-<div class="client-header-actions">
-<div class="session-summary"><span id="session-name"></span><small id="session-role">Cliente autorizado</small></div>
-<button class="ghost" id="logout-button" type="button">Sair</button>
-</div>
-</header>
-<div class="client-layout"><aside aria-label="Administração do site" class="client-sidebar" id="client-sidebar">
-<div class="sidebar-site-card">
-<span class="eyebrow">Administração do site</span>
-<strong id="sidebar-site-name">Meu site</strong>
-<small id="sidebar-last-update">Sessão protegida</small>
-</div>
-<nav class="client-nav">
-<button class="client-nav-link active" data-route-tab="resumo" type="button"><span class="nav-icon">⌂</span><span>Inicial</span></button>
-<details class="client-nav-group">
-<summary><span><span class="nav-icon">⚙</span>Configurações</span><span class="nav-chevron">›</span></summary>
-<div class="client-subnav">
-<button data-route-editor="principal" type="button">Principal</button>
-<button data-route-editor="redes" type="button">Redes Sociais</button>
-<button data-route-editor="player" type="button">Player</button>
-<button data-route-editor="google" type="button">Serviços Google</button>
-<button data-route-editor="contato" type="button">Página Fale Conosco</button>
-<button data-route-editor="midias" type="button">Biblioteca de Imagens</button>
-</div>
-</details>
-<details class="client-nav-group">
-<summary><span><span class="nav-icon">▣</span>Layout</span><span class="nav-chevron">›</span></summary>
-<div class="client-subnav">
-<button data-route-editor="cabecalho" type="button">Cabeçalho</button>
-<button data-route-editor="rodape" type="button">Rodapé</button>
-<button data-route-editor="aparencia" type="button">Plano de Fundo</button>
-<button data-route-editor="paginas" type="button">Páginas Fixas</button>
-<button data-route-editor="aparencia" type="button">Cores / Ícones</button>
-<button data-route-editor="menu" type="button">Menu do Site</button>
-<button data-route-editor="seo" type="button">SEO e Compartilhamento</button>
-</div>
-</details>
-<details class="client-nav-group">
-<summary><span><span class="nav-icon">◆</span>Módulos</span><span class="nav-chevron">›</span></summary>
-<div class="client-subnav">
-<button data-route-editor="modulos" type="button">Cadastrar Módulo</button>
-<button data-route-editor="modulos" type="button">Listar Módulos</button>
-</div>
-</details>
-<details class="client-nav-group">
-<summary><span><span class="nav-icon">✎</span>Conteúdo</span><span class="nav-chevron">›</span></summary>
-<div class="client-subnav content-sequence">
-<button data-route-editor="google" type="button">AdSense</button>
-<button data-route-editor="aplicativos" type="button">Baixe nosso Aplicativo</button>
-<button data-route-editor="destaques" type="button">Destaque</button>
-<button data-route-editor="enquete" type="button">Enquete</button>
-<button data-route-editor="redes" type="button">Fan Page</button>
-<button data-route-editor="galeria" type="button">Galeria de Fotos</button>
-<button data-route-editor="locutores" type="button">Locutores</button>
-<button data-route-editor="mural" type="button">Mural</button>
-<button data-route-editor="noticias" type="button">Notícias</button>
-<button data-route-editor="noticias" type="button">Notícias Atualizadas</button>
-<button data-route-editor="ouvinte" type="button">Ouvinte do Mês</button>
-<button data-route-editor="paginas" type="button">Páginas Fixas</button>
-<button data-route-editor="parceiros" type="button">Parceiros</button>
-<button data-route-editor="pedidos" type="button">Peça sua Música</button>
-<button data-route-editor="programacao" type="button">Programação</button>
-<button data-route-editor="publicidades" type="button">Publicidades</button>
-<button data-route-editor="publicidades" type="button">Publicidade Abertura</button>
-<button data-route-editor="topmusicas" type="button">Top Música</button>
-<button data-route-editor="videos" type="button">Vídeos</button>
-<button data-route-editor="videos" type="button">Web TV</button>
-<button data-route-editor="whatsapp" type="button">WhatsApp</button>
-</div>
-</details>
-<button class="client-nav-link" data-route-tab="seguranca" type="button"><span class="nav-icon">♙</span><span>Usuários</span></button>
-<div class="client-nav-divider" role="separator"></div>
-<span class="client-nav-caption">Conta e operação</span>
-<button class="client-nav-link secondary-link" data-route-tab="faturas" type="button"><span class="nav-icon">▤</span><span>Faturas</span></button>
-<button class="client-nav-link secondary-link" data-route-tab="contratos" type="button"><span class="nav-icon">▧</span><span>Contrato</span></button>
-<button class="client-nav-link secondary-link" data-route-editor="publicacao" type="button"><span class="nav-icon">✓</span><span>Publicação</span></button>
-</nav>
-<footer class="sidebar-footer">
-<strong>Portal do Cliente v1.3.0</strong>
-<span>Commit 22.18.2 • Configurações e mídias</span>
-</footer>
-</aside><main class="main-content client-workspace" id="conteudo">
-<div class="message hidden" id="global-message" role="status"></div>
-<section class="panel" data-panel="resumo">
-<div class="page-heading"><div><span class="eyebrow">Painel inicial</span><h1 id="welcome-title">Portal do Cliente</h1><p class="muted" id="welcome-subtitle"></p></div><button class="secondary" id="refresh-button" type="button">Atualizar dados</button></div><section aria-labelledby="notices-title" class="dashboard-notices">
-<div class="dashboard-section-head"><div><span class="eyebrow">Central de avisos</span><h2 id="notices-title">Novidades do sistema</h2></div><span class="live-chip">Painel conectado</span></div>
-<div class="notice-list">
-<article><strong>Fluxo editorial protegido</strong><p>As alterações são salvas como rascunho e só entram no site após aprovação.</p></article>
-<article><strong>Estrutura do painel em evolução</strong><p>Esta versão inicia a nova navegação na sequência aprovada: Inicial, Configurações, Layout, Módulos, Conteúdo e Usuários.</p></article>
-</div>
-</section>
-<div class="kpis">
-<article><span>Contrato</span><strong id="kpi-contract">—</strong><small id="kpi-contract-detail">Nenhum contrato</small></article>
-<article><span>Site</span><strong id="kpi-site">—</strong><small id="kpi-site-detail">Não preparado</small></article>
-<article><span>Faturas em aberto</span><strong id="kpi-invoices">0</strong><small id="kpi-invoices-detail">R$ 0,00</small></article>
-<article><span>Próximo vencimento</span><strong id="kpi-due">—</strong><small id="kpi-due-detail">Sem cobrança pendente</small></article>
-</div><section class="dashboard-operational-grid">
-<article class="dashboard-card">
-<div class="dashboard-card-head"><div><span class="eyebrow">Resumo do site</span><h2>Conteúdo e publicação</h2></div><button class="small-action" data-route-editor="inicio" type="button">Gerenciar</button></div>
-<div class="summary-metrics" id="home-site-summary">
-<div><strong id="home-content-count">0</strong><span>itens de conteúdo</span></div>
-<div><strong id="home-module-count">0</strong><span>módulos ativos</span></div>
-<div><strong id="home-version-count">0</strong><span>versões registradas</span></div>
-<div><strong id="home-media-count">0</strong><span>imagens enviadas</span></div>
-</div>
-</article>
-<article class="dashboard-card">
-<div class="dashboard-card-head"><div><span class="eyebrow">Estatísticas</span><h2>Visitas do site</h2></div><span class="status-neutral">Sem números simulados</span></div>
-<div class="analytics-empty"><strong>Telemetria ainda não ativada</strong><p>Os gráficos reais de visitas, usuários online e origem dos acessos serão conectados na Parte 7.</p></div>
-</article>
-</section>
-<div class="grid-two">
-<article class="card"><h2>Andamento do site</h2><div class="status-stack" id="site-progress"></div></article>
-<article class="card"><h2>Últimas faturas</h2><div class="compact-list" id="recent-invoices"></div></article>
-</div>
-</section>
-<section class="panel hidden" data-panel="site">
-<div class="empty hidden" id="site-unavailable">Nenhum site foi preparado para este cliente.</div>
-<form class="site-manager site-manager-full hidden" id="site-form" novalidate="">
-<section class="manager-content">
-<div class="manager-toolbar workspace-toolbar">
-<div><div class="workspace-site-context"><strong id="manager-site-name">Meu site</strong><span class="header-status" id="manager-site-status">Rascunho</span></div><span class="eyebrow" id="editor-breadcrumb">Painel do site</span><h1 id="editor-title">Inicial</h1><p class="muted" id="editor-description">Resumo do conteúdo e atalhos de edição.</p></div>
-<div class="button-row"><button class="secondary" id="preview-button" type="button">Visualizar prévia</button><button class="primary" id="save-draft-button" type="button">Salvar rascunho</button></div>
-</div>
-<section class="editor-page active" data-editor-page-content="inicio">
-<div class="editor-kpis">
-<article><span>Preenchimento</span><strong id="editor-completion">0%</strong><small>Campos principais preenchidos</small></article>
-<article><span>Conteúdos</span><strong id="editor-content-count">0</strong><small>Itens cadastrados</small></article>
-<article><span>Módulos ativos</span><strong id="editor-modules-count">0</strong><small>Seções visíveis no site</small></article>
-<article><span>Última versão</span><strong id="editor-version">—</strong><small id="editor-version-date">Ainda não salva</small></article>
-</div>
-<div class="grid-two">
-<article class="card"><h2>Atalhos</h2><div class="shortcut-grid"><button data-go-editor="principal" type="button">Dados principais</button><button data-go-editor="programacao" type="button">Programação</button><button data-go-editor="noticias" type="button">Notícias</button><button data-go-editor="publicacao" type="button">Publicar</button></div></article>
-<article class="card"><h2>Situação</h2><div class="status-stack" id="editor-status-list"></div></article>
-</div>
-<article class="card"><h2>Histórico de versões</h2><div class="compact-list" id="versions-list"></div></article>
-</section>
-<section class="editor-page" data-editor-page-content="principal" data-field="nome slogan logo capa descricao textos_institucionais">
-<div class="section-heading"><h2>Informações principais</h2><p>Nome, identidade e apresentação da rádio.</p></div>
-<div class="form-grid">
-<label data-field="nome">Nome da rádio<input maxlength="140" name="nome"/></label>
-<label data-field="slogan">Slogan<input maxlength="180" name="slogan"/></label>
-<div class="full media-control" data-media-control data-media-profile="logo" data-media-label="Logomarca principal">
-<input name="logo" type="hidden"/>
-<div class="media-copy"><strong>Logomarca principal</strong><small>Recomendado: 800 × 400 px • PNG, JPG ou WEBP • até 300 KB</small></div>
-<div class="media-preview" data-media-preview><span>Nenhuma imagem</span></div>
-<div class="media-actions"><label class="media-file-button">Selecionar imagem<input accept="image/jpeg,image/png,image/webp" data-media-file type="file"/></label><button class="ghost media-remove" data-media-remove type="button">Remover</button></div>
-<div class="media-progress hidden" data-media-progress></div>
-</div>
-<div class="full media-control" data-media-control data-media-profile="capa" data-media-label="Imagem de capa">
-<input name="capa" type="hidden"/>
-<div class="media-copy"><strong>Imagem de capa</strong><small>Recomendado: 1600 × 600 px • corte horizontal automático • até 600 KB</small></div>
-<div class="media-preview media-preview-wide" data-media-preview><span>Nenhuma imagem</span></div>
-<div class="media-actions"><label class="media-file-button">Selecionar imagem<input accept="image/jpeg,image/png,image/webp" data-media-file type="file"/></label><button class="ghost media-remove" data-media-remove type="button">Remover</button></div>
-<div class="media-progress hidden" data-media-progress></div>
-</div>
-<div class="full media-control" data-media-control data-media-profile="favicon" data-media-label="Ícone do site">
-<input name="favicon" type="hidden"/>
-<div class="media-copy"><strong>Ícone do site / favicon</strong><small>Recomendado: 512 × 512 px • formato quadrado • até 120 KB</small></div>
-<div class="media-preview media-preview-square" data-media-preview><span>Nenhuma imagem</span></div>
-<div class="media-actions"><label class="media-file-button">Selecionar imagem<input accept="image/jpeg,image/png,image/webp" data-media-file type="file"/></label><button class="ghost media-remove" data-media-remove type="button">Remover</button></div>
-<div class="media-progress hidden" data-media-progress></div>
-</div>
-<label class="full" data-field="descricao">Descrição curta<textarea maxlength="3000" name="descricao" rows="4"></textarea></label>
-<label class="full" data-field="textos_institucionais">Sobre a rádio<textarea name="sobre" rows="6"></textarea></label>
-<label class="full" data-field="textos_institucionais">Missão<textarea name="missao" rows="3"></textarea></label>
-<label class="full" data-field="textos_institucionais">Visão<textarea name="visao" rows="3"></textarea></label>
-<label class="full" data-field="textos_institucionais">Valores<textarea name="valores" rows="3"></textarea></label>
-</div>
-</section>
-<section class="editor-page" data-editor-page-content="redes" data-field="redes_sociais">
-<div class="section-heading"><h2>Redes sociais</h2><p>Links oficiais exibidos no site.</p></div>
-<div class="form-grid">
-<label>Instagram<input name="instagram" type="url"/></label><label>Facebook<input name="facebook" type="url"/></label>
-<label>YouTube<input name="youtube" type="url"/></label><label>TikTok<input name="tiktok" type="url"/></label>
-<label>X / Twitter<input name="xTwitter" type="url"/></label><label>Threads<input name="threads" type="url"/></label>
-<label>Telegram<input name="telegram" type="url"/></label><label>Spotify<input name="spotify" type="url"/></label>
-</div>
-</section>
-<section class="editor-page" data-editor-page-content="player" data-field="textos_institucionais cores capa logo">
-<div class="section-heading"><h2>Player da rádio</h2><p>O endereço técnico do áudio continua protegido e é definido pela Central.</p></div>
-<div class="notice"><strong>Stream técnico:</strong> <span id="technical-stream">Será definido pela Central.</span></div>
-<div class="form-grid">
-<label>Título do player<input maxlength="120" name="playerTitulo" placeholder="Ouça ao vivo"/></label>
-<label>Texto do botão<input maxlength="50" name="playerBotao" placeholder="Tocar rádio"/></label>
-<label>Estilo<select name="playerEstilo"><option value="compacto">Compacto</option><option value="destaque">Destaque</option><option value="flutuante">Flutuante</option></select></label>
-<label>Mostrar capa atual<select name="playerMostrarCapa"><option value="sim">Sim</option><option value="nao">Não</option></select></label>
-<label class="full">Mensagem quando offline<input maxlength="180" name="playerOffline" placeholder="Transmissão temporariamente indisponível"/></label>
-<div class="full media-control" data-media-control data-media-profile="player" data-media-label="Imagem padrão do player">
-<input name="playerImagem" type="hidden"/>
-<div class="media-copy"><strong>Imagem padrão do player</strong><small>Recomendado: 800 × 800 px • formato quadrado • até 250 KB</small></div>
-<div class="media-preview media-preview-square" data-media-preview><span>Nenhuma imagem</span></div>
-<div class="media-actions"><label class="media-file-button">Selecionar imagem<input accept="image/jpeg,image/png,image/webp" data-media-file type="file"/></label><button class="ghost media-remove" data-media-remove type="button">Remover</button></div>
-<div class="media-progress hidden" data-media-progress></div>
-</div>
-</div>
-</section>
-<section class="editor-page" data-editor-page-content="google" data-field="textos_institucionais">
-<div class="section-heading"><h2>Serviços Google</h2><p>Identificadores de ferramentas externas. Nenhum dado de visita é inventado.</p></div>
-<div class="form-grid">
-<label>Google Analytics 4<input name="googleAnalytics" placeholder="G-XXXXXXXXXX"/></label>
-<label>Google Tag Manager<input name="googleTagManager" placeholder="GTM-XXXXXXX"/></label>
-<label>Google Search Console<input name="googleSearchConsole" placeholder="Código de verificação"/></label>
-<label>Google AdSense<input name="googleAdsense" placeholder="ca-pub-..."/></label>
-<label class="full">Link do mapa / Google Maps<input name="googleMaps" type="url"/></label>
-</div>
-</section>
-<section class="editor-page" data-editor-page-content="contato" data-field="contatos whatsapp">
-<div class="section-heading"><h2>Página Fale Conosco</h2><p>Informações públicas de contato.</p></div>
-<div class="form-grid">
-<label>E-mail público<input name="contatoEmail" type="email"/></label><label>Telefone<input name="contatoTelefone"/></label>
-<label>Responsável<input name="contatoResponsavel"/></label><label>Horário de atendimento<input name="contatoHorario"/></label>
-<label class="full">Endereço<input name="contatoEndereco"/></label><label>Cidade<input name="contatoCidade"/></label><label>Estado<input maxlength="2" name="contatoEstado"/></label>
-<label class="toggle full"><input name="contatoFormulario" type="checkbox"/> Exibir formulário de contato no site</label>
-</div>
-</section>
+  <a class="skip-link" href="#main-content">Pular para o conteúdo</a>
 
-<section class="editor-page" data-editor-page-content="midias">
-<div class="section-heading inline"><div><h2>Biblioteca de imagens</h2><p>Arquivos enviados pelo cliente e usados no site.</p></div><button class="secondary" id="refresh-media-button" type="button">Atualizar biblioteca</button></div>
-<div class="media-usage-card"><div><strong>Armazenamento utilizado</strong><small id="media-usage-text">0 KB de 25 MB</small></div><progress id="media-usage-progress" max="100" value="0">0%</progress></div>
-<div class="notice"><strong>Imagens otimizadas automaticamente</strong><p>O painel recorta, redimensiona e comprime cada arquivo de acordo com o local em que será usado. O cliente não precisa informar endereços de imagens.</p></div>
-<div class="media-library" id="media-library"><div class="empty">Nenhuma imagem enviada.</div></div>
-</section>
-<section class="editor-page" data-editor-page-content="cabecalho" data-field="textos_institucionais logo slogan">
-<div class="section-heading"><h2>Cabeçalho</h2><p>Organize a área superior do site.</p></div>
-<div class="form-grid">
-<label>Modelo<select name="headerModelo"><option value="centralizado">Centralizado</option><option value="horizontal">Horizontal</option><option value="hero">Hero com imagem</option></select></label>
-<label>Alinhamento<select name="headerAlinhamento"><option value="centro">Centro</option><option value="esquerda">Esquerda</option><option value="direita">Direita</option></select></label>
-<label>Altura<input max="700" min="120" name="headerAltura" type="number" value="360"/></label>
-<label class="toggle"><input name="headerMostrarLogo" type="checkbox"/> Mostrar logomarca</label>
-<label class="toggle"><input name="headerMostrarSlogan" type="checkbox"/> Mostrar slogan</label>
-<label class="toggle"><input name="headerMostrarPlayer" type="checkbox"/> Mostrar player no cabeçalho</label>
-</div>
-</section>
-<section class="editor-page" data-editor-page-content="rodape" data-field="textos_institucionais contatos redes_sociais">
-<div class="section-heading"><h2>Rodapé</h2><p>Textos e elementos exibidos no final das páginas.</p></div>
-<div class="form-grid">
-<label class="full">Texto do rodapé<textarea name="footerTexto" rows="3"></textarea></label>
-<label class="toggle"><input name="footerRedes" type="checkbox"/> Mostrar redes sociais</label>
-<label class="toggle"><input name="footerContato" type="checkbox"/> Mostrar contato</label>
-<label class="toggle"><input name="footerMenu" type="checkbox"/> Mostrar menu</label>
-<label class="full">Aviso de direitos autorais<input name="footerCopyright"/></label>
-</div>
-</section>
-<section class="editor-page" data-editor-page-content="aparencia" data-field="cores">
-<div class="section-heading"><h2>Plano de fundo, cores e ícones</h2><p>Personalize a identidade visual sem alterar o código.</p></div>
-<div class="form-grid colors-grid">
-<label>Cor principal<input name="corPrimaria" type="color" value="#0b1f3a"/></label><label>Cor de destaque<input name="corSecundaria" type="color" value="#13a8e5"/></label>
-<label>Fundo<input name="corFundo" type="color" value="#07142b"/></label><label>Texto<input name="corTexto" type="color" value="#f4f8ff"/></label>
-<label>Cabeçalho<input name="corCabecalho" type="color" value="#0b1f3a"/></label><label>Rodapé<input name="corRodape" type="color" value="#07142b"/></label>
-<div class="full media-control" data-media-control data-media-profile="fundo" data-media-label="Imagem de fundo">
-<input name="fundoImagem" type="hidden"/>
-<div class="media-copy"><strong>Imagem de fundo</strong><small>Recomendado: 1920 × 1080 px • até 700 KB</small></div>
-<div class="media-preview media-preview-wide" data-media-preview><span>Nenhuma imagem</span></div>
-<div class="media-actions"><label class="media-file-button">Selecionar imagem<input accept="image/jpeg,image/png,image/webp" data-media-file type="file"/></label><button class="ghost media-remove" data-media-remove type="button">Remover</button></div>
-<div class="media-progress hidden" data-media-progress></div>
-</div>
-<label>Fonte<select name="fonteSite"><option value="sistema">Sistema</option><option value="moderna">Moderna</option><option value="classica">Clássica</option><option value="condensada">Condensada</option></select></label>
-<label>Estilo dos ícones<select name="iconeEstilo"><option value="linha">Linha</option><option value="preenchido">Preenchido</option><option value="arredondado">Arredondado</option></select></label>
-</div>
-</section>
-<section class="editor-page" data-editor-page-content="paginas" data-field="textos_institucionais">
-<div class="section-heading inline"><div><h2>Páginas fixas</h2><p>Crie páginas institucionais adicionais.</p></div><button class="secondary" data-add-item="paginas" type="button">+ Nova página</button></div>
-<div class="repeater-list" id="pages-list"></div>
-</section>
-<section class="editor-page" data-editor-page-content="menu" data-field="textos_institucionais">
-<div class="section-heading"><h2>Menu do site</h2><p>Defina os itens e a ordem. Uma linha por item: Nome | Link.</p></div>
-<textarea name="menuItens" placeholder="Início | #inicio
-Programação | #programacao
-Contato | #contato" rows="10"></textarea>
-<div class="form-grid compact-top"><label>Estilo<select name="menuEstilo"><option value="horizontal">Horizontal</option><option value="hamburguer">Menu recolhido</option><option value="lateral">Lateral</option></select></label><label class="toggle"><input name="menuFixo" type="checkbox"/> Manter menu fixo no topo</label></div>
-</section>
-<section class="editor-page" data-editor-page-content="seo" data-field="textos_institucionais capa">
-<div class="section-heading"><h2>SEO e compartilhamento</h2><p>Como a rádio aparece em buscadores e redes sociais.</p></div>
-<div class="form-grid">
-<label class="full">Título para buscadores<input maxlength="70" name="seoTitulo"/></label>
-<label class="full">Descrição para buscadores<textarea maxlength="170" name="seoDescricao" rows="3"></textarea></label>
-<label class="full">Palavras-chave<input name="seoPalavras" placeholder="rádio, música, cidade"/></label>
-<div class="full media-control" data-media-control data-media-profile="compartilhamento" data-media-label="Imagem de compartilhamento">
-<input name="seoImagem" type="hidden"/>
-<div class="media-copy"><strong>Imagem de compartilhamento</strong><small>Recomendado: 1200 × 630 px • até 300 KB</small></div>
-<div class="media-preview media-preview-wide" data-media-preview><span>Nenhuma imagem</span></div>
-<div class="media-actions"><label class="media-file-button">Selecionar imagem<input accept="image/jpeg,image/png,image/webp" data-media-file type="file"/></label><button class="ghost media-remove" data-media-remove type="button">Remover</button></div>
-<div class="media-progress hidden" data-media-progress></div>
-</div>
-<label class="toggle full"><input name="seoIndexar" type="checkbox"/> Permitir indexação pelos buscadores</label>
-</div>
-</section>
-<section class="editor-page" data-editor-page-content="modulos" data-field="textos_institucionais">
-<div class="section-heading"><h2>Ativar e organizar módulos</h2><p>Escolha quais seções ficarão disponíveis no site.</p></div>
-<div class="modules-grid" id="modules-grid"></div>
-</section>
-<section class="editor-page" data-editor-page-content="destaques" data-field="banners">
-<div class="section-heading inline"><div><h2>Destaques e banners</h2><p>Slides e chamadas da página inicial.</p></div><button class="secondary" data-add-item="destaques" type="button">+ Novo destaque</button></div>
-<div class="repeater-list" id="highlights-list"></div>
-</section>
-<section class="editor-page" data-editor-page-content="enquete" data-field="textos_institucionais">
-<div class="section-heading"><h2>Enquete</h2><p>Configure uma pergunta para os ouvintes.</p></div>
-<div class="form-grid"><label class="full">Pergunta<input name="enquetePergunta"/></label><label class="full">Opções, uma por linha<textarea name="enqueteOpcoes" rows="6"></textarea></label><label class="toggle"><input name="enqueteAtiva" type="checkbox"/> Enquete ativa</label></div>
-</section>
-<section class="editor-page" data-editor-page-content="galeria" data-field="textos_institucionais">
-<div class="section-heading inline"><div><h2>Galeria de fotos</h2><p>Imagens de eventos, estúdio e equipe.</p></div><button class="secondary" data-add-item="galeria" type="button">+ Nova foto</button></div>
-<div class="repeater-list" id="gallery-list"></div>
-</section>
-<section class="editor-page" data-editor-page-content="locutores" data-field="locutores">
-<div class="section-heading inline"><div><h2>Locutores e equipe</h2><p>Apresentadores, produtores e colaboradores.</p></div><button class="secondary" data-add-item="locutores" type="button">+ Novo locutor</button></div>
-<div class="repeater-list" id="hosts-list"></div>
-</section>
-<section class="editor-page" data-editor-page-content="mural" data-field="textos_institucionais">
-<div class="section-heading"><h2>Mural</h2><p>Configure mensagens e participação do público.</p></div>
-<div class="form-grid"><label>Título<input name="muralTitulo"/></label><label>Moderação<select name="muralModeracao"><option value="sim">Aprovar antes de exibir</option><option value="nao">Exibir automaticamente</option></select></label><label class="full">Mensagem de orientação<textarea name="muralMensagem" rows="4"></textarea></label><label class="toggle"><input name="muralAtivo" type="checkbox"/> Mural ativo</label></div>
-</section>
-<section class="editor-page" data-editor-page-content="noticias" data-field="noticias">
-<div class="section-heading inline"><div><h2>Notícias</h2><p>Publique notícias e comunicados da rádio.</p></div><button class="secondary" data-add-item="noticias" type="button">+ Nova notícia</button></div>
-<div class="repeater-list" id="news-list"></div>
-</section>
-<section class="editor-page" data-editor-page-content="ouvinte" data-field="textos_institucionais">
-<div class="section-heading"><h2>Ouvinte do mês</h2><p>Destaque um ouvinte na página inicial.</p></div>
-<div class="form-grid"><label>Nome<input name="ouvinteNome"/></label><label>Cidade<input name="ouvinteCidade"/></label><div class="full media-control" data-media-control data-media-profile="ouvinte" data-media-label="Foto do ouvinte">
-<input name="ouvinteFoto" type="hidden"/>
-<div class="media-copy"><strong>Foto do ouvinte</strong><small>Recomendado: 800 × 800 px • até 250 KB</small></div>
-<div class="media-preview media-preview-square" data-media-preview><span>Nenhuma imagem</span></div>
-<div class="media-actions"><label class="media-file-button">Selecionar imagem<input accept="image/jpeg,image/png,image/webp" data-media-file type="file"/></label><button class="ghost media-remove" data-media-remove type="button">Remover</button></div>
-<div class="media-progress hidden" data-media-progress></div>
-</div><label class="full">Mensagem<textarea name="ouvinteMensagem" rows="4"></textarea></label><label class="toggle"><input name="ouvinteAtivo" type="checkbox"/> Exibir no site</label></div>
-</section>
-<section class="editor-page" data-editor-page-content="parceiros" data-field="patrocinadores">
-<div class="section-heading inline"><div><h2>Parceiros e patrocinadores</h2><p>Empresas apoiadoras da emissora.</p></div><button class="secondary" data-add-item="parceiros" type="button">+ Novo parceiro</button></div>
-<div class="repeater-list" id="sponsors-list"></div>
-</section>
-<section class="editor-page" data-editor-page-content="pedidos" data-field="textos_institucionais whatsapp contatos">
-<div class="section-heading"><h2>Peça sua música</h2><p>Configure a participação dos ouvintes.</p></div>
-<div class="form-grid"><label>Canal<select name="pedidoCanal"><option value="whatsapp">WhatsApp</option><option value="formulario">Formulário do site</option><option value="email">E-mail</option></select></label><label>Destino<input name="pedidoDestino"/></label><label class="full">Mensagem inicial<textarea name="pedidoMensagem" rows="4"></textarea></label><label class="toggle"><input name="pedidoAtivo" type="checkbox"/> Aceitar pedidos de música</label></div>
-</section>
-<section class="editor-page" data-editor-page-content="programacao" data-field="programacao">
-<div class="section-heading inline"><div><h2>Programação</h2><p>Grade de programas e horários.</p></div><button class="secondary" data-add-item="programacao" type="button">+ Novo programa</button></div>
-<div class="repeater-list" id="schedule-list"></div>
-</section>
-<section class="editor-page" data-editor-page-content="publicidades" data-field="banners">
-<div class="section-heading inline"><div><h2>Publicidades</h2><p>Banners comerciais e publicidade de abertura.</p></div><button class="secondary" data-add-item="publicidades" type="button">+ Nova publicidade</button></div>
-<div class="repeater-list" id="ads-list"></div>
-<article class="card nested-card"><h3>Publicidade de abertura</h3><div class="form-grid"><label class="toggle"><input name="aberturaAtiva" type="checkbox"/> Ativar ao abrir o site</label><label>Tempo em segundos<input max="30" min="1" name="aberturaSegundos" type="number" value="5"/></label><div class="full media-control" data-media-control data-media-profile="abertura" data-media-label="Publicidade de abertura">
-<input name="aberturaImagem" type="hidden"/>
-<div class="media-copy"><strong>Imagem da abertura</strong><small>Recomendado: 1200 × 675 px • até 350 KB</small></div>
-<div class="media-preview media-preview-wide" data-media-preview><span>Nenhuma imagem</span></div>
-<div class="media-actions"><label class="media-file-button">Selecionar imagem<input accept="image/jpeg,image/png,image/webp" data-media-file type="file"/></label><button class="ghost media-remove" data-media-remove type="button">Remover</button></div>
-<div class="media-progress hidden" data-media-progress></div>
-</div><label class="full">Link<input name="aberturaLink" type="url"/></label></div></article>
-</section>
-<section class="editor-page" data-editor-page-content="topmusicas" data-field="textos_institucionais">
-<div class="section-heading inline"><div><h2>Top músicas</h2><p>Ranking editorial informado pela rádio.</p></div><button class="secondary" data-add-item="topmusicas" type="button">+ Nova música</button></div>
-<div class="repeater-list" id="top-songs-list"></div>
-</section>
-<section class="editor-page" data-editor-page-content="videos" data-field="textos_institucionais">
-<div class="section-heading inline"><div><h2>Vídeos e Web TV</h2><p>Vídeos incorporados e transmissão de vídeo.</p></div><button class="secondary" data-add-item="videos" type="button">+ Novo vídeo</button></div>
-<div class="repeater-list" id="videos-list"></div>
-<article class="card nested-card"><h3>Web TV</h3><div class="form-grid"><label class="toggle"><input name="webtvAtiva" type="checkbox"/> Ativar Web TV</label><label>Título<input name="webtvTitulo"/></label><label class="full">URL da transmissão<input name="webtvUrl" type="url"/></label></div></article>
-</section>
-<section class="editor-page" data-editor-page-content="whatsapp" data-field="whatsapp">
-<div class="section-heading"><h2>WhatsApp</h2><p>Botão flutuante e mensagens rápidas.</p></div>
-<div class="form-grid"><label>Número com DDI e DDD<input name="whatsappNumero" placeholder="5564999999999"/></label><label>Título do botão<input name="whatsappTitulo" placeholder="Fale com a rádio"/></label><label class="full">Mensagem automática<textarea name="whatsappMensagem" rows="4"></textarea></label><label>Horário de atendimento<input name="whatsappHorario"/></label><label class="toggle"><input name="whatsappFlutuante" type="checkbox"/> Mostrar botão flutuante</label></div>
-</section>
-<section class="editor-page" data-editor-page-content="aplicativos" data-field="links_aplicativos">
-<div class="section-heading"><h2>Baixe nosso aplicativo</h2><p>Links para PWA, lojas e assistentes de voz.</p></div>
-<div class="form-grid"><label>Google Play<input name="appAndroid" type="url"/></label><label>App Store<input name="appIos" type="url"/></label><label>PWA<input name="appPwa" type="url"/></label><label>Alexa<input name="appAlexa" type="url"/></label><label>Windows<input name="appWindows" type="url"/></label><div class="full media-control" data-media-control data-media-profile="qrcode" data-media-label="QR Code do aplicativo">
-<input name="appQr" type="hidden"/>
-<div class="media-copy"><strong>QR Code do aplicativo</strong><small>Recomendado: 512 × 512 px • até 150 KB</small></div>
-<div class="media-preview media-preview-square" data-media-preview><span>Nenhuma imagem</span></div>
-<div class="media-actions"><label class="media-file-button">Selecionar imagem<input accept="image/jpeg,image/png,image/webp" data-media-file type="file"/></label><button class="ghost media-remove" data-media-remove type="button">Remover</button></div>
-<div class="media-progress hidden" data-media-progress></div>
-</div></div>
-</section>
-<section class="editor-page" data-editor-page-content="podcasts" data-field="textos_institucionais">
-<div class="section-heading inline"><div><h2>Podcasts</h2><p>Episódios e programas sob demanda.</p></div><button class="secondary" data-add-item="podcasts" type="button">+ Novo episódio</button></div>
-<div class="repeater-list" id="podcasts-list"></div>
-</section>
-<section class="editor-page" data-editor-page-content="eventos" data-field="textos_institucionais">
-<div class="section-heading inline"><div><h2>Agenda e eventos</h2><p>Eventos, transmissões e ações externas.</p></div><button class="secondary" data-add-item="eventos" type="button">+ Novo evento</button></div>
-<div class="repeater-list" id="events-list"></div>
-</section>
-<section class="editor-page" data-editor-page-content="promocoes" data-field="textos_institucionais">
-<div class="section-heading inline"><div><h2>Promoções e sorteios</h2><p>Campanhas promocionais com regras claras.</p></div><button class="secondary" data-add-item="promocoes" type="button">+ Nova promoção</button></div>
-<div class="repeater-list" id="promotions-list"></div>
-</section>
-<section class="editor-page" data-editor-page-content="acessibilidade" data-field="textos_institucionais">
-<div class="section-heading"><h2>Acessibilidade</h2><p>Recursos para ampliar o acesso ao conteúdo.</p></div>
-<div class="form-grid"><label class="toggle"><input name="acessibilidadeContraste" type="checkbox"/> Botão de alto contraste</label><label class="toggle"><input name="acessibilidadeFonte" type="checkbox"/> Controle de tamanho da fonte</label><label class="toggle"><input name="acessibilidadeReducao" type="checkbox"/> Respeitar redução de movimento</label><label class="toggle"><input name="acessibilidadeLeitor" type="checkbox"/> Otimização para leitor de tela</label><label class="full">Texto alternativo padrão para a logo<input name="acessibilidadeLogoAlt"/></label></div>
-</section>
-<section class="editor-page" data-editor-page-content="backup">
-<div class="section-heading"><h2>Backup do conteúdo</h2><p>Baixe uma cópia JSON do rascunho atual para segurança.</p></div>
-<div class="card backup-card"><p>O arquivo contém apenas o conteúdo do site, sem senha, contrato ou dados financeiros.</p><button class="secondary" id="export-content-button" type="button">Baixar backup JSON</button></div>
-</section>
-<section class="editor-page" data-editor-page-content="publicacao">
-<div class="section-heading"><h2>Publicação</h2><p>Revise o rascunho e envie para aprovação da Central.</p></div>
-<div class="publication-center">
-<article class="card"><span>Status atual</span><strong id="draft-status">Rascunho ainda não salvo</strong><small id="publication-detail">As alterações não aparecem no site até a publicação.</small></article>
-<article class="card"><span>Fluxo</span><ol><li>Preencha o conteúdo.</li><li>Salve o rascunho.</li><li>Visualize a prévia.</li><li>Solicite a publicação.</li></ol></article>
-</div>
-<div class="publication-actions"><button class="secondary" id="publication-preview-button" type="button">Visualizar prévia</button><button class="secondary" id="publication-save-button" type="button">Salvar rascunho</button><button class="primary" id="request-publication-button" type="button">Solicitar publicação</button></div>
-</section>
-</section>
-</form>
-</section>
-<section class="panel hidden" data-panel="faturas">
-<div class="page-heading"><div><span class="eyebrow">Financeiro</span><h1>Faturas e pagamentos</h1><p class="muted">Consulte competências, vencimentos e situação dos pagamentos.</p></div></div>
-<div class="table-wrap"><table><thead><tr><th>Fatura</th><th>Serviço</th><th>Competência</th><th>Vencimento</th><th>Total</th><th>Pago</th><th>Status</th></tr></thead><tbody id="invoices-body"></tbody></table></div>
-</section>
-<section class="panel hidden" data-panel="contratos">
-<div class="page-heading"><div><span class="eyebrow">Serviços contratados</span><h1>Meu contrato</h1><p class="muted">Resumo do plano e do andamento dos serviços.</p></div></div>
-<div class="cards-list" id="contracts-list"></div>
-</section>
-<section class="panel hidden" data-panel="seguranca">
-<div class="page-heading"><div><span class="eyebrow">Segurança</span><h1>Usuários e acesso</h1><p class="muted">Gerencie seu acesso atual. Usuários adicionais e níveis de permissão entram na Parte 6.</p></div></div>
-<div class="notice"><strong>Conta principal do cliente</strong><p>Esta conta possui acesso administrativo ao conteúdo liberado pela Central. O cadastro de outros usuários será acrescentado sem alterar este login.</p></div><form class="card narrow-form" id="password-form">
-<label>Senha atual<input autocomplete="current-password" name="senhaAtual" required="" type="password"/></label>
-<label>Nova senha<input autocomplete="new-password" minlength="8" name="novaSenha" required="" type="password"/></label>
-<label>Confirmar nova senha<input autocomplete="new-password" minlength="8" name="confirmacao" required="" type="password"/></label>
-<button class="primary" type="submit">Atualizar senha</button>
-</form>
-</section>
-</main><div class="sidebar-backdrop" hidden="" id="sidebar-backdrop"></div></div></div>
-<dialog class="preview-dialog" id="preview-dialog">
-<div class="dialog-head"><div><span class="eyebrow">Prévia local</span><h2>Como o site poderá aparecer</h2></div><button aria-label="Fechar prévia" class="ghost" id="close-preview" type="button">✕</button></div>
-<div class="site-preview" id="preview-content"></div>
-</dialog>
-<template id="repeater-template"><article class="repeater-item"><div class="repeater-fields"></div><button class="danger-link" data-remove-item="" type="button">Remover</button></article></template>
-<script src="config.js"></script>
-<script src="app.js"></script>
+  <section class="login-view" id="login-view">
+    <div class="login-card">
+      <div class="login-brand"><span class="brand-symbol">CRB</span><div><strong>Central Rádios Brasil</strong><small>Portal do Cliente</small></div></div>
+      <h1>Administre o site da sua rádio</h1>
+      <p>Entre com o acesso criado pela Central Rádios Brasil.</p>
+      <form id="login-form" class="login-form">
+        <label>E-mail<input id="login-email" type="email" autocomplete="username" required></label>
+        <label>Senha<input id="login-password" type="password" autocomplete="current-password" required></label>
+        <button class="button primary" id="login-button" type="submit">Entrar</button>
+      </form>
+      <div class="global-message hidden" id="login-message" role="alert"></div>
+      <small class="login-version">Portal v2.0.0 • CMS Multitema integrado</small>
+    </div>
+  </section>
+
+  <div class="app-shell hidden" id="app-shell">
+    <aside class="sidebar" id="sidebar" aria-label="Menu principal">
+      <div class="sidebar-brand">
+        <div class="brand-symbol" aria-hidden="true">CRB</div>
+        <div><strong>Central Rádios Brasil</strong><span>CMS Multitema</span></div>
+      </div>
+      <div class="site-selector">
+        <span class="overline">Site em edição</span>
+        <strong id="sidebar-radio-name">Minha rádio</strong>
+        <span class="status-pill draft" id="sidebar-status">Carregando</span>
+      </div>
+      <nav class="sidebar-nav" id="sidebar-nav"></nav>
+      <div class="sidebar-footer">
+        <span>Portal v2.0.0</span>
+        <small>Dados reais • Worker + D1</small>
+      </div>
+    </aside>
+
+    <div class="workspace">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="icon-button menu-toggle" id="menu-toggle" type="button" aria-label="Abrir ou fechar menu" aria-controls="sidebar" aria-expanded="true">☰</button>
+          <div><span class="overline" id="page-eyebrow">Visão geral</span><h1 id="page-title">Dashboard</h1></div>
+        </div>
+        <div class="topbar-actions">
+          <button class="button secondary" id="preview-top-button" type="button">Visualizar site</button>
+          <button class="button primary" id="save-button" type="button">Salvar rascunho</button>
+          <div class="account-chip"><span class="avatar" id="account-avatar">CR</span><div><strong id="account-name">Cliente</strong><small id="account-role">Acesso autorizado</small></div></div>
+          <button class="button ghost small" id="logout-button" type="button">Sair</button>
+        </div>
+      </header>
+
+      <main id="main-content" tabindex="-1">
+        <div class="global-message hidden" id="global-message" role="status"></div>
+        <div id="page-root"></div>
+      </main>
+    </div>
+  </div>
+
+  <dialog class="modal" id="editor-modal">
+    <form method="dialog" class="modal-card" id="editor-form">
+      <header class="modal-header"><div><span class="overline" id="modal-eyebrow">Cadastro</span><h2 id="modal-title">Novo item</h2></div><button class="icon-button" value="cancel" aria-label="Fechar" type="submit">×</button></header>
+      <div class="modal-body" id="modal-fields"></div>
+      <footer class="modal-footer"><button class="button ghost" value="cancel" type="submit">Cancelar</button><button class="button primary" id="modal-save" value="default" type="submit">Salvar item</button></footer>
+    </form>
+  </dialog>
+
+  <dialog class="preview-dialog" id="preview-dialog">
+    <div class="preview-shell">
+      <header class="preview-toolbar">
+        <div><span class="overline">Prévia do site</span><strong id="preview-theme-name">Tema</strong></div>
+        <div class="device-switch" role="group" aria-label="Tamanho da prévia"><button type="button" class="active" data-preview-device="desktop">Desktop</button><button type="button" data-preview-device="tablet">Tablet</button><button type="button" data-preview-device="mobile">Celular</button></div>
+        <div class="preview-actions"><button class="button secondary" id="preview-refresh" type="button">Atualizar prévia</button><button class="button ghost" id="preview-close" type="button">Fechar</button></div>
+      </header>
+      <div class="preview-stage" id="preview-stage"><div class="preview-canvas desktop" id="preview-canvas"></div></div>
+    </div>
+  </dialog>
+
+  <input type="file" id="backup-import" accept="application/json" hidden>
+  <script src="config.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>

@@ -1,23 +1,39 @@
-RELATÓRIO DE VALIDAÇÃO — COMMIT 22.18 PARTE 2
-Portal v1.3.0 + Worker v1.15.0
+VALIDAÇÃO — Portal do Cliente v2.0.0 Integrado
 
-[OK] Versão do Portal
-[OK] Versão do Worker
-[OK] IDs HTML únicos — 87 IDs
-[OK] Menu na sequência aprovada
-[OK] Biblioteca de imagens
-[OK] Uploads estáticos — 9 controles
-[OK] Sem URL manual para campos visuais
-[OK] Uploads nos cadastros repetíveis
-[OK] Otimização no navegador
-[OK] Limites individuais
-[OK] API de mídias no Portal
-[OK] Rotas de mídia no Worker
-[OK] Validação de assinatura
-[OK] Cota de 25 MB
-[OK] Tabela de mídias no Worker
-[OK] Tabela de mídias no schema
-[OK] Schema SQLite executável — 14 tabelas
-[OK] Perfis compatíveis Portal/Worker — 21 perfis
+Resultado: 35/35 verificações aprovadas
 
-Resultado: 18/18 verificações aprovadas.
+[OK] Arquivo index.html
+[OK] Arquivo styles.css
+[OK] Arquivo app.js
+[OK] Arquivo config.js
+[OK] Arquivo manifest.webmanifest
+[OK] Arquivo README.md
+[OK] Arquivo RELATORIO-INTEGRACAO.md
+[OK] HTML sem IDs duplicados
+[OK] ID login-view
+[OK] ID app-shell
+[OK] ID sidebar-nav
+[OK] ID page-root
+[OK] ID preview-dialog
+[OK] ID editor-modal
+[OK] Worker configurado
+[OK] Versão 2.0.0
+[OK] Endpoint /api/cliente/login
+[OK] Endpoint /api/cliente/sessao
+[OK] Endpoint /api/cliente/dashboard
+[OK] Endpoint /api/cliente/site
+[OK] Endpoint /api/cliente/site/rascunho
+[OK] Endpoint /api/cliente/site/midias
+[OK] Endpoint /api/cliente/site/solicitar-publicacao
+[OK] Endpoint /api/cliente/trocar-senha
+[OK] Endpoint /api/cliente/logout
+[OK] Sem localStorage
+[OK] Mapeamento remoto -> CMS
+[OK] Mapeamento CMS -> rascunho
+[OK] Namespace cms_v2
+[OK] Upload real de mídia
+[OK] Publicação supervisionada
+[OK] Dashboard sem audiência fictícia
+[OK] Prévia desktop/tablet/celular
+[OK] Manifest JSON válido
+[OK] Manifest standalone

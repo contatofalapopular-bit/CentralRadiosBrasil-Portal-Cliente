@@ -551,3 +551,5 @@ button.site-sponsor{font:inherit}.site-footer-action{border:1px solid rgba(255,2
 .site-event-address{display:grid;gap:4px;padding:13px 15px;margin-bottom:16px;border-left:4px solid var(--site-primary,#e31c45);border-radius:10px;background:#f8fafc;color:#334155}
 .site-event-address strong{font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:#64748b}.site-event-address span{font-size:.9rem}
 .site-detail-actions{display:flex;flex-wrap:wrap;gap:9px;align-items:center}.site-detail-actions .site-detail-external{margin-bottom:0}
+
+/* v2.3.0 final — consolidação integrada de podcasts, vídeos, promoções e eventos */

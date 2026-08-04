@@ -190,19 +190,59 @@
     contato:{layout:"Faixa",width:"Amplo",background:"Automático",alignment:"Esquerda",limit:1,showDescription:true,showAction:true,title:"",eyebrow:""}
   });
 
+  const editorBlockColorKeys = Object.freeze(["backgroundColor","titleColor","textColor","eyebrowColor","buttonColor","buttonTextColor"]);
+  const editorBlockColorLabels = Object.freeze({
+    backgroundColor:["Fundo do bloco","Define a superfície completa desta seção."],
+    titleColor:["Títulos","Títulos principais, nomes e destaques do bloco."],
+    textColor:["Textos","Descrições, resumos e informações secundárias."],
+    eyebrowColor:["Chamadas","Categoria, chamada superior, horário e metadados."],
+    buttonColor:["Botões","Fundo dos botões e acessos principais do bloco."],
+    buttonTextColor:["Texto dos botões","Cor usada nos rótulos dos botões."]
+  });
+
   function cloneJSON(value) { return JSON.parse(JSON.stringify(value)); }
+  function normalizeHexColor(value,fallback="#ffffff") {
+    const raw=String(value||"").trim();
+    const short=/^#([0-9a-f]{3})$/i.exec(raw);
+    if(short)return `#${short[1].split("").map(char=>char+char).join("")}`.toLowerCase();
+    return /^#[0-9a-f]{6}$/i.test(raw)?raw.toLowerCase():fallback;
+  }
+  function editorColorDefaults(themeId="morada") {
+    const theme=themes.find(item=>item.id===themeId)||themes[0];
+    const textByTheme={morada:"#334155",spotify:"#49354f",news:"#334155",gospel:"#405552",young:"#513653",custom:"#374151"};
+    return {
+      useThemeColors:true,
+      backgroundColor:normalizeHexColor(theme.colors[3],"#ffffff"),
+      titleColor:normalizeHexColor(theme.colors[1],"#172033"),
+      textColor:normalizeHexColor(textByTheme[theme.id],"#52657a"),
+      eyebrowColor:normalizeHexColor(theme.colors[0],"#1457d9"),
+      buttonColor:normalizeHexColor(theme.colors[0],"#1457d9"),
+      buttonTextColor:"#ffffff"
+    };
+  }
+  function freshEditorBlockOptions(id,themeId="morada") {
+    return {...cloneJSON(editorBlockDefaults[id]||editorBlockDefaults.programacao),...editorColorDefaults(themeId)};
+  }
+  function normalizeEditorBlockOptions(id,themeId,value={}) {
+    const fresh=freshEditorBlockOptions(id,themeId), source=value&&typeof value==="object"?value:{};
+    const merged={...fresh,...source};
+    merged.useThemeColors=source.useThemeColors!==false;
+    editorBlockColorKeys.forEach(key=>{merged[key]=normalizeHexColor(merged[key],fresh[key]);});
+    return merged;
+  }
   function defaultEditorState() {
     const blocks={};
-    themes.forEach(theme=>{blocks[theme.id]={};modulesCatalog.forEach(([id])=>{blocks[theme.id][id]=cloneJSON(editorBlockDefaults[id]||editorBlockDefaults.programacao);});});
-    return {version:2,themeOptions:cloneJSON(editorThemeDefaults),blocks,selectedBlock:"hero"};
+    themes.forEach(theme=>{blocks[theme.id]={};modulesCatalog.forEach(([id])=>{blocks[theme.id][id]=freshEditorBlockOptions(id,theme.id);});});
+    return {version:3,themeOptions:cloneJSON(editorThemeDefaults),blocks,selectedBlock:"hero"};
   }
 
   function normalizeEditorState(value={}) {
     const fresh=defaultEditorState(), source=value&&typeof value==="object"?value:{};
     themes.forEach(theme=>{
       fresh.themeOptions[theme.id]={...fresh.themeOptions[theme.id],...(source.themeOptions?.[theme.id]||{})};
-      modulesCatalog.forEach(([id])=>{fresh.blocks[theme.id][id]={...fresh.blocks[theme.id][id],...(source.blocks?.[theme.id]?.[id]||{})};});
+      modulesCatalog.forEach(([id])=>{fresh.blocks[theme.id][id]=normalizeEditorBlockOptions(id,theme.id,source.blocks?.[theme.id]?.[id]);});
     });
+    fresh.version=3;
     fresh.selectedBlock=modulesCatalog.some(([id])=>id===source.selectedBlock)?source.selectedBlock:"hero";
     return fresh;
   }
@@ -379,7 +419,7 @@
   function defaultState() {
     const today = new Date().toISOString().slice(0, 10);
     return {
-      version: "2.6.0-stage2",
+      version: "2.6.0-stage3",
       updatedAt: new Date().toISOString(),
       status: "rascunho",
       selectedTheme: "morada",
@@ -675,7 +715,7 @@
       </div>
       <div class="grid-2 equal" style="margin-top:18px">
         <section class="card"><header class="card-header"><div><h3>Dados reais, sem números inventados</h3><p>Audiência e ouvintes.</p></div></header><div class="card-body"><div class="notice">O painel não exibe audiência fictícia. O número de ouvintes só será mostrado quando existir uma fonte técnica confiável do streaming.</div></div></section>
-        <section class="card"><header class="card-header"><div><h3>Integração ativa</h3><p>Ambiente utilizado nesta instalação.</p></div></header><div class="card-body"><div class="code-box">Portal: ${escapeHTML(CONFIG.VERSION || "2.6.0-stage2")}\nWorker: ${escapeHTML(CONFIG.WORKER_URL || "—")}\nPersistência: Cloudflare D1\nMídias: API do site\nPublicação: supervisionada pela Central</div></div></section>
+        <section class="card"><header class="card-header"><div><h3>Integração ativa</h3><p>Ambiente utilizado nesta instalação.</p></div></header><div class="card-body"><div class="code-box">Portal: ${escapeHTML(CONFIG.VERSION || "2.6.0-stage3")}\nWorker: ${escapeHTML(CONFIG.WORKER_URL || "—")}\nPersistência: Cloudflare D1\nMídias: API do site\nPublicação: supervisionada pela Central</div></div></section>
       </div>`;
     bindGoButtons(root);
   }
@@ -850,7 +890,7 @@
 
   function editorBlockOptions(blockId,themeId=state.selectedTheme) {
     ensureV260EditorState();
-    return state.editor.blocks[themeId][blockId] || cloneJSON(editorBlockDefaults[blockId]||editorBlockDefaults.programacao);
+    return state.editor.blocks[themeId][blockId] || freshEditorBlockOptions(blockId,themeId);
   }
 
   function ensureV260EditorState() {
@@ -885,6 +925,43 @@
     });
   }
 
+  function hexToRgb(value) {
+    const hex=normalizeHexColor(value,"#000000").slice(1);
+    return [0,2,4].map(index=>parseInt(hex.slice(index,index+2),16));
+  }
+  function relativeLuminance(value) {
+    const channels=hexToRgb(value).map(channel=>{const normalized=channel/255;return normalized<=0.03928?normalized/12.92:Math.pow((normalized+0.055)/1.055,2.4);});
+    return channels[0]*0.2126+channels[1]*0.7152+channels[2]*0.0722;
+  }
+  function contrastRatio(foreground,background) {
+    const a=relativeLuminance(foreground),b=relativeLuminance(background);
+    return (Math.max(a,b)+0.05)/(Math.min(a,b)+0.05);
+  }
+  function blockContrastChecks(values) {
+    const background=normalizeHexColor(values.backgroundColor,"#ffffff");
+    return [
+      ["Título e fundo",contrastRatio(values.titleColor,background),3],
+      ["Texto e fundo",contrastRatio(values.textColor,background),4.5],
+      ["Chamada e fundo",contrastRatio(values.eyebrowColor,background),4.5],
+      ["Texto e botão",contrastRatio(values.buttonTextColor,values.buttonColor),4.5]
+    ].map(([label,ratio,minimum])=>({label,ratio,minimum,pass:ratio>=minimum}));
+  }
+  function contrastReportMarkup(values) {
+    if(values.useThemeColors!==false)return `<div class="editor-contrast-report neutral" id="block-contrast-report" role="status"><strong>Cores originais do modelo</strong><span>O contraste permanece sob controle do tema selecionado.</span></div>`;
+    const checks=blockContrastChecks(values),failures=checks.filter(item=>!item.pass);
+    return `<div class="editor-contrast-report ${failures.length?"warning":"success"}" id="block-contrast-report" role="status"><strong>${failures.length?`Atenção: ${failures.length} combinação(ões) com baixo contraste`:`Contraste aprovado`}</strong><div>${checks.map(item=>`<span class="${item.pass?"pass":"fail"}">${item.pass?"✓":"!"} ${escapeHTML(item.label)} — ${item.ratio.toFixed(2)}:1</span>`).join("")}</div><small>Referência: 3:1 para títulos grandes e 4,5:1 para textos e botões.</small></div>`;
+  }
+  function editorColorFieldMarkup(key,values) {
+    const [label,help]=editorBlockColorLabels[key],value=normalizeHexColor(values[key],editorColorDefaults(state.selectedTheme)[key]),disabled=values.useThemeColors!==false;
+    return `<label class="editor-color-field"><span>${escapeHTML(label)}</span><div class="editor-color-control"><input type="color" value="${value}" data-block-color-picker="${key}" ${disabled?"disabled":""} aria-label="Selecionar ${escapeHTML(label.toLowerCase())}"><input type="text" value="${value.toUpperCase()}" maxlength="7" spellcheck="false" data-block-color-text="${key}" ${disabled?"disabled":""} aria-label="Código hexadecimal de ${escapeHTML(label.toLowerCase())}"></div><small>${escapeHTML(help)}</small></label>`;
+  }
+  function updateContrastReport(host,values) {
+    const current=$("#block-contrast-report",host);if(current)current.outerHTML=contrastReportMarkup(values);
+  }
+  function resetEditorBlockColors(values,themeId=state.selectedTheme) {
+    const defaults=editorColorDefaults(themeId);Object.assign(values,defaults);
+  }
+
   function blockSupportsLimit(id) { return ["programacao","noticias","promocoes","podcasts","videos","equipe","galeria","eventos","parceiros"].includes(id); }
   function blockLayoutChoices(id) {
     if(id==="hero")return["Destaque","Cartão","Minimalista"];
@@ -905,13 +982,19 @@
       <div class="editor-options-grid block-options-grid">
         <label class="field"><span>Composição</span><select data-block-option="layout">${layouts.map(item=>`<option ${item===values.layout?"selected":""}>${item}</option>`).join("")}</select></label>
         <label class="field"><span>Largura</span><select data-block-option="width">${["Total","Amplo","Contido"].map(item=>`<option ${item===values.width?"selected":""}>${item}</option>`).join("")}</select></label>
-        <label class="field"><span>Fundo</span><select data-block-option="background">${["Automático","Claro","Contraste","Cor do tema"].map(item=>`<option ${item===values.background?"selected":""}>${item}</option>`).join("")}</select></label>
+        <label class="field"><span>Estilo de fundo</span><select data-block-option="background">${["Automático","Claro","Contraste","Cor do tema"].map(item=>`<option ${item===values.background?"selected":""}>${item}</option>`).join("")}</select></label>
         <label class="field"><span>Alinhamento</span><select data-block-option="alignment">${["Esquerda","Centro"].map(item=>`<option ${item===values.alignment?"selected":""}>${item}</option>`).join("")}</select></label>
         ${blockSupportsLimit(module.id)?`<label class="field"><span>Itens na página</span><input type="number" min="1" max="12" value="${Number(values.limit||4)}" data-block-option="limit"></label>`:""}
         <label class="field editor-span-2"><span>Título personalizado</span><input type="text" maxlength="80" value="${escapeHTML(values.title||"")}" placeholder="Deixe vazio para usar o título padrão" data-block-option="title"></label>
         <label class="field editor-span-2"><span>Chamada superior</span><input type="text" maxlength="60" value="${escapeHTML(values.eyebrow||"")}" placeholder="Deixe vazio para usar a chamada padrão" data-block-option="eyebrow"></label>
         <label class="editor-option-check"><input type="checkbox" data-block-option="showDescription" ${values.showDescription!==false?"checked":""}><span><strong>Mostrar descrição</strong><small>Texto explicativo abaixo do título.</small></span></label>
         <label class="editor-option-check"><input type="checkbox" data-block-option="showAction" ${values.showAction!==false?"checked":""}><span><strong>Mostrar acesso completo</strong><small>Botão para lista, grade ou conteúdo completo.</small></span></label>
+        <section class="editor-color-panel editor-span-2">
+          <header><div><span>Personalização de cores</span><h4>Cores exclusivas deste bloco</h4><p>As escolhas ficam separadas por modelo e não alteram os outros temas.</p></div><button class="button ghost small" id="reset-block-colors" type="button">Restaurar cores</button></header>
+          <label class="editor-option-check editor-color-toggle"><input type="checkbox" data-block-option="useThemeColors" ${values.useThemeColors!==false?"checked":""}><span><strong>Usar cores originais do modelo</strong><small>Desative para liberar fundo, fontes, chamadas e botões personalizados.</small></span></label>
+          <div class="editor-color-grid ${values.useThemeColors!==false?"disabled":""}" aria-disabled="${values.useThemeColors!==false?"true":"false"}">${editorBlockColorKeys.map(key=>editorColorFieldMarkup(key,values)).join("")}</div>
+          ${contrastReportMarkup(values)}
+        </section>
       </div>`;
     $$('[data-block-option]',host).forEach(input=>{
       const eventName=input.tagName==="INPUT"&&input.type==="text"?"input":"change";
@@ -920,10 +1003,21 @@
         if(input.type==="number")value=Math.max(1,Math.min(12,Number(value||1)));
         editorBlockOptions(module.id)[input.dataset.blockOption]=value;
         persist(false);renderModuleList();renderSitePreview($("#inline-preview"));
+        if(input.dataset.blockOption==="useThemeColors")renderBlockEditorControls();
       });
     });
+    $$('[data-block-color-picker]',host).forEach(input=>input.addEventListener("input",()=>{
+      const key=input.dataset.blockColorPicker,current=editorBlockOptions(module.id),value=normalizeHexColor(input.value,current[key]);
+      current[key]=value;const text=$(`[data-block-color-text="${key}"]`,host);if(text)text.value=value.toUpperCase();
+      persist(false);renderSitePreview($("#inline-preview"));updateContrastReport(host,current);
+    }));
+    $$('[data-block-color-text]',host).forEach(input=>{
+      const apply=()=>{const key=input.dataset.blockColorText,current=editorBlockOptions(module.id),raw=String(input.value||"").trim();if(!/^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i.test(raw)){input.value=normalizeHexColor(current[key],"#ffffff").toUpperCase();notify("Use uma cor hexadecimal válida, como #1457D9.","warning");return;}const value=normalizeHexColor(raw,current[key]);current[key]=value;input.value=value.toUpperCase();const picker=$(`[data-block-color-picker="${key}"]`,host);if(picker)picker.value=value;persist(false);renderSitePreview($("#inline-preview"));updateContrastReport(host,current);};
+      input.addEventListener("input",()=>{if(/^#[0-9a-f]{6}$/i.test(input.value.trim()))apply();});input.addEventListener("change",apply);
+    });
+    $("#reset-block-colors",host)?.addEventListener("click",()=>{const current=editorBlockOptions(module.id);resetEditorBlockColors(current);persist(false);renderBlockEditorControls();renderModuleList();renderSitePreview($("#inline-preview"));notify("Cores originais do bloco restauradas.","success");});
     $("#reset-block-options",host)?.addEventListener("click",()=>{
-      state.editor.blocks[state.selectedTheme][module.id]=cloneJSON(editorBlockDefaults[module.id]||editorBlockDefaults.programacao);
+      state.editor.blocks[state.selectedTheme][module.id]=freshEditorBlockOptions(module.id,state.selectedTheme);
       persist(false);renderBlockEditorControls();renderModuleList();renderSitePreview($("#inline-preview"));notify("Configuração do bloco restaurada.","success");
     });
   }
@@ -932,7 +1026,7 @@
     ensureV260EditorState();
     root.innerHTML = `
       ${pageHeader("Editor Visual", "Organize os blocos e personalize cada modelo sem alterar o conteúdo cadastrado.", `<button class="button primary" data-preview type="button">Prévia em tela cheia</button>`)}
-      <section class="editor-stage-note"><div><span>v2.6.0 • Etapa 2</span><h3>Editor por modelo e por bloco</h3><p>Cada tema guarda sua própria composição. Alterar o News não muda o Gospel, o Popular ou o Portal Regional.</p></div><strong>Mesmo rascunho atual<br>Sem mudança no Worker</strong></section>
+      <section class="editor-stage-note"><div><span>v2.6.0 • Etapa 3</span><h3>Editor por modelo, bloco e cores</h3><p>Cada bloco pode ter fundo, títulos, textos, chamadas e botões próprios em cada modelo, com verificação automática de contraste.</p></div><strong>Mesmo rascunho atual<br>Sem mudança no Worker</strong></section>
       <div class="editor-layout editor-layout-v260">
         <aside class="editor-sidebar">
           <section class="card"><header class="card-header"><div><h3>Modelo ativo</h3><p>As opções abaixo pertencem somente a ele.</p></div></header><div class="card-body"><select id="quick-theme">${themes.map(theme => `<option value="${theme.id}" ${theme.id === state.selectedTheme ? "selected" : ""}>${escapeHTML(theme.name)}</option>`).join("")}</select><button class="button secondary" data-go="themes" type="button" style="width:100%;margin-top:10px">Ver todos os modelos</button></div></section>
@@ -989,7 +1083,7 @@
 
   function renderThemes(root) {
     root.innerHTML = `${pageHeader("Temas", "Modelos construídos em HTML, CSS e JavaScript. O conteúdo é compartilhado, mas a experiência visual muda de verdade.")}
-      <section class="theme-release-note"><div><span>v2.6.0 • Etapa 2</span><h3>Modelos e blocos agora possuem ajustes próprios</h3><p>As seis vitrines continuam distintas e cada uma preserva sua composição, ordem e apresentação de blocos. O modelo Jovem mantém sua identidade original.</p></div><strong>Mesmo rascunho do Portal<br>Sem mudanças no Worker</strong></section>
+      <section class="theme-release-note"><div><span>v2.6.0 • Etapa 3</span><h3>Modelos, blocos e cores agora possuem ajustes próprios</h3><p>As seis vitrines continuam distintas e cada bloco pode usar sua própria paleta de fundo, fontes, chamadas e botões. O modelo Jovem mantém sua identidade original enquanto permite personalização opcional por bloco.</p></div><strong>Mesmo rascunho do Portal<br>Sem mudanças no Worker</strong></section>
       <div class="theme-grid">${themes.map(theme => {
         const [accent,dark,highlight,bg] = theme.colors;
         return `<article class="theme-card ${theme.id === state.selectedTheme ? "selected" : ""}" data-theme-card="${theme.id}">${theme.id === state.selectedTheme ? `<span class="theme-selected-tag">Tema ativo</span>` : ""}<div class="theme-shot" style="--shot-bg:${bg};--shot-dark:${dark};--shot-accent:${accent};--shot-highlight:${highlight};--shot-muted:${highlight}22">${themeShotMarkup(theme)}</div><div class="theme-meta"><span class="theme-layout-label">Composição ${escapeHTML(themeLayoutLabel(theme.layout))}</span><h3>${escapeHTML(theme.name)}</h3><small class="theme-audience">${escapeHTML(theme.audience || "")}</small><p>${escapeHTML(theme.description)}</p><button class="button ${theme.id === state.selectedTheme ? "secondary" : "primary"} small" data-select-theme="${theme.id}" type="button">${theme.id === state.selectedTheme ? "Selecionado" : "Usar este tema"}</button> <button class="button ghost small" data-theme-preview="${theme.id}" type="button">Visualizar</button></div></article>`;
@@ -1454,7 +1548,7 @@
         <section class="card"><div class="card-body"><h3>Exportar JSON</h3><p class="field-help">Baixa configurações, módulos, temas e conteúdos.</p><button class="button primary" id="export-backup" type="button">Baixar backup</button></div></section>
         <section class="card"><div class="card-body"><h3>Importar JSON</h3><p class="field-help">Carrega o arquivo no editor; clique em Salvar rascunho para gravar no D1.</p><button class="button secondary" id="import-backup" type="button">Selecionar arquivo</button></div></section>
         <section class="card"><div class="card-body"><h3>Recarregar do servidor</h3><p class="field-help">Descarta alterações ainda não salvas e recarrega o último rascunho do servidor.</p><button class="button danger" id="reset-demo" type="button">Recarregar dados</button></div></section>
-      </div><section class="card" style="margin-top:18px"><header class="card-header"><div><h3>Sobre esta instalação</h3><p>Informações técnicas.</p></div></header><div class="card-body"><div class="code-box">Modo: produção integrada\nVersão: ${CONFIG.VERSION || "2.6.0-stage2"}\nPersistência: Cloudflare D1\nAPI: ${CONFIG.WORKER_URL || "não configurada"}\nÚltima alteração: ${formatDateTime(state.updatedAt)}</div></div></section>`;
+      </div><section class="card" style="margin-top:18px"><header class="card-header"><div><h3>Sobre esta instalação</h3><p>Informações técnicas.</p></div></header><div class="card-body"><div class="code-box">Modo: produção integrada\nVersão: ${CONFIG.VERSION || "2.6.0-stage3"}\nPersistência: Cloudflare D1\nAPI: ${CONFIG.WORKER_URL || "não configurada"}\nÚltima alteração: ${formatDateTime(state.updatedAt)}</div></div></section>`;
     $("#export-backup").addEventListener("click",exportBackup);
     $("#import-backup").addEventListener("click",()=>$("#backup-import").click());
     $("#reset-demo").addEventListener("click",()=>{if(confirm("Descartar alterações não salvas e recarregar o rascunho do servidor?")) loadAll();});
@@ -1516,13 +1610,23 @@
   function themeOption(key,themeId=state.selectedTheme) { return editorThemeOptions(themeId)?.[key]; }
   function blockOption(id,key,fallback=null) { const value=editorBlockOptions(id)?.[key];return value===undefined||value===null||value===""?fallback:value; }
   function blockLimit(id,fallback) { return Math.max(1,Math.min(12,Number(blockOption(id,"limit",fallback)||fallback))); }
+  function blockCustomColorStyle(opts) {
+    if(opts.useThemeColors!==false)return "";
+    return `--editor-block-bg:${normalizeHexColor(opts.backgroundColor,"#ffffff")};--editor-block-title:${normalizeHexColor(opts.titleColor,"#172033")};--editor-block-text:${normalizeHexColor(opts.textColor,"#52657a")};--editor-block-eyebrow:${normalizeHexColor(opts.eyebrowColor,"#1457d9")};--editor-block-button:${normalizeHexColor(opts.buttonColor,"#1457d9")};--editor-block-button-text:${normalizeHexColor(opts.buttonTextColor,"#ffffff")};`;
+  }
   function applyBlockPresentation(id,html) {
     if(!html)return "";
-    const opts=editorBlockOptions(id), classes=[`editor-block-${optionSlug(opts.layout)}`,`editor-width-${optionSlug(opts.width)}`,`editor-bg-${optionSlug(opts.background)}`,`editor-align-${optionSlug(opts.alignment)}`];
-    if(opts.showDescription===false)classes.push("editor-hide-description");if(opts.showAction===false)classes.push("editor-hide-action");
+    const opts=editorBlockOptions(id), classes=[`editor-block-${optionSlug(opts.layout)}`,`editor-width-${optionSlug(opts.width)}`,`editor-bg-${optionSlug(opts.background)}`,`editor-align-${optionSlug(opts.alignment)}`],colorStyle=blockCustomColorStyle(opts);
+    if(opts.showDescription===false)classes.push("editor-hide-description");if(opts.showAction===false)classes.push("editor-hide-action");if(colorStyle)classes.push("editor-custom-colors");
     html=html.replace(/<(section|div)\b([^>]*)data-site-section=(["'])[^"']+\3([^>]*)>/,full=>{
-      if(/class=(["'])/.test(full))return full.replace(/class=(["'])([^"']*)\1/,(_,quote,current)=>`class=${quote}${current} ${classes.join(" ")}${quote}`);
-      return full.replace(/^<(section|div)/,match=>`${match} class="${classes.join(" ")}"`);
+      let updated=full;
+      if(/class=(["'])/.test(updated))updated=updated.replace(/class=(["'])([^"']*)\1/,(_,quote,current)=>`class=${quote}${current} ${classes.join(" ")}${quote}`);
+      else updated=updated.replace(/^<(section|div)/,match=>`${match} class="${classes.join(" ")}"`);
+      if(colorStyle){
+        if(/style=(["'])/.test(updated))updated=updated.replace(/style=(["'])([^"']*)\1/,(_,quote,current)=>`style=${quote}${current}${current.trim().endsWith(";")?"":";"}${colorStyle}${quote}`);
+        else updated=updated.replace(/>$/,` style="${colorStyle}">`);
+      }
+      return updated;
     });
     if(!/data-site-section=/.test(html))return html;
     if(opts.title){html=html.replace(/<h([12])>[^<]*<\/h\1>/,(_,level)=>`<h${level}>${escapeHTML(opts.title)}</h${level}>`);}
@@ -2171,7 +2275,7 @@
 
   function mapRemoteToState(site,dashboard) {
     const fresh=defaultState(), content=site.conteudoRascunho || site.conteudoPublicado || {}, texts=content.textos_institucionais || {}, cms=texts.cms_v2 || {}, contacts=content.contatos || {}, whats=typeof content.whatsapp === "string" ? {numero:content.whatsapp} : (content.whatsapp || {}), colors=content.cores || {}, apps=content.links_aplicativos || {}, banners=content.banners || {};
-    fresh.version="2.6.0-stage2"; fresh.updatedAt=versions[0]?.criado_em || new Date().toISOString(); fresh.status=site.status_publicacao || "sem_rascunho"; fresh.selectedTheme=cms.selectedTheme || "morada"; fresh.editor=normalizeEditorState(cms.editor||{});
+    fresh.version="2.6.0-stage3"; fresh.updatedAt=versions[0]?.criado_em || new Date().toISOString(); fresh.status=site.status_publicacao || "sem_rascunho"; fresh.selectedTheme=cms.selectedTheme || "morada"; fresh.editor=normalizeEditorState(cms.editor||{});
     fresh.radio={...fresh.radio,nome:content.nome || site.nome_site || dashboard?.cliente?.nome_radio || "Minha rádio",slogan:content.slogan || "",descricao:content.descricao || texts.sobre || "",cidade:contacts.cidade || dashboard?.cliente?.cidade || "",estado:contacts.estado || dashboard?.cliente?.estado || "",email:contacts.email || dashboard?.cliente?.email || "",telefone:contacts.telefone || "",whatsapp:whats.numero || "",endereco:contacts.endereco || "",streamUrl:site.stream_url || "",musicaAtual:texts.player?.titulo || "Transmissão ao vivo",locutorAtual:texts.player?.subtitulo || "Programação da rádio",logo:content.logo || "",hero:content.capa || "",playerImage:texts.player?.imagem || "",cores:{primaria:colors.primaria || "#e31c45",secundaria:colors.secundaria || "#121d31",destaque:colors.destaque || "#f1a11a",fundo:colors.fundo || "#f4f6f9"},listenersEnabled:false};
     const moduleValues=texts.modulos || {}; const savedModules=safeArray(cms.modules);
     fresh.modules=modulesCatalog.map(([id,label,description],index)=>{const saved=savedModules.find(m=>m.id===id);return{id,label,description,enabled:saved? saved.enabled!==false : moduleValues[id]!==false,order:Number(saved?.order ?? index)};});
@@ -2218,7 +2322,7 @@
     if(can("patrocinadores"))content.patrocinadores=state.content.parceiros.map(i=>({...i,site:i.link}));
     if(can("banners"))content.banners={...(content.banners||{}),destaques:state.content.banners,publicidades:state.content.publicidade};
     if(can("links_aplicativos"))content.links_aplicativos={...(content.links_aplicativos||{}),android:state.integrations.aplicativo.android,ios:state.integrations.aplicativo.ios,pwa:state.integrations.aplicativo.pwa,qr:state.integrations.aplicativo.qrcode};
-    if(can("textos_institucionais"))content.textos_institucionais={...texts,sobre:state.radio.descricao,player:{...(texts.player||{}),titulo:state.radio.musicaAtual,subtitulo:state.radio.locutorAtual,imagem:state.radio.playerImage},seo:state.integrations.seo,podcasts:state.content.podcasts,videos:state.content.videos,promocoes:state.content.promocoes,galeria:state.content.galeria,eventos:state.content.eventos,modulos:Object.fromEntries(state.modules.map(m=>[m.id,m.enabled])),pedidosMusica:{...(texts.pedidosMusica||{}),ativo:state.integrations.whatsapp.pedidos},acessibilidade:{...(texts.acessibilidade||{}),leitorTela:state.integrations.configuracoes.acessibilidade},cms_v2:{...cms,schemaVersion:10,release:"2.6.0-stage2",editor:state.editor,security:state.security,audit:{entries:(state.audit?.entries||[]).slice(0,500),functionalRuns:(state.audit?.functionalRuns||[]).slice(0,10)},backup:{settings:state.backup?.settings||{},snapshots:(state.backup?.snapshots||[]).slice(0,5)},selectedTheme:state.selectedTheme,modules:state.modules,content:{equipe:state.content.equipe,popups:state.content.popups,anunciantes:state.content.anunciantes},aplicativo:{icone:state.integrations.aplicativo.icone},configuracoes:state.integrations.configuracoes,updatedAt:new Date().toISOString()}};
+    if(can("textos_institucionais"))content.textos_institucionais={...texts,sobre:state.radio.descricao,player:{...(texts.player||{}),titulo:state.radio.musicaAtual,subtitulo:state.radio.locutorAtual,imagem:state.radio.playerImage},seo:state.integrations.seo,podcasts:state.content.podcasts,videos:state.content.videos,promocoes:state.content.promocoes,galeria:state.content.galeria,eventos:state.content.eventos,modulos:Object.fromEntries(state.modules.map(m=>[m.id,m.enabled])),pedidosMusica:{...(texts.pedidosMusica||{}),ativo:state.integrations.whatsapp.pedidos},acessibilidade:{...(texts.acessibilidade||{}),leitorTela:state.integrations.configuracoes.acessibilidade},cms_v2:{...cms,schemaVersion:11,release:"2.6.0-stage3",editor:state.editor,security:state.security,audit:{entries:(state.audit?.entries||[]).slice(0,500),functionalRuns:(state.audit?.functionalRuns||[]).slice(0,10)},backup:{settings:state.backup?.settings||{},snapshots:(state.backup?.snapshots||[]).slice(0,5)},selectedTheme:state.selectedTheme,modules:state.modules,content:{equipe:state.content.equipe,popups:state.content.popups,anunciantes:state.content.anunciantes},aplicativo:{icone:state.integrations.aplicativo.icone},configuracoes:state.integrations.configuracoes,updatedAt:new Date().toISOString()}};
     return content;
   }
 
@@ -2249,7 +2353,7 @@
   function ensureV250State() {
     if (!state || typeof state !== "object") state=defaultState();
     state.editor=normalizeEditorState(state.editor||{});
-    state.version="2.6.0-stage2";
+    state.version="2.6.0-stage3";
     const client=dashboardData?.cliente || {};
     const ownerEmail=String(client.email || state.radio?.email || "cliente@exemplo.com.br").trim().toLowerCase();
     const ownerName=client.nome || client.nome_radio || state.radio?.nome || "Administrador do cliente";
@@ -2520,7 +2624,7 @@
     ensureV250State();const data=stableBackupData(),json=JSON.stringify(data),snapshot={id:uid("snapshot"),label,source,createdAt:new Date().toISOString(),checksum:checksumText(json),size:json.length,counts:contentCounts(data),data:json};state.backup.snapshots.unshift(snapshot);state.backup.snapshots=state.backup.snapshots.slice(0,state.backup.settings.maxSnapshots);recordAudit("backup.criado","backup","snapshot",`${label} • ${source}`);return snapshot;
   }
   function downloadBlob(filename,content,type="application/json") { const blob=new Blob([content],{type}),a=document.createElement("a"),url=URL.createObjectURL(blob);a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),0); }
-  function backupEnvelope(data=stableBackupData()) { const payload=JSON.stringify(data);return{format:"crb-cms-backup",version:"2.6.0-stage2",schemaVersion:10,generatedAt:new Date().toISOString(),checksum:checksumText(payload),counts:contentCounts(data),data}; }
+  function backupEnvelope(data=stableBackupData()) { const payload=JSON.stringify(data);return{format:"crb-cms-backup",version:"2.6.0-stage3",schemaVersion:11,generatedAt:new Date().toISOString(),checksum:checksumText(payload),counts:contentCounts(data),data}; }
   function exportBackup() { if(!requirePermission("export","backup"))return;const envelope=backupEnvelope();downloadBlob(`crb-cms-backup-v2.6.0-${new Date().toISOString().slice(0,10)}.json`,JSON.stringify(envelope,null,2));recordAudit("backup.exportado","backup","arquivo",envelope.checksum);notify("Backup completo gerado.","success"); }
   function downloadSnapshot(id) { if(!requirePermission("export","backup"))return;const snapshot=state.backup.snapshots.find(item=>item.id===id);if(!snapshot)return;const data=JSON.parse(snapshot.data);downloadBlob(`crb-ponto-${slugify(snapshot.label)}-${snapshot.createdAt.slice(0,10)}.json`,JSON.stringify(backupEnvelope(data),null,2));recordAudit("backup.snapshot_exportado","backup","snapshot",snapshot.label); }
   function restoreSnapshot(id) { if(!requirePermission("backup","backup"))return;const snapshot=state.backup.snapshots.find(item=>item.id===id);if(!snapshot)return;if(checksumText(snapshot.data)!==snapshot.checksum)return notify("Este ponto de restauração está corrompido.","error");if(!confirm(`Restaurar “${snapshot.label}”? O estado atual será preservado em um novo ponto.`))return;const existing=[...state.backup.snapshots];createSnapshot("Antes da restauração","automático");const preserved=[...state.backup.snapshots];state=deepMerge(defaultState(),JSON.parse(snapshot.data));ensureV250State();state.backup.snapshots=preserved;recordAudit("backup.restaurado","backup","snapshot",snapshot.label);persist(false);renderPage();notify("Ponto de restauração carregado. Salve o rascunho para confirmar no servidor.","success"); }
@@ -2532,11 +2636,11 @@
   function renderBackup(root) {
     ensureV250State();const snapshots=state.backup.snapshots,totalSize=snapshots.reduce((sum,item)=>sum+Number(item.size||0),0);
     root.innerHTML=`${pageHeader("Backup e recuperação","Exporte, valide, crie pontos de restauração e recupere o CMS com segurança.",canAccess("backup","backup")?`<button class="button primary" id="create-snapshot" type="button">Criar ponto agora</button>`:"")}
-      <div class="editorial-kpis"><article><span>Pontos disponíveis</span><strong>${snapshots.length}</strong></article><article><span>Limite configurado</span><strong>${state.backup.settings.maxSnapshots}</strong></article><article><span>Espaço estimado</span><strong>${Math.ceil(totalSize/1024)} KB</strong></article><article><span>Schema</span><strong>10</strong></article></div>
+      <div class="editorial-kpis"><article><span>Pontos disponíveis</span><strong>${snapshots.length}</strong></article><article><span>Limite configurado</span><strong>${state.backup.settings.maxSnapshots}</strong></article><article><span>Espaço estimado</span><strong>${Math.ceil(totalSize/1024)} KB</strong></article><article><span>Schema</span><strong>11</strong></article></div>
       <div class="grid-3"><section class="card"><div class="card-body"><h3>Exportar backup completo</h3><p class="field-help">Arquivo com metadados, contagens e checksum de integridade.</p><button class="button primary" id="export-backup" type="button">Baixar backup</button></div></section><section class="card"><div class="card-body"><h3>Importar e validar</h3><p class="field-help">Confere estrutura e checksum antes de carregar os dados.</p><button class="button secondary" id="import-backup" type="button">Selecionar arquivo</button></div></section><section class="card"><div class="card-body"><h3>Recarregar do servidor</h3><p class="field-help">Descarta alterações locais e recupera o último rascunho do D1.</p><button class="button danger" id="reset-demo" type="button">Recarregar dados</button></div></section></div>
       <section class="card" style="margin-top:18px"><header class="card-header"><div><h3>Automação de segurança</h3><p>Proteções antes de operações críticas.</p></div></header><div class="card-body"><form id="backup-settings" class="form-grid"><div class="field full"><div class="toggle-row"><div><strong>Ponto automático antes de importar</strong><small>Preserva o estado atual antes de substituir dados.</small></div><label class="switch"><input type="checkbox" name="autoBeforeImport" ${state.backup.settings.autoBeforeImport?"checked":""}><span></span></label></div><div class="toggle-row"><div><strong>Ponto automático antes de publicar</strong><small>Cria uma referência antes de enviar para revisão.</small></div><label class="switch"><input type="checkbox" name="autoBeforePublication" ${state.backup.settings.autoBeforePublication?"checked":""}><span></span></label></div></div><div class="field"><label for="max-snapshots">Máximo de pontos</label><input id="max-snapshots" name="maxSnapshots" type="number" min="1" max="10" value="${state.backup.settings.maxSnapshots}"></div><div class="field"><button class="button secondary" type="submit">Salvar automação</button></div></form></div></section>
       <section class="table-card" style="margin-top:18px"><div class="table-toolbar"><div><strong>Pontos de restauração</strong><small>O conteúdo atual é preservado antes de restaurar outro ponto.</small></div><span class="badge info">${snapshots.length}</span></div>${snapshots.length?`<div class="table-scroll"><table class="data-table"><thead><tr><th>Ponto</th><th>Origem</th><th>Conteúdo</th><th>Integridade</th><th style="text-align:right">Ações</th></tr></thead><tbody>${snapshots.map(item=>`<tr><td><strong>${escapeHTML(item.label)}</strong><small>${formatDateTime(item.createdAt)}</small></td><td>${escapeHTML(item.source)}</td><td><small>${Object.values(item.counts||{}).reduce((a,b)=>a+Number(b||0),0)} registros • ${Math.ceil(Number(item.size||0)/1024)} KB</small></td><td><span class="badge ${checksumText(item.data||"")===item.checksum?"active":"inactive"}">${checksumText(item.data||"")===item.checksum?"Íntegro":"Corrompido"}</span></td><td><div class="row-actions"><button class="button small primary" data-snapshot-restore="${item.id}" type="button">Restaurar</button><button class="button small secondary" data-snapshot-download="${item.id}" type="button">Baixar</button><button class="button small danger" data-snapshot-delete="${item.id}" type="button">Excluir</button></div></td></tr>`).join("")}</tbody></table></div>`:`<div class="empty-state"><strong>Nenhum ponto criado</strong><span>Crie um ponto antes de grandes alterações.</span></div>`}</section>
-      <section class="card" style="margin-top:18px"><header class="card-header"><div><h3>Sobre esta instalação</h3><p>Informações técnicas.</p></div></header><div class="card-body"><div class="code-box">Modo: produção integrada\nVersão: ${CONFIG.VERSION||"2.6.0-stage2"}\nSchema: 10\nPersistência: Cloudflare D1\nAPI: ${CONFIG.WORKER_URL||"não configurada"}\nÚltima alteração: ${formatDateTime(state.updatedAt)}</div></div></section>`;
+      <section class="card" style="margin-top:18px"><header class="card-header"><div><h3>Sobre esta instalação</h3><p>Informações técnicas.</p></div></header><div class="card-body"><div class="code-box">Modo: produção integrada\nVersão: ${CONFIG.VERSION||"2.6.0-stage3"}\nSchema: 11\nPersistência: Cloudflare D1\nAPI: ${CONFIG.WORKER_URL||"não configurada"}\nÚltima alteração: ${formatDateTime(state.updatedAt)}</div></div></section>`;
     $("#create-snapshot")?.addEventListener("click",()=>{createSnapshot("Ponto manual","manual");persist(false);renderBackup(root);notify("Ponto de restauração criado.","success");});$("#export-backup")?.addEventListener("click",exportBackup);$("#import-backup")?.addEventListener("click",()=>$("#backup-import").click());$("#reset-demo")?.addEventListener("click",()=>{if(confirm("Descartar alterações não salvas e recarregar o rascunho do servidor?")){createSnapshot("Antes de recarregar servidor","automático");recordAudit("servidor.recarregado","backup","site","Recarga solicitada");loadAll();}});
     $("#backup-settings")?.addEventListener("submit",event=>{event.preventDefault();if(!requirePermission("backup","backup"))return;const form=new FormData(event.currentTarget);state.backup.settings.autoBeforeImport=form.has("autoBeforeImport");state.backup.settings.autoBeforePublication=form.has("autoBeforePublication");state.backup.settings.maxSnapshots=Math.max(1,Math.min(10,Number(form.get("maxSnapshots")||5)));state.backup.snapshots=state.backup.snapshots.slice(0,state.backup.settings.maxSnapshots);recordAudit("backup.configurado","backup","configuracao",`Máximo ${state.backup.settings.maxSnapshots}`);persist(false);renderBackup(root);notify("Automação de backup atualizada.","success");});
     $$('[data-snapshot-restore]',root).forEach(button=>button.addEventListener("click",()=>restoreSnapshot(button.dataset.snapshotRestore)));$$('[data-snapshot-download]',root).forEach(button=>button.addEventListener("click",()=>downloadSnapshot(button.dataset.snapshotDownload)));$$('[data-snapshot-delete]',root).forEach(button=>button.addEventListener("click",()=>deleteSnapshot(button.dataset.snapshotDelete)));applyPermissionState(root,"backup");
@@ -2554,6 +2658,10 @@
     ensureV260EditorState();
     checks.push(auditCheck("editor-themes","Editor: opções por modelo",themes.every(theme=>state.editor.themeOptions[theme.id])?"pass":"fail",`${Object.keys(state.editor.themeOptions).length} modelos configuráveis`));
     checks.push(auditCheck("editor-blocks","Editor: opções por bloco",themes.every(theme=>modulesCatalog.every(([id])=>state.editor.blocks[theme.id]?.[id]))?"pass":"fail",`${themes.length*modulesCatalog.length} configurações isoladas`));
+    const colorConfigComplete=themes.every(theme=>modulesCatalog.every(([id])=>{const options=state.editor.blocks[theme.id]?.[id];return options&&typeof options.useThemeColors==="boolean"&&editorBlockColorKeys.every(key=>/^#[0-9a-f]{6}$/i.test(options[key]||""));}));
+    checks.push(auditCheck("editor-block-colors","Editor: cores por modelo e bloco",colorConfigComplete?"pass":"fail",`${themes.length*modulesCatalog.length} paletas isoladas com 6 cores`));
+    const customColorWarnings=[];themes.forEach(theme=>modulesCatalog.forEach(([id])=>{const options=state.editor.blocks[theme.id]?.[id];if(options?.useThemeColors===false){const failed=blockContrastChecks(options).filter(item=>!item.pass);if(failed.length)customColorWarnings.push(`${theme.name}/${id}: ${failed.length}`);}}));
+    checks.push(auditCheck("editor-block-contrast","Editor: contraste das cores personalizadas",customColorWarnings.length?"warning":"pass",customColorWarnings.slice(0,8).join("; ")||"Sem combinações personalizadas abaixo do recomendado"));
     const programConflicts=[];(state.content.programacao||[]).forEach((a,index)=>(state.content.programacao||[]).slice(index+1).forEach(b=>{if(a.ativo===false||b.ativo===false)return;const shared=normalizeDays(a.dias||a.dia).some(day=>normalizeDays(b.dias||b.dia).includes(day));if(shared&&a.inicio<b.fim&&a.fim>b.inicio)programConflicts.push(`${a.titulo} × ${b.titulo}`);}));checks.push(auditCheck("program-conflicts","Programação sem conflitos",programConflicts.length?"warning":"pass",programConflicts.slice(0,5).join("; ")||"Nenhum conflito"));
     const slugs=duplicateValues((state.content.noticias||[]).map(item=>slugify(item.slug||item.titulo)));checks.push(auditCheck("news-slugs","Notícias com endereços únicos",slugs.length?"fail":"pass",slugs.length?slugs.join(", "):"Sem duplicidades"));
     const videoUrls=duplicateValues((state.content.videos||[]).map(item=>normalizeComparableURL(item.url)));checks.push(auditCheck("video-urls","Vídeos sem URLs duplicadas",videoUrls.length?"warning":"pass",videoUrls.length?`${videoUrls.length} duplicidade(s)`:"Sem duplicidades"));
@@ -2567,7 +2675,7 @@
     themes.forEach(theme=>{const probe=document.createElement("div");probe.className="preview-canvas desktop";try{state.selectedTheme=theme.id;renderSitePreview(probe);clearPreviewPopupTimer();const preview=$(`.site-preview.theme-${theme.id}`,probe),structure=$(themeStructures[theme.id],probe);const unlabeled=$$('button,[role="button"]',probe).filter(el=>!String(el.textContent||"").trim()&&!el.getAttribute("aria-label")&&!el.getAttribute("title"));const broken=$$('[data-site-open]',probe).filter(el=>!contentItem(el.dataset.siteOpen,el.dataset.siteId));checks.push(auditCheck(`theme-${theme.id}`,`${theme.name}: renderização e estrutura`,preview&&structure?"pass":"fail",preview&&structure?`${themeLayoutLabel(theme.layout)} carregada`:`Estrutura ${themeStructures[theme.id]} ausente`));checks.push(auditCheck(`theme-buttons-${theme.id}`,`${theme.name}: controles identificados`,unlabeled.length?"fail":"pass",unlabeled.length?`${unlabeled.length} sem rótulo`:`${$$('button,[role="button"]',probe).length} controles`));checks.push(auditCheck(`theme-content-${theme.id}`,`${theme.name}: conteúdo navegável`,broken.length?"fail":"pass",broken.length?`${broken.length} alvo(s) ausente(s)`:"Todos os cards apontam para conteúdo existente"));}catch(error){checks.push(auditCheck(`theme-${theme.id}`,`${theme.name}: renderização`,"fail",error.message));}});
     state.selectedTheme=originalAuditTheme;
     const pageButtons=$$('button',document).filter(button=>!String(button.textContent||"").trim()&&!button.getAttribute("aria-label")&&!button.getAttribute("title"));checks.push(auditCheck("page-buttons","Botões da tela atual identificados",pageButtons.length?"fail":"pass",pageButtons.length?`${pageButtons.length} sem rótulo`:`${$$('button',document).length} botões verificados`));
-    const totals={pass:checks.filter(c=>c.status==="pass").length,warning:checks.filter(c=>c.status==="warning").length,fail:checks.filter(c=>c.status==="fail").length};const run={id:uid("run"),timestamp:new Date().toISOString(),version:"2.6.0-stage2",checks,totals};
+    const totals={pass:checks.filter(c=>c.status==="pass").length,warning:checks.filter(c=>c.status==="warning").length,fail:checks.filter(c=>c.status==="fail").length};const run={id:uid("run"),timestamp:new Date().toISOString(),version:"2.6.0-stage3",checks,totals};
     if(save){state.audit.functionalRuns.unshift(run);state.audit.functionalRuns=state.audit.functionalRuns.slice(0,10);recordAudit("auditoria.executada","auditoria","sistema",`${totals.pass} aprovadas, ${totals.warning} alertas, ${totals.fail} falhas`,totals.fail?"error":totals.warning?"warning":"success");persist(false);}return run;
   }
   function exportAuditCSV() { if(!requirePermission("export","auditoria"))return;const rows=[["Data/hora","Resultado","Ação","Área","Alvo","Usuário","Detalhes"],...state.audit.entries.map(item=>[item.timestamp,item.result,item.action,item.area,item.target,item.actor?.email||item.actor?.nome||"",item.details])];const csv=rows.map(row=>row.map(value=>`"${String(value??"").replaceAll('"','""')}"`).join(";")).join("\n");downloadBlob(`crb-auditoria-${new Date().toISOString().slice(0,10)}.csv`,`\ufeff${csv}`,"text/csv;charset=utf-8");recordAudit("auditoria.exportada","auditoria","csv",`${state.audit.entries.length} eventos`); }

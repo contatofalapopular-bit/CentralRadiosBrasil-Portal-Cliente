@@ -1,0 +1,10 @@
+{
+  "status": "pass",
+  "puts": 1,
+  "schema": 11,
+  "release": "2.6.0-stage3",
+  "endpoint": "/api/cliente/site/rascunho",
+  "themes": 6,
+  "blocksPerTheme": 14,
+  "colorsPerBlock": 6
+}

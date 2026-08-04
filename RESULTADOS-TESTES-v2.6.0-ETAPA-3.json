@@ -1,0 +1,294 @@
+{
+  "version": "2.6.0-stage3",
+  "summary": {
+    "total": 56,
+    "pass": 56,
+    "fail": 0
+  },
+  "results": [
+    {
+      "name": "version-login",
+      "status": "pass",
+      "detail": "Portal v2.6.0 • Cores por bloco"
+    },
+    {
+      "name": "version-sidebar",
+      "status": "pass",
+      "detail": "Portal v2.6.0 • Etapa 3\nDados reais • Worker + D1"
+    },
+    {
+      "name": "routes",
+      "status": "pass",
+      "detail": "30 áreas; falhas=[]"
+    },
+    {
+      "name": "stage-note",
+      "status": "pass",
+      "detail": "V2.6.0 • ETAPA 3\nEditor por modelo, bloco e cores\n\nCada bloco pode ter fundo, títulos, textos, chamadas e botões próprios em cada modelo, com verificação automática de contraste.\n\nMesmo rascunho atual\nSem mudança no Worker"
+    },
+    {
+      "name": "blocks",
+      "status": "pass",
+      "detail": "14"
+    },
+    {
+      "name": "color-panel",
+      "status": "pass",
+      "detail": "painel presente"
+    },
+    {
+      "name": "six-color-pickers",
+      "status": "pass",
+      "detail": "6"
+    },
+    {
+      "name": "six-color-texts",
+      "status": "pass",
+      "detail": "6"
+    },
+    {
+      "name": "theme-colors-default",
+      "status": "pass",
+      "detail": "cores originais ligadas"
+    },
+    {
+      "name": "colors-disabled-default",
+      "status": "pass",
+      "detail": "6"
+    },
+    {
+      "name": "neutral-contrast",
+      "status": "pass",
+      "detail": "Cores originais do modelo\nO contraste permanece sob controle do tema selecionado."
+    },
+    {
+      "name": "colors-enabled",
+      "status": "pass",
+      "detail": "6"
+    },
+    {
+      "name": "custom-class",
+      "status": "pass",
+      "detail": "site-section alt editor-block-editorial editor-width-amplo editor-bg-automatico editor-align-esquerda editor-custom-colors"
+    },
+    {
+      "name": "custom-css-vars",
+      "status": "pass",
+      "detail": "--editor-block-bg:#102030;--editor-block-title:#f8fafc;--editor-block-text:#d7e3ef;--editor-block-eyebrow:#7dd3fc;--editor-block-button:#f97316;--editor-block-button-text:#111827;"
+    },
+    {
+      "name": "background-computed",
+      "status": "pass",
+      "detail": "rgb(16, 32, 48)"
+    },
+    {
+      "name": "title-computed",
+      "status": "pass",
+      "detail": "rgb(248, 250, 252)"
+    },
+    {
+      "name": "text-computed",
+      "status": "pass",
+      "detail": "rgb(215, 227, 239)"
+    },
+    {
+      "name": "eyebrow-computed",
+      "status": "pass",
+      "detail": "rgb(125, 211, 252)"
+    },
+    {
+      "name": "button-background",
+      "status": "pass",
+      "detail": "rgb(249, 115, 22)"
+    },
+    {
+      "name": "button-text",
+      "status": "pass",
+      "detail": "rgb(17, 24, 39)"
+    },
+    {
+      "name": "contrast-success",
+      "status": "pass",
+      "detail": "Contraste aprovado\n✓ Título e fundo — 15.79:1\n✓ Texto e fundo — 12.68:1\n✓ Chamada e fundo — 9.91:1\n✓ Texto e botão — 6.33:1\nReferência: 3:1 para títulos grandes e 4,5:1 para textos e botões."
+    },
+    {
+      "name": "contrast-warning",
+      "status": "pass",
+      "detail": "Atenção: 4 combinação(ões) com baixo contraste\n! Título e fundo — 1.02:1\n! Texto e fundo — 1.16:1\n! Chamada e fundo — 1.04:1\n! Texto e botão — 1.06:1\nReferência: 3:1 para títulos grandes e 4,5:1 para textos e botões."
+    },
+    {
+      "name": "contrast-fail-items",
+      "status": "pass",
+      "detail": "4"
+    },
+    {
+      "name": "gospel-original-colors",
+      "status": "pass",
+      "detail": "gospel preservado"
+    },
+    {
+      "name": "theme-color-isolation",
+      "status": "pass",
+      "detail": "#FFFAF0"
+    },
+    {
+      "name": "news-custom-persist",
+      "status": "pass",
+      "detail": "customização persistiu"
+    },
+    {
+      "name": "news-bg-persist",
+      "status": "pass",
+      "detail": "#FFFFFF"
+    },
+    {
+      "name": "reset-colors-original",
+      "status": "pass",
+      "detail": "cores originais restauradas"
+    },
+    {
+      "name": "reset-removes-class",
+      "status": "pass",
+      "detail": "classe removida"
+    },
+    {
+      "name": "reset-keeps-layout",
+      "status": "pass",
+      "detail": "Editorial"
+    },
+    {
+      "name": "young-default-original",
+      "status": "pass",
+      "detail": "identidade original"
+    },
+    {
+      "name": "young-custom-optional",
+      "status": "pass",
+      "detail": "site-hero editor-block-destaque editor-width-total editor-bg-automatico editor-align-esquerda editor-custom-colors"
+    },
+    {
+      "name": "fullscreen-custom-color",
+      "status": "pass",
+      "detail": "rgb(34, 17, 51)"
+    },
+    {
+      "name": "device-desktop",
+      "status": "pass",
+      "detail": "preview-canvas desktop"
+    },
+    {
+      "name": "device-tablet",
+      "status": "pass",
+      "detail": "preview-canvas tablet"
+    },
+    {
+      "name": "device-mobile",
+      "status": "pass",
+      "detail": "preview-canvas mobile"
+    },
+    {
+      "name": "same-draft-endpoint",
+      "status": "pass",
+      "detail": "endpoint preservado"
+    },
+    {
+      "name": "schema-static",
+      "status": "pass",
+      "detail": "schema 11"
+    },
+    {
+      "name": "release-static",
+      "status": "pass",
+      "detail": "release stage3"
+    },
+    {
+      "name": "audit-color-config",
+      "status": "pass",
+      "detail": "check presente"
+    },
+    {
+      "name": "audit-contrast",
+      "status": "pass",
+      "detail": "check presente"
+    },
+    {
+      "name": "audit-no-fail",
+      "status": "pass",
+      "detail": "[]"
+    },
+    {
+      "name": "theme-morada",
+      "status": "pass",
+      "detail": ".theme-stage-regional"
+    },
+    {
+      "name": "theme-labels-morada",
+      "status": "pass",
+      "detail": "0"
+    },
+    {
+      "name": "theme-spotify",
+      "status": "pass",
+      "detail": ".theme-stage-music"
+    },
+    {
+      "name": "theme-labels-spotify",
+      "status": "pass",
+      "detail": "0"
+    },
+    {
+      "name": "theme-news",
+      "status": "pass",
+      "detail": ".theme-stage-news"
+    },
+    {
+      "name": "theme-labels-news",
+      "status": "pass",
+      "detail": "0"
+    },
+    {
+      "name": "theme-gospel",
+      "status": "pass",
+      "detail": ".theme-stage-community"
+    },
+    {
+      "name": "theme-labels-gospel",
+      "status": "pass",
+      "detail": "0"
+    },
+    {
+      "name": "theme-young",
+      "status": "pass",
+      "detail": ".theme-stage-young"
+    },
+    {
+      "name": "theme-labels-young",
+      "status": "pass",
+      "detail": "0"
+    },
+    {
+      "name": "theme-custom",
+      "status": "pass",
+      "detail": ".theme-stage-clean"
+    },
+    {
+      "name": "theme-labels-custom",
+      "status": "pass",
+      "detail": "0"
+    },
+    {
+      "name": "page-errors",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "name": "console-errors",
+      "status": "pass",
+      "detail": ""
+    }
+  ],
+  "consoleErrors": [
+    "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  ],
+  "pageErrors": []
+}

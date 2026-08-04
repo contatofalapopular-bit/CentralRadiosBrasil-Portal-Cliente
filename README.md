@@ -1,68 +1,88 @@
 # Portal do Cliente — Central Rádios Brasil
 
-## v2.5.0 — Usuários, permissões, auditoria e backup
+## v2.6.0 — Etapa 1: Modelos diferenciados em código
 
-Versão consolidada construída sobre a **v2.4.0 Final Consolidada**. Preserva os módulos editoriais e comerciais já aprovados e acrescenta controle de acesso, rastreabilidade e recuperação segura do rascunho.
+Esta etapa foi construída sobre a **v2.5.0 Final Auditoria** e altera somente o repositório do **Portal do Cliente**.
 
-### Usuários e permissões
+Não houve alteração no Worker, no Portal Público/PWA, no Painel Administrativo, no firmware ou em qualquer outro repositório.
 
-- Administrador principal protegido contra exclusão e suspensão.
-- Cadastro de usuários adicionais com nome, e-mail, perfil, situação e exigência de autenticação em duas etapas.
-- Perfis prontos: Administrador, Editor, Redator, Comercial, Auditor e Somente leitura.
-- Restrição do menu por área permitida.
-- Restrição de ações: visualizar, criar, editar, duplicar, ativar/desativar, excluir, salvar, publicar, gerenciar usuários, auditar, exportar e restaurar backup.
-- E-mails duplicados são bloqueados.
-- Perfis sem permissão veem ações bloqueadas ou não enxergam as áreas correspondentes.
+## Modelos disponíveis
 
-### Auditoria integrada
+### Portal Regional & TV
 
-- Histórico com usuário, data/hora, ação, área, alvo, resultado e detalhes.
-- Registro de criação, edição, duplicação, exclusão, alteração de status, salvamento, publicação, usuários, senhas, auditorias e backups.
-- Auditoria funcional interna de rotas, elementos essenciais, identificadores, conteúdos, links, programação, notícias, vídeos, campanhas, usuários, backups, botões e cards da prévia.
-- Exportação do histórico em CSV.
-- Filtros por sucesso, alerta, erro e permissão negada.
+- Central de rádio e vídeo ao vivo.
+- Hero editorial com player lateral.
+- Manchetes locais em mosaico.
+- Vídeos e programação em sequência de portal regional.
+- Paleta azul, azul-marinho, laranja e azul-claro.
 
-### Backup e recuperação
+### Rádio Popular & Musical
 
-- Exportação de backup completo em envelope versionado.
-- Checksum para verificar integridade antes da importação.
-- Compatibilidade com backups legados que possuem `radio`, `modules` e `content`.
-- Pontos de restauração manuais e automáticos.
-- Ponto automático antes de importar e antes de solicitar publicação.
-- Download, restauração e exclusão de pontos.
-- Preservação automática do estado atual antes de restaurar outro ponto.
-- Limite configurável entre 1 e 10 pontos.
+- Player protagonista.
+- Atalhos de pedido musical, promoções e programação.
+- Hero e cards com linguagem mais quente e participativa.
+- Podcasts em vitrine visual.
+- Paleta coral, roxo profundo, amarelo e creme.
 
-### Integração de dados
+### News 24h
 
-- Versão interna: `2.5.0-final`.
-- Schema interno: `8`.
-- Dados novos gravados em `textos_institucionais.cms_v2.security`, `audit` e `backup`.
-- Nenhuma migração SQL obrigatória.
-- O rascunho continua sendo salvo pelo endpoint já existente do Worker/D1.
+- Faixa de últimas notícias.
+- Hierarquia forte de manchetes.
+- Player em barra editorial.
+- Programação em lista compacta.
+- Paleta azul, azul-marinho, vermelho de alerta e cinza-claro.
 
-### Observação de segurança
+### Gospel Inspira
 
-O Portal aplica as permissões no menu e nas ações e persiste a configuração no CMS. Para que usuários adicionais tenham credenciais independentes e para que a proteção seja também validada no servidor, o Worker deve autenticar cada usuário e conferir o perfil/permissão em todos os endpoints de escrita. O contrato esperado está documentado em `INTEGRACAO-WORKER-v2.5.0.md`.
+- Hero acolhedor e centralizado.
+- Blocos de programação, louvores, vídeos e agenda.
+- Player e programação em composição própria.
+- Paleta verde-petróleo, verde profundo, dourado e marfim.
 
-### Auditoria de navegador
+### Rádio Jovem
 
-Foram executadas **190 verificações em Chromium**, divididas em quatro baterias:
+O código e a identidade do modelo Jovem foram preservados.
 
-- Navegação e conteúdo editorial: 74/74.
-- Comercial, editor, temas e prévia: 64/64.
-- Usuários, auditoria, backup, configurações e publicação: 32/32.
-- Perfis e bloqueios de permissão: 20/20.
+### Estúdio Personalizado
 
-Resultado: **190/190 aprovadas**, com **0 exceções JavaScript** e **0 erros de console**. A API foi simulada para não alterar produção.
+Continua usando as cores cadastradas pela emissora, com estrutura flexível para projetos premium.
 
-### Instalação
+## Compatibilidade e isolamento
 
-1. Faça backup da **v2.4.0 Final Consolidada**.
-2. Descompacte este pacote.
-3. Publique os arquivos sobre a versão atual do Portal do Cliente.
-4. Preserve a URL correta do Worker em `config.js`.
-5. Limpe o cache com `Ctrl + F5`.
-6. Teste login, salvamento, usuários, auditoria, backup e publicação.
+- IDs dos temas foram preservados: `morada`, `spotify`, `news`, `gospel`, `young` e `custom`.
+- Conteúdos cadastrados na v2.5.0 continuam compatíveis.
+- A URL do Worker em `config.js` não foi alterada.
+- Nenhum endpoint novo foi criado.
+- Nenhuma migração SQL é necessária.
+- Schema interno: `9`.
+- Release interna: `2.6.0-stage1`.
 
-A próxima versão do roadmap é **v2.6.0 — Editor visual e temas consolidados**.
+## Auditoria
+
+A bateria em Chromium aprovou **48 de 48 verificações**, cobrindo:
+
+- login simulado sem produção;
+- 30 áreas do menu;
+- seis modelos;
+- estruturas específicas de cada modelo;
+- desktop, tablet e celular;
+- paletas distintas;
+- abertura de notícias e programação;
+- troca de tema;
+- prévia ao vivo do Editor Visual;
+- auditoria interna dos seis modelos;
+- ausência de exceções JavaScript.
+
+A API foi simulada e nenhum dado de produção foi alterado.
+
+## Instalação
+
+1. Faça backup da v2.5.0 instalada.
+2. Descompacte o ZIP.
+3. Envie o conteúdo interno somente ao repositório `CentralRádiosBrasil-Portal-Cliente`.
+4. Não envie o ZIP fechado.
+5. Não altere o Worker nem outros repositórios.
+6. Aguarde o GitHub Pages concluir a publicação.
+7. Pressione `Ctrl + F5`.
+8. Abra **Temas** e visualize os seis modelos.
+

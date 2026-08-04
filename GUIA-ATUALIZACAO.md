@@ -1,38 +1,28 @@
-# Guia de atualização — v2.5.0 Final
+# Guia de atualização — v2.6.0 Etapa 1
 
-## Base de origem
+## Repositório correto
 
-Atualize a partir da **v2.4.0 Final Consolidada**.
+Publique somente em:
+
+`CentralRádiosBrasil-Portal-Cliente`
+
+Branch utilizada pelo projeto: `principal`.
 
 ## Procedimento
 
-1. Baixe e guarde uma cópia da instalação atual.
-2. Exporte também um backup JSON pelo painel atual.
-3. Descompacte o pacote da v2.5.0.
-4. Substitua os arquivos publicados do Portal do Cliente.
-5. Confira `config.js` e preserve a URL do Worker do seu ambiente.
-6. Faça `Ctrl + F5` após a publicação.
-7. Entre no painel e abra:
-   - Usuários e acesso;
-   - Auditoria;
-   - Backup;
-   - Publicação.
-8. Execute a auditoria completa dentro do painel.
-9. Crie um ponto de restauração antes de iniciar novos cadastros.
+1. Baixe e descompacte o pacote.
+2. Faça backup dos arquivos atuais do repositório.
+3. No GitHub, use **Adicionar arquivo → Carregar arquivos**.
+4. Envie o conteúdo interno da pasta descompactada.
+5. Substitua os arquivos com nomes iguais.
+6. Mensagem sugerida do commit: `Portal do Cliente v2.6.0 Etapa 1 — modelos diferenciados`.
+7. Aguarde o GitHub Pages concluir.
+8. Pressione `Ctrl + F5`.
 
-## Compatibilidade
+## Não fazer
 
-- Nenhuma migração SQL é necessária.
-- O schema interno passa de 7 para 8.
-- Conteúdos das versões v2.1.0 até v2.4.0 continuam compatíveis.
-- Backups antigos continuam aceitos quando possuem a estrutura mínima do CMS.
-
-## Retorno à versão anterior
-
-Em caso de problema:
-
-1. Restaure os arquivos da v2.4.0 Final Consolidada.
-2. Importe o backup exportado antes da atualização, se necessário.
-3. Limpe o cache do navegador.
-
-A v2.5.0 grava os novos dados dentro de `cms_v2`, sem alterar as tabelas principais do D1.
+- Não enviar o ZIP fechado.
+- Não publicar no Portal Público/PWA.
+- Não publicar no Worker.
+- Não alterar o Painel Administrativo.
+- Não substituir configurações de outros repositórios.

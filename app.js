@@ -100,6 +100,113 @@
     { id: "custom", layout: "studio", name: "Estúdio Personalizado", audience: "Projetos premium • identidade própria", description: "Base flexível e institucional que utiliza as cores da emissora e mantém liberdade para uma identidade exclusiva.", colors: ["#138a7e", "#111827", "#f59e0b", "#f5f7fb"] }
   ];
 
+  const editorThemeSchemas = Object.freeze({
+    morada: {
+      title: "Portal Regional & TV",
+      description: "Ajustes para portal local, rádio com notícias e webTV.",
+      fields: [
+        ["headerStyle","Cabeçalho","select",["Portal compacto","Institucional amplo","TV ao vivo"]],
+        ["headlineLayout","Manchetes","select",["Mosaico editorial","Lista de notícias","Grade equilibrada"]],
+        ["liveHub","Central ao vivo","checkbox"],
+        ["videoEmphasis","Destaque audiovisual","checkbox"],
+        ["density","Densidade","select",["Confortável","Compacta","Espaçosa"]]
+      ]
+    },
+    spotify: {
+      title: "Rádio Popular & Musical",
+      description: "Ajustes para participação, promoções e música em destaque.",
+      fields: [
+        ["headerStyle","Cabeçalho","select",["Noturno compacto","Colorido promocional","Logo central"]],
+        ["playerStyle","Player principal","select",["Painel lateral","Centralizado","Faixa horizontal"]],
+        ["quickActions","Atalhos de participação","checkbox"],
+        ["roundedCards","Cards bem arredondados","checkbox"],
+        ["density","Densidade","select",["Confortável","Compacta","Espaçosa"]]
+      ]
+    },
+    news: {
+      title: "News 24h",
+      description: "Ajustes editoriais para rádio jornal, esportes e opinião.",
+      fields: [
+        ["headerStyle","Cabeçalho","select",["Redação compacta","Portal clássico","Plantão ao vivo"]],
+        ["headlineLayout","Manchetes","select",["Principal + laterais","Grade editorial","Lista cronológica"]],
+        ["ticker","Faixa de últimas notícias","checkbox"],
+        ["sectionRules","Divisórias editoriais","checkbox"],
+        ["density","Densidade","select",["Compacta","Confortável","Espaçosa"]]
+      ]
+    },
+    gospel: {
+      title: "Gospel Inspira",
+      description: "Ajustes para acolhimento, louvores, mensagens e comunidade.",
+      fields: [
+        ["headerStyle","Cabeçalho","select",["Logo central","Clássico elegante","Comunidade"]],
+        ["heroShape","Formato do banner","select",["Curva suave","Reto elegante","Cartão central"]],
+        ["welcome","Painel de acolhimento","checkbox"],
+        ["softCards","Cards suaves","checkbox"],
+        ["density","Densidade","select",["Espaçosa","Confortável","Compacta"]]
+      ]
+    },
+    young: {
+      title: "Rádio Jovem",
+      description: "Identidade original preservada. Apenas o movimento pode ser reduzido.",
+      fields: [["motion","Movimento suave","checkbox"]],
+      locked: true
+    },
+    custom: {
+      title: "Estúdio Personalizado",
+      description: "Base flexível que respeita as cores definidas em Minha Rádio.",
+      fields: [
+        ["headerStyle","Cabeçalho","select",["Institucional","Minimalista","Logo central"]],
+        ["heroStyle","Banner principal","select",["Destaque amplo","Cartão contido","Texto central"]],
+        ["surfaceStyle","Superfícies","select",["Claras","Contorno","Contraste"]],
+        ["roundedCards","Cards arredondados","checkbox"],
+        ["density","Densidade","select",["Confortável","Compacta","Espaçosa"]]
+      ]
+    }
+  });
+
+  const editorThemeDefaults = Object.freeze({
+    morada:{headerStyle:"Portal compacto",headlineLayout:"Mosaico editorial",liveHub:true,videoEmphasis:true,density:"Confortável"},
+    spotify:{headerStyle:"Noturno compacto",playerStyle:"Painel lateral",quickActions:true,roundedCards:true,density:"Confortável"},
+    news:{headerStyle:"Redação compacta",headlineLayout:"Principal + laterais",ticker:true,sectionRules:true,density:"Compacta"},
+    gospel:{headerStyle:"Logo central",heroShape:"Curva suave",welcome:true,softCards:true,density:"Espaçosa"},
+    young:{motion:true},
+    custom:{headerStyle:"Institucional",heroStyle:"Destaque amplo",surfaceStyle:"Claras",roundedCards:false,density:"Confortável"}
+  });
+
+  const editorBlockDefaults = Object.freeze({
+    hero:{layout:"Destaque",width:"Total",background:"Automático",alignment:"Esquerda",limit:1,showDescription:true,showAction:true,title:"",eyebrow:""},
+    player:{layout:"Destaque",width:"Amplo",background:"Contraste",alignment:"Esquerda",limit:1,showDescription:true,showAction:true,title:"",eyebrow:""},
+    programacao:{layout:"Grade",width:"Amplo",background:"Automático",alignment:"Esquerda",limit:4,showDescription:true,showAction:true,title:"",eyebrow:""},
+    noticias:{layout:"Editorial",width:"Amplo",background:"Automático",alignment:"Esquerda",limit:4,showDescription:true,showAction:true,title:"",eyebrow:""},
+    promocoes:{layout:"Cards",width:"Amplo",background:"Automático",alignment:"Esquerda",limit:3,showDescription:true,showAction:true,title:"",eyebrow:""},
+    podcasts:{layout:"Cards",width:"Amplo",background:"Contraste",alignment:"Esquerda",limit:4,showDescription:true,showAction:true,title:"",eyebrow:""},
+    videos:{layout:"Editorial",width:"Amplo",background:"Automático",alignment:"Esquerda",limit:4,showDescription:true,showAction:true,title:"",eyebrow:""},
+    equipe:{layout:"Cards",width:"Amplo",background:"Automático",alignment:"Esquerda",limit:5,showDescription:true,showAction:true,title:"",eyebrow:""},
+    galeria:{layout:"Mosaico",width:"Amplo",background:"Automático",alignment:"Esquerda",limit:5,showDescription:true,showAction:true,title:"",eyebrow:""},
+    eventos:{layout:"Cards",width:"Amplo",background:"Automático",alignment:"Esquerda",limit:3,showDescription:true,showAction:true,title:"",eyebrow:""},
+    publicidade:{layout:"Faixa",width:"Total",background:"Automático",alignment:"Centro",limit:1,showDescription:true,showAction:true,title:"",eyebrow:""},
+    parceiros:{layout:"Logotipos",width:"Amplo",background:"Automático",alignment:"Centro",limit:8,showDescription:true,showAction:true,title:"",eyebrow:""},
+    aplicativo:{layout:"Faixa",width:"Amplo",background:"Contraste",alignment:"Esquerda",limit:1,showDescription:true,showAction:true,title:"",eyebrow:""},
+    contato:{layout:"Faixa",width:"Amplo",background:"Automático",alignment:"Esquerda",limit:1,showDescription:true,showAction:true,title:"",eyebrow:""}
+  });
+
+  function cloneJSON(value) { return JSON.parse(JSON.stringify(value)); }
+  function defaultEditorState() {
+    const blocks={};
+    themes.forEach(theme=>{blocks[theme.id]={};modulesCatalog.forEach(([id])=>{blocks[theme.id][id]=cloneJSON(editorBlockDefaults[id]||editorBlockDefaults.programacao);});});
+    return {version:2,themeOptions:cloneJSON(editorThemeDefaults),blocks,selectedBlock:"hero"};
+  }
+
+  function normalizeEditorState(value={}) {
+    const fresh=defaultEditorState(), source=value&&typeof value==="object"?value:{};
+    themes.forEach(theme=>{
+      fresh.themeOptions[theme.id]={...fresh.themeOptions[theme.id],...(source.themeOptions?.[theme.id]||{})};
+      modulesCatalog.forEach(([id])=>{fresh.blocks[theme.id][id]={...fresh.blocks[theme.id][id],...(source.blocks?.[theme.id]?.[id]||{})};});
+    });
+    fresh.selectedBlock=modulesCatalog.some(([id])=>id===source.selectedBlock)?source.selectedBlock:"hero";
+    return fresh;
+  }
+
   const schemas = {
     programacao: {
       title: "Programação", singular: "programa", imageProfile: "square",
@@ -272,10 +379,11 @@
   function defaultState() {
     const today = new Date().toISOString().slice(0, 10);
     return {
-      version: "2.6.0-stage1",
+      version: "2.6.0-stage2",
       updatedAt: new Date().toISOString(),
       status: "rascunho",
       selectedTheme: "morada",
+      editor: defaultEditorState(),
       radio: {
         nome: "Portal Cidade RV",
         slogan: "Informação, música e a voz da nossa cidade",
@@ -362,6 +470,7 @@
   let collectionFilter = "todos";
   let collectionContextFilter = "todos";
   let collectionSort = "padrao";
+  let editorSelectedBlock = "hero";
 
   function loadState() { return defaultState(); }
 
@@ -566,7 +675,7 @@
       </div>
       <div class="grid-2 equal" style="margin-top:18px">
         <section class="card"><header class="card-header"><div><h3>Dados reais, sem números inventados</h3><p>Audiência e ouvintes.</p></div></header><div class="card-body"><div class="notice">O painel não exibe audiência fictícia. O número de ouvintes só será mostrado quando existir uma fonte técnica confiável do streaming.</div></div></section>
-        <section class="card"><header class="card-header"><div><h3>Integração ativa</h3><p>Ambiente utilizado nesta instalação.</p></div></header><div class="card-body"><div class="code-box">Portal: ${escapeHTML(CONFIG.VERSION || "2.6.0-stage1")}\nWorker: ${escapeHTML(CONFIG.WORKER_URL || "—")}\nPersistência: Cloudflare D1\nMídias: API do site\nPublicação: supervisionada pela Central</div></div></section>
+        <section class="card"><header class="card-header"><div><h3>Integração ativa</h3><p>Ambiente utilizado nesta instalação.</p></div></header><div class="card-body"><div class="code-box">Portal: ${escapeHTML(CONFIG.VERSION || "2.6.0-stage2")}\nWorker: ${escapeHTML(CONFIG.WORKER_URL || "—")}\nPersistência: Cloudflare D1\nMídias: API do site\nPublicação: supervisionada pela Central</div></div></section>
       </div>`;
     bindGoButtons(root);
   }
@@ -734,52 +843,134 @@
     return new Promise((resolve,reject) => { const reader = new FileReader(); reader.onload = () => resolve(reader.result); reader.onerror = reject; reader.readAsDataURL(blob); });
   }
 
+  function editorThemeOptions(themeId=state.selectedTheme) {
+    ensureV260EditorState();
+    return state.editor.themeOptions[themeId];
+  }
+
+  function editorBlockOptions(blockId,themeId=state.selectedTheme) {
+    ensureV260EditorState();
+    return state.editor.blocks[themeId][blockId] || cloneJSON(editorBlockDefaults[blockId]||editorBlockDefaults.programacao);
+  }
+
+  function ensureV260EditorState() {
+    state.editor=normalizeEditorState(state.editor||{});
+    editorSelectedBlock=modulesCatalog.some(([id])=>id===editorSelectedBlock)?editorSelectedBlock:(state.editor.selectedBlock||"hero");
+    state.editor.selectedBlock=editorSelectedBlock;
+    return state.editor;
+  }
+
+  function optionSlug(value="") {
+    return String(value).replace(/([a-z0-9])([A-Z])/g,"$1-$2").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+  }
+
+  function editorFieldMarkup(field,value) {
+    const [key,label,type,values]=field;
+    if(type==="checkbox") return `<label class="editor-option-check"><input type="checkbox" data-theme-option="${key}" ${value!==false?"checked":""}><span><strong>${escapeHTML(label)}</strong><small>Aplicado somente a este modelo.</small></span></label>`;
+    return `<label class="field"><span>${escapeHTML(label)}</span><select data-theme-option="${key}">${values.map(item=>`<option value="${escapeHTML(item)}" ${item===value?"selected":""}>${escapeHTML(item)}</option>`).join("")}</select></label>`;
+  }
+
+  function renderThemeEditorControls() {
+    const host=$("#theme-editor-controls"); if(!host)return;
+    ensureV260EditorState();
+    const schema=editorThemeSchemas[state.selectedTheme], values=editorThemeOptions();
+    host.innerHTML=`<div class="editor-control-heading"><div><span>Opções do modelo</span><h3>${escapeHTML(schema.title)}</h3><p>${escapeHTML(schema.description)}</p></div><button class="button ghost small" id="reset-theme-options" type="button">Restaurar modelo</button></div>${schema.locked?`<div class="notice editor-locked-note"><strong>Identidade preservada.</strong><br>O modelo Jovem mantém sua composição original, conforme definido.</div>`:""}<div class="editor-options-grid">${schema.fields.map(field=>editorFieldMarkup(field,values[field[0]])).join("")}</div>`;
+    $$('[data-theme-option]',host).forEach(input=>input.addEventListener("change",()=>{
+      editorThemeOptions()[input.dataset.themeOption]=input.type==="checkbox"?input.checked:input.value;
+      persist(false);renderSitePreview($("#inline-preview"));
+    }));
+    $("#reset-theme-options",host)?.addEventListener("click",()=>{
+      state.editor.themeOptions[state.selectedTheme]=cloneJSON(editorThemeDefaults[state.selectedTheme]);
+      persist(false);renderThemeEditorControls();renderSitePreview($("#inline-preview"));notify("Opções do modelo restauradas.","success");
+    });
+  }
+
+  function blockSupportsLimit(id) { return ["programacao","noticias","promocoes","podcasts","videos","equipe","galeria","eventos","parceiros"].includes(id); }
+  function blockLayoutChoices(id) {
+    if(id==="hero")return["Destaque","Cartão","Minimalista"];
+    if(id==="player")return["Destaque","Compacto","Faixa"];
+    if(["noticias","videos"].includes(id))return["Editorial","Grade","Lista"];
+    if(id==="galeria")return["Mosaico","Grade","Faixa"];
+    if(id==="parceiros")return["Logotipos","Cards","Faixa"];
+    if(["aplicativo","contato","publicidade"].includes(id))return["Faixa","Cartão","Minimalista"];
+    return["Cards","Grade","Lista"];
+  }
+
+  function renderBlockEditorControls() {
+    const host=$("#block-editor-controls"); if(!host)return;
+    ensureV260EditorState();
+    const module=state.modules.find(item=>item.id===editorSelectedBlock)||state.modules[0], values=editorBlockOptions(module.id);
+    const layouts=blockLayoutChoices(module.id);
+    host.innerHTML=`<div class="editor-control-heading"><div><span>Bloco selecionado</span><h3>${escapeHTML(module.label)}</h3><p>${escapeHTML(module.description)}</p></div><button class="button ghost small" id="reset-block-options" type="button">Restaurar bloco</button></div>
+      <div class="editor-options-grid block-options-grid">
+        <label class="field"><span>Composição</span><select data-block-option="layout">${layouts.map(item=>`<option ${item===values.layout?"selected":""}>${item}</option>`).join("")}</select></label>
+        <label class="field"><span>Largura</span><select data-block-option="width">${["Total","Amplo","Contido"].map(item=>`<option ${item===values.width?"selected":""}>${item}</option>`).join("")}</select></label>
+        <label class="field"><span>Fundo</span><select data-block-option="background">${["Automático","Claro","Contraste","Cor do tema"].map(item=>`<option ${item===values.background?"selected":""}>${item}</option>`).join("")}</select></label>
+        <label class="field"><span>Alinhamento</span><select data-block-option="alignment">${["Esquerda","Centro"].map(item=>`<option ${item===values.alignment?"selected":""}>${item}</option>`).join("")}</select></label>
+        ${blockSupportsLimit(module.id)?`<label class="field"><span>Itens na página</span><input type="number" min="1" max="12" value="${Number(values.limit||4)}" data-block-option="limit"></label>`:""}
+        <label class="field editor-span-2"><span>Título personalizado</span><input type="text" maxlength="80" value="${escapeHTML(values.title||"")}" placeholder="Deixe vazio para usar o título padrão" data-block-option="title"></label>
+        <label class="field editor-span-2"><span>Chamada superior</span><input type="text" maxlength="60" value="${escapeHTML(values.eyebrow||"")}" placeholder="Deixe vazio para usar a chamada padrão" data-block-option="eyebrow"></label>
+        <label class="editor-option-check"><input type="checkbox" data-block-option="showDescription" ${values.showDescription!==false?"checked":""}><span><strong>Mostrar descrição</strong><small>Texto explicativo abaixo do título.</small></span></label>
+        <label class="editor-option-check"><input type="checkbox" data-block-option="showAction" ${values.showAction!==false?"checked":""}><span><strong>Mostrar acesso completo</strong><small>Botão para lista, grade ou conteúdo completo.</small></span></label>
+      </div>`;
+    $$('[data-block-option]',host).forEach(input=>{
+      const eventName=input.tagName==="INPUT"&&input.type==="text"?"input":"change";
+      input.addEventListener(eventName,()=>{
+        let value=input.type==="checkbox"?input.checked:input.value;
+        if(input.type==="number")value=Math.max(1,Math.min(12,Number(value||1)));
+        editorBlockOptions(module.id)[input.dataset.blockOption]=value;
+        persist(false);renderModuleList();renderSitePreview($("#inline-preview"));
+      });
+    });
+    $("#reset-block-options",host)?.addEventListener("click",()=>{
+      state.editor.blocks[state.selectedTheme][module.id]=cloneJSON(editorBlockDefaults[module.id]||editorBlockDefaults.programacao);
+      persist(false);renderBlockEditorControls();renderModuleList();renderSitePreview($("#inline-preview"));notify("Configuração do bloco restaurada.","success");
+    });
+  }
+
   function renderVisualEditor(root) {
+    ensureV260EditorState();
     root.innerHTML = `
-      ${pageHeader("Editor Visual", "Ative, desative e reorganize blocos. A prévia usa o mesmo conteúdo do painel.", `<button class="button primary" data-preview type="button">Prévia em tela cheia</button>`)}
-      <div class="editor-layout">
+      ${pageHeader("Editor Visual", "Organize os blocos e personalize cada modelo sem alterar o conteúdo cadastrado.", `<button class="button primary" data-preview type="button">Prévia em tela cheia</button>`)}
+      <section class="editor-stage-note"><div><span>v2.6.0 • Etapa 2</span><h3>Editor por modelo e por bloco</h3><p>Cada tema guarda sua própria composição. Alterar o News não muda o Gospel, o Popular ou o Portal Regional.</p></div><strong>Mesmo rascunho atual<br>Sem mudança no Worker</strong></section>
+      <div class="editor-layout editor-layout-v260">
         <aside class="editor-sidebar">
-          <section class="card"><header class="card-header"><div><h3>Blocos da página</h3><p>Arraste para mudar a ordem.</p></div></header><div class="card-body"><div class="module-list" id="module-list"></div></div></section>
-          <section class="card"><header class="card-header"><div><h3>Tema ativo</h3><p>Troque sem perder o conteúdo.</p></div></header><div class="card-body"><select id="quick-theme">${themes.map(theme => `<option value="${theme.id}" ${theme.id === state.selectedTheme ? "selected" : ""}>${escapeHTML(theme.name)}</option>`).join("")}</select><button class="button secondary" data-go="themes" type="button" style="width:100%;margin-top:10px">Ver todos os temas</button></div></section>
-          <section class="card"><div class="card-body"><div class="notice"><strong>v2.6.0 — modelos em código.</strong><br>O conteúdo continua único, mas cada tema aplica composição, hierarquia, paleta e comportamento responsivo próprios. O modelo Jovem foi preservado.</div></div></section>
+          <section class="card"><header class="card-header"><div><h3>Modelo ativo</h3><p>As opções abaixo pertencem somente a ele.</p></div></header><div class="card-body"><select id="quick-theme">${themes.map(theme => `<option value="${theme.id}" ${theme.id === state.selectedTheme ? "selected" : ""}>${escapeHTML(theme.name)}</option>`).join("")}</select><button class="button secondary" data-go="themes" type="button" style="width:100%;margin-top:10px">Ver todos os modelos</button></div></section>
+          <section class="card"><header class="card-header"><div><h3>Blocos da página</h3><p>Arraste ou use as setas. Clique no bloco para editar.</p></div></header><div class="card-body"><div class="module-list" id="module-list"></div></div></section>
         </aside>
-        <section>
-          <div class="device-toolbar"><strong>Prévia ao vivo</strong><div class="device-switch"><button class="active" data-inline-device="desktop" type="button">Desktop</button><button data-inline-device="tablet" type="button">Tablet</button><button data-inline-device="mobile" type="button">Celular</button></div></div>
-          <div class="preview-panel"><div id="inline-preview" class="preview-canvas desktop"></div></div>
+        <section class="editor-workspace">
+          <div class="editor-controls-stack">
+            <section class="card editor-control-card"><div class="card-body" id="theme-editor-controls"></div></section>
+            <section class="card editor-control-card"><div class="card-body" id="block-editor-controls"></div></section>
+          </div>
+          <div class="editor-preview-column">
+            <div class="device-toolbar"><strong>Prévia ao vivo</strong><div class="device-switch"><button class="active" data-inline-device="desktop" type="button">Desktop</button><button data-inline-device="tablet" type="button">Tablet</button><button data-inline-device="mobile" type="button">Celular</button></div></div>
+            <div class="preview-panel"><div id="inline-preview" class="preview-canvas desktop"></div></div>
+          </div>
         </section>
       </div>`;
-    renderModuleList();
-    renderSitePreview($("#inline-preview"));
-    $("[data-preview]", root).addEventListener("click", openPreview);
-    bindGoButtons(root);
-    $("#quick-theme").addEventListener("change", event => { state.selectedTheme = event.target.value; persist(false); renderSitePreview($("#inline-preview")); });
-    $$('[data-inline-device]', root).forEach(button => button.addEventListener("click", () => {
-      $$('[data-inline-device]', root).forEach(item => item.classList.remove("active")); button.classList.add("active");
-      $("#inline-preview").className = `preview-canvas ${button.dataset.inlineDevice}`;
-    }));
+    renderModuleList();renderThemeEditorControls();renderBlockEditorControls();renderSitePreview($("#inline-preview"));
+    $("[data-preview]", root).addEventListener("click", openPreview);bindGoButtons(root);
+    $("#quick-theme").addEventListener("change", event => { state.selectedTheme = event.target.value;ensureV260EditorState();persist(false);renderModuleList();renderThemeEditorControls();renderBlockEditorControls();renderSitePreview($("#inline-preview")); });
+    $$('[data-inline-device]', root).forEach(button => button.addEventListener("click", () => {$$('[data-inline-device]', root).forEach(item => item.classList.remove("active"));button.classList.add("active");$("#inline-preview").className = `preview-canvas ${button.dataset.inlineDevice}`;renderSitePreview($("#inline-preview"));}));
   }
 
   function renderModuleList() {
-    const list = $("#module-list");
-    if (!list) return;
+    const list = $("#module-list"); if (!list) return;
+    ensureV260EditorState();
     state.modules.sort((a,b) => a.order - b.order);
-    list.innerHTML = state.modules.map(module => `<div class="module-item ${module.enabled ? "" : "disabled"}" draggable="true" data-module-id="${module.id}"><span class="drag-handle">☷</span><div><strong>${escapeHTML(module.label)}</strong><small>${escapeHTML(module.description)}</small></div><div class="module-actions"><label class="switch"><input type="checkbox" ${module.enabled ? "checked" : ""} data-module-toggle="${module.id}"><span></span></label></div></div>`).join("");
-    $$('[data-module-toggle]', list).forEach(input => input.addEventListener("change", () => {
-      const module = state.modules.find(item => item.id === input.dataset.moduleToggle);
-      module.enabled = input.checked;
-      persist(false); renderModuleList(); renderSitePreview($("#inline-preview"));
-    }));
-    let dragging = null;
-    $$('.module-item', list).forEach(item => {
-      item.addEventListener("dragstart", () => { dragging = item; item.classList.add("dragging"); });
-      item.addEventListener("dragend", () => { item.classList.remove("dragging"); dragging = null; persist(false); renderSitePreview($("#inline-preview")); });
-      item.addEventListener("dragover", event => {
-        event.preventDefault(); if (!dragging || dragging === item) return;
-        const rect = item.getBoundingClientRect(); const after = event.clientY > rect.top + rect.height/2;
-        list.insertBefore(dragging, after ? item.nextSibling : item);
-        $$('.module-item', list).forEach((row,index) => { const module = state.modules.find(entry => entry.id === row.dataset.moduleId); module.order = index; });
-      });
+    list.innerHTML = state.modules.map(module => `<div class="module-item ${module.enabled ? "" : "disabled"} ${module.id===editorSelectedBlock?"selected":""}" draggable="true" data-module-id="${module.id}" role="button" tabindex="0" aria-label="Configurar bloco ${escapeHTML(module.label)}"><span class="drag-handle" aria-hidden="true">☷</span><div class="module-copy"><strong>${escapeHTML(module.label)}</strong><small>${escapeHTML(editorBlockOptions(module.id).layout)} • ${escapeHTML(editorBlockOptions(module.id).width)}</small></div><div class="module-actions"><button class="module-move" data-module-up="${module.id}" type="button" aria-label="Mover ${escapeHTML(module.label)} para cima">↑</button><button class="module-move" data-module-down="${module.id}" type="button" aria-label="Mover ${escapeHTML(module.label)} para baixo">↓</button><label class="switch" title="Ativar ou desativar"><input type="checkbox" ${module.enabled ? "checked" : ""} data-module-toggle="${module.id}" aria-label="Ativar bloco ${escapeHTML(module.label)}"><span></span></label></div></div>`).join("");
+    $$('.module-item',list).forEach(item=>{
+      const select=()=>{editorSelectedBlock=item.dataset.moduleId;state.editor.selectedBlock=editorSelectedBlock;renderModuleList();renderBlockEditorControls();};
+      item.addEventListener("click",event=>{if(!event.target.closest("button,input,label"))select();});
+      item.addEventListener("keydown",event=>{if((event.key==="Enter"||event.key===" ")&&!event.target.closest("button,input")){event.preventDefault();select();}});
     });
+    $$('[data-module-toggle]', list).forEach(input => input.addEventListener("change", () => {const module = state.modules.find(item => item.id === input.dataset.moduleToggle);module.enabled = input.checked;persist(false);renderModuleList();renderSitePreview($("#inline-preview"));}));
+    const move=(id,delta)=>{const ordered=[...state.modules].sort((a,b)=>a.order-b.order),index=ordered.findIndex(item=>item.id===id),target=index+delta;if(index<0||target<0||target>=ordered.length)return;[ordered[index],ordered[target]]=[ordered[target],ordered[index]];ordered.forEach((item,i)=>item.order=i);persist(false);renderModuleList();renderSitePreview($("#inline-preview"));};
+    $$('[data-module-up]',list).forEach(button=>button.addEventListener("click",()=>move(button.dataset.moduleUp,-1)));
+    $$('[data-module-down]',list).forEach(button=>button.addEventListener("click",()=>move(button.dataset.moduleDown,1)));
+    let dragging = null;
+    $$('.module-item', list).forEach(item => {item.addEventListener("dragstart", () => { dragging = item; item.classList.add("dragging"); });item.addEventListener("dragend", () => { item.classList.remove("dragging"); dragging = null; persist(false);renderModuleList();renderSitePreview($("#inline-preview")); });item.addEventListener("dragover", event => {event.preventDefault(); if (!dragging || dragging === item) return;const rect = item.getBoundingClientRect(); const after = event.clientY > rect.top + rect.height/2;list.insertBefore(dragging, after ? item.nextSibling : item);$$('.module-item', list).forEach((row,index) => { const module = state.modules.find(entry => entry.id === row.dataset.moduleId); module.order = index; });});});
   }
 
   function themeLayoutLabel(layout) {
@@ -798,7 +989,7 @@
 
   function renderThemes(root) {
     root.innerHTML = `${pageHeader("Temas", "Modelos construídos em HTML, CSS e JavaScript. O conteúdo é compartilhado, mas a experiência visual muda de verdade.")}
-      <section class="theme-release-note"><div><span>v2.6.0 • Etapa 1</span><h3>Quatro novas vitrines comerciais em código</h3><p>Portal Regional & TV, Rádio Popular & Musical, News 24h e Gospel Inspira receberam estruturas próprias. O modelo Jovem foi preservado sem alteração de identidade.</p></div><strong>Sem mudanças no Worker<br>Sem alterações em outros repositórios</strong></section>
+      <section class="theme-release-note"><div><span>v2.6.0 • Etapa 2</span><h3>Modelos e blocos agora possuem ajustes próprios</h3><p>As seis vitrines continuam distintas e cada uma preserva sua composição, ordem e apresentação de blocos. O modelo Jovem mantém sua identidade original.</p></div><strong>Mesmo rascunho do Portal<br>Sem mudanças no Worker</strong></section>
       <div class="theme-grid">${themes.map(theme => {
         const [accent,dark,highlight,bg] = theme.colors;
         return `<article class="theme-card ${theme.id === state.selectedTheme ? "selected" : ""}" data-theme-card="${theme.id}">${theme.id === state.selectedTheme ? `<span class="theme-selected-tag">Tema ativo</span>` : ""}<div class="theme-shot" style="--shot-bg:${bg};--shot-dark:${dark};--shot-accent:${accent};--shot-highlight:${highlight};--shot-muted:${highlight}22">${themeShotMarkup(theme)}</div><div class="theme-meta"><span class="theme-layout-label">Composição ${escapeHTML(themeLayoutLabel(theme.layout))}</span><h3>${escapeHTML(theme.name)}</h3><small class="theme-audience">${escapeHTML(theme.audience || "")}</small><p>${escapeHTML(theme.description)}</p><button class="button ${theme.id === state.selectedTheme ? "secondary" : "primary"} small" data-select-theme="${theme.id}" type="button">${theme.id === state.selectedTheme ? "Selecionado" : "Usar este tema"}</button> <button class="button ghost small" data-theme-preview="${theme.id}" type="button">Visualizar</button></div></article>`;
@@ -1263,7 +1454,7 @@
         <section class="card"><div class="card-body"><h3>Exportar JSON</h3><p class="field-help">Baixa configurações, módulos, temas e conteúdos.</p><button class="button primary" id="export-backup" type="button">Baixar backup</button></div></section>
         <section class="card"><div class="card-body"><h3>Importar JSON</h3><p class="field-help">Carrega o arquivo no editor; clique em Salvar rascunho para gravar no D1.</p><button class="button secondary" id="import-backup" type="button">Selecionar arquivo</button></div></section>
         <section class="card"><div class="card-body"><h3>Recarregar do servidor</h3><p class="field-help">Descarta alterações ainda não salvas e recarrega o último rascunho do servidor.</p><button class="button danger" id="reset-demo" type="button">Recarregar dados</button></div></section>
-      </div><section class="card" style="margin-top:18px"><header class="card-header"><div><h3>Sobre esta instalação</h3><p>Informações técnicas.</p></div></header><div class="card-body"><div class="code-box">Modo: produção integrada\nVersão: ${CONFIG.VERSION || "2.6.0-stage1"}\nPersistência: Cloudflare D1\nAPI: ${CONFIG.WORKER_URL || "não configurada"}\nÚltima alteração: ${formatDateTime(state.updatedAt)}</div></div></section>`;
+      </div><section class="card" style="margin-top:18px"><header class="card-header"><div><h3>Sobre esta instalação</h3><p>Informações técnicas.</p></div></header><div class="card-body"><div class="code-box">Modo: produção integrada\nVersão: ${CONFIG.VERSION || "2.6.0-stage2"}\nPersistência: Cloudflare D1\nAPI: ${CONFIG.WORKER_URL || "não configurada"}\nÚltima alteração: ${formatDateTime(state.updatedAt)}</div></div></section>`;
     $("#export-backup").addEventListener("click",exportBackup);
     $("#import-backup").addEventListener("click",()=>$("#backup-import").click());
     $("#reset-demo").addEventListener("click",()=>{if(confirm("Descartar alterações não salvas e recarregar o rascunho do servidor?")) loadAll();});
@@ -1322,21 +1513,46 @@
   }
   function compareTime(a,b) { return String(a || "99:99").localeCompare(String(b || "99:99")); }
 
+  function themeOption(key,themeId=state.selectedTheme) { return editorThemeOptions(themeId)?.[key]; }
+  function blockOption(id,key,fallback=null) { const value=editorBlockOptions(id)?.[key];return value===undefined||value===null||value===""?fallback:value; }
+  function blockLimit(id,fallback) { return Math.max(1,Math.min(12,Number(blockOption(id,"limit",fallback)||fallback))); }
+  function applyBlockPresentation(id,html) {
+    if(!html)return "";
+    const opts=editorBlockOptions(id), classes=[`editor-block-${optionSlug(opts.layout)}`,`editor-width-${optionSlug(opts.width)}`,`editor-bg-${optionSlug(opts.background)}`,`editor-align-${optionSlug(opts.alignment)}`];
+    if(opts.showDescription===false)classes.push("editor-hide-description");if(opts.showAction===false)classes.push("editor-hide-action");
+    html=html.replace(/<(section|div)\b([^>]*)data-site-section=(["'])[^"']+\3([^>]*)>/,full=>{
+      if(/class=(["'])/.test(full))return full.replace(/class=(["'])([^"']*)\1/,(_,quote,current)=>`class=${quote}${current} ${classes.join(" ")}${quote}`);
+      return full.replace(/^<(section|div)/,match=>`${match} class="${classes.join(" ")}"`);
+    });
+    if(!/data-site-section=/.test(html))return html;
+    if(opts.title){html=html.replace(/<h([12])>[^<]*<\/h\1>/,(_,level)=>`<h${level}>${escapeHTML(opts.title)}</h${level}>`);}
+    if(opts.eyebrow){html=html.replace(/(<div class="site-section-head"><div><span>)[^<]*(<\/span>)/,`$1${escapeHTML(opts.eyebrow)}$2`).replace(/(<span class="site-kicker">)[^<]*(<\/span>)/,`$1${escapeHTML(opts.eyebrow)}$2`);}
+    return html;
+  }
+  function previewThemeClasses() {
+    const o=editorThemeOptions(), out=[`editor-density-${optionSlug(o.density||"Confortável")}`,`editor-header-${optionSlug(o.headerStyle||"Padrão")}`];
+    Object.entries(o).forEach(([key,value])=>{if(typeof value==="boolean"&&value)out.push(`editor-option-${optionSlug(key)}`);else if(typeof value==="string"&&!["density","headerStyle"].includes(key))out.push(`editor-${optionSlug(key)}-${optionSlug(value)}`);});
+    return out.join(" ");
+  }
+
   function themeLatestNews(limit=3) {
     return [...state.content.noticias].filter(isNewsVisible).sort((a,b)=>String(`${b.data||""}${b.hora||""}`).localeCompare(String(`${a.data||""}${a.hora||""}`))).slice(0,limit);
   }
 
   function siteNewsTicker() {
+    if(themeOption("ticker")===false)return "";
     const items=themeLatestNews(4);
     if (!items.length) return "";
     return `<section class="theme-news-ticker" aria-label="Últimas notícias"><strong>AGORA</strong><div>${items.map(item=>`<button type="button" data-site-open="noticias" data-site-id="${escapeHTML(item.id)}">${escapeHTML(item.titulo)}</button>`).join("")}</div></section>`;
   }
 
   function siteMusicQuickActions() {
+    if(themeOption("quickActions")===false)return "";
     return `<section class="theme-music-actions" aria-label="Participação do ouvinte"><button type="button" data-site-play><span>▶</span><strong>Ouvir agora</strong><small>Player ao vivo</small></button><button type="button" data-site-action="whatsapp"><span>✦</span><strong>Peça sua música</strong><small>Participe pelo WhatsApp</small></button>${previewSectionAvailable("promocoes")?`<button type="button" data-site-scroll="promocoes"><span>★</span><strong>Promoções</strong><small>Confira e participe</small></button>`:""}${previewSectionAvailable("programacao")?`<button type="button" data-site-scroll="programacao"><span>▦</span><strong>Programação</strong><small>Veja o que vem a seguir</small></button>`:""}</section>`;
   }
 
   function siteGospelWelcome() {
+    if(themeOption("welcome")===false)return "";
     const cards=[
       ["programacao","Programação de hoje","Acompanhe mensagens, louvores e programas"],
       ["videos","Louvores e vídeos","Conteúdo para assistir e compartilhar"],
@@ -1346,6 +1562,7 @@
   }
 
   function siteRegionalLiveHub(r) {
+    if(themeOption("liveHub")===false)return "";
     const firstVideo=sortMediaItems("videos",state.content.videos.filter(item=>item.ativo!==false))[0];
     return `<section class="theme-regional-livehub" aria-label="Central ao vivo"><div class="theme-regional-signal"><span>AO VIVO</span><strong>${escapeHTML(r.musicaAtual||"Transmissão da emissora")}</strong><small>${escapeHTML(r.locutorAtual||`${r.cidade} • ${r.estado}`)}</small></div><div class="theme-regional-hub-actions"><button type="button" data-site-play>▶ Ouvir rádio</button>${firstVideo?`<button type="button" data-site-open="videos" data-site-id="${escapeHTML(firstVideo.id)}">▣ Assistir destaque</button>`:""}${previewSectionAvailable("noticias")?`<button type="button" data-site-scroll="noticias">Últimas notícias</button>`:""}</div></section>`;
   }
@@ -1359,7 +1576,7 @@
     const sections = {
       hero: () => siteHero(r), player: () => sitePlayer(r), programacao: () => siteProgramming(), noticias: () => siteNews(), promocoes: () => sitePromotions(), podcasts: () => sitePodcasts(), videos: () => siteVideos(), equipe: () => siteTeam(), galeria: () => siteGallery(), eventos: () => siteEvents(), publicidade: () => "", parceiros: () => sitePartners(), aplicativo: () => siteApp(), contato: () => siteContact()
     };
-    const section=(id)=>enabled.has(id)&&sections[id]?sections[id]():"";
+    const section=(id)=>enabled.has(id)&&sections[id]?applyBlockPresentation(id,sections[id]()):"";
     const rest=(skip)=>ordered.filter(id=>!skip.has(id)&&enabled.has(id)&&sections[id]).map(id=>sections[id]()).join("");
     let body="";
     if (state.selectedTheme === "spotify") body=`${siteHeader(r)}${siteMusicQuickActions()}<div class="theme-stage theme-stage-music">${section("player")}${section("hero")}</div>${section("promocoes")}${section("programacao")}${section("podcasts")}${rest(new Set(["hero","player","promocoes","programacao","podcasts"]))}`;
@@ -1381,7 +1598,7 @@
       const anchor=body.includes('data-site-section="programacao"') ? "programacao" : (body.includes('data-site-section="noticias"') ? "noticias" : "player");
       body=insertAfterSiteSection(body,anchor,betweenSlot);
     }
-    container.innerHTML = `<div class="site-preview theme-${state.selectedTheme}" data-site-section="inicio" style="${customStyle}${r.hero ? `--hero-image:url('${escapeHTML(r.hero)}')` : ""}">${body}${footerSlot}${siteFooter(r)}</div>`;
+    container.innerHTML = `<div class="site-preview theme-${state.selectedTheme} ${previewThemeClasses()}" data-site-section="inicio" style="${customStyle}${r.hero ? `--hero-image:url('${escapeHTML(r.hero)}')` : ""}">${body}${footerSlot}${siteFooter(r)}</div>`;
     bindSitePreviewInteractions(container);
     schedulePreviewPopup(container);
     syncAudioButtons();
@@ -1497,14 +1714,14 @@
     const today=currentWeekdayLabel(), now=currentTimeKey();
     return [...items].sort((a,b)=>Number(isProgramLive(b))-Number(isProgramLive(a)) || Number(normalizeDays(b.dias||b.dia).includes(today) && b.inicio>=now)-Number(normalizeDays(a.dias||a.dia).includes(today) && a.inicio>=now) || Math.min(...normalizeDays(a.dias||a.dia).map(day=>weekOrder.indexOf(day)).filter(index=>index>=0),99)-Math.min(...normalizeDays(b.dias||b.dia).map(day=>weekOrder.indexOf(day)).filter(index=>index>=0),99) || compareTime(a.inicio,b.inicio) || String(a.titulo||"").localeCompare(String(b.titulo||""),"pt-BR"));
   }
-  function siteProgramming() { const items=sortProgrammingItems(state.content.programacao.filter(i=>i.ativo!==false)).slice(0,4), hasLive=items.some(isProgramLive); return `<section class="site-section" data-site-section="programacao"><div class="site-section-head"><div><span>${hasLive?"No ar e próximos":"Grade da emissora"}</span><h2>Programação</h2><p>Conteúdo organizado por dia e horário.</p></div><button class="site-section-link" data-site-list="programacao" type="button">Ver grade completa →</button></div><div class="site-program-grid">${items.map(i=>{const live=isProgramLive(i);return `<article class="site-program-card ${live?"live":""}" data-site-open="programacao" data-site-id="${escapeHTML(i.id)}" role="button" tabindex="0" aria-label="Abrir programa ${escapeHTML(i.titulo)}" style="${i.cor?`--program-color:${escapeHTML(i.cor)}`:""}"><div class="site-program-time">${live?"AGORA":escapeHTML(i.inicio||"")}</div><strong>${escapeHTML(i.titulo)}</strong><small>${escapeHTML(i.locutor||formatDays(i.dias||i.dia))}</small></article>`;}).join("")}</div></section>`; }
-  function siteNews() { const items=[...state.content.noticias].filter(isNewsVisible).sort((a,b)=>Number(Boolean(b.destaque))-Number(Boolean(a.destaque)) || String(`${b.data||""}${b.hora||""}`).localeCompare(String(`${a.data||""}${a.hora||""}`))).slice(0,4); return `<section class="site-section alt" data-site-section="noticias"><div class="site-section-head"><div><span>Informação</span><h2>Últimas notícias</h2><p>Cidade, esporte, agronegócio e os assuntos do dia.</p></div><button class="site-section-link" data-site-list="noticias" type="button">Todas as notícias →</button></div><div class="site-news-grid">${items.map((i,index)=>`<article class="site-news-card ${index===0?"featured":""}" data-site-open="noticias" data-site-id="${escapeHTML(i.id)}" role="button" tabindex="0" aria-label="Abrir notícia ${escapeHTML(i.titulo)}"><div class="site-news-image">${i.imagem?`<img src="${escapeHTML(i.imagem)}" alt="Capa da notícia ${escapeHTML(i.titulo)}">`:""}</div><div class="site-news-body"><span>${escapeHTML(i.categoria||"Notícias")}</span><h3>${escapeHTML(i.titulo)}</h3><p>${escapeHTML(i.resumo||"")}</p><small class="site-news-meta">${escapeHTML(i.autor||"")} ${i.data?`• ${formatDate(i.data)}`:""}</small></div></article>`).join("")}</div></section>`; }
-  function sitePromotions() { const items=sortPromotionItems(state.content.promocoes.filter(i=>i.ativo!==false&&["ativa","agendada"].includes(promotionStatusValue(i)))).slice(0,3); if(!items.length)return ""; return `<section class="site-section" data-site-section="promocoes"><div class="site-section-head"><div><span>Participe</span><h2>Promoções</h2><p>Campanhas ativas e próximas oportunidades para os ouvintes.</p></div><button class="site-section-link" data-site-list="promocoes" type="button">Ver todas →</button></div><div class="site-promo-grid">${items.map(i=>`<article class="site-promo-card ${i.destaque?"media-featured":""}" data-site-open="promocoes" data-site-id="${escapeHTML(i.id)}" role="button" tabindex="0" aria-label="Abrir promoção ${escapeHTML(i.titulo)}" style="${i.imagem?`--card-image:url('${i.imagem}')`:""}"><span class="site-content-status status-promo-${promotionStatusValue(i)}">${escapeHTML(promotionStatusLabel(i))}</span><strong>${escapeHTML(i.titulo)}</strong><small>${escapeHTML(i.premio||i.descricao||"")}</small><em>${i.fim?`Até ${escapeHTML(formatDate(i.fim))}`:"Sem data de encerramento"}</em></article>`).join("")}</div></section>`; }
-  function sitePodcasts() { const items=sortMediaItems("podcasts",state.content.podcasts.filter(i=>i.ativo!==false)).slice(0,4); if(!items.length)return ""; return `<section class="site-section dark" data-site-section="podcasts"><div class="site-section-head"><div><span>Ouça quando quiser</span><h2>Podcasts</h2><p>Programas, entrevistas e episódios sob demanda.</p></div><button class="site-section-link" data-site-list="podcasts" type="button">Todos os episódios →</button></div><div class="site-podcast-grid">${items.map(i=>`<article class="site-podcast-card ${i.destaque?"media-featured":""}" data-site-open="podcasts" data-site-id="${escapeHTML(i.id)}" role="button" tabindex="0" aria-label="Ouvir podcast ${escapeHTML(i.titulo)}"><div class="site-podcast-cover">${i.imagem?`<img src="${escapeHTML(i.imagem)}" alt="Capa de ${escapeHTML(i.titulo)}">`:`<span aria-hidden="true">◉</span>`}<i class="site-media-play" aria-hidden="true">▶</i></div><div class="site-podcast-copy"><div class="site-media-labels">${i.destaque?`<span>Destaque</span>`:""}<span>${escapeHTML(episodeLabel(i))}</span></div><strong>${escapeHTML(i.titulo)}</strong><small>${escapeHTML(i.programa||"Podcast")}</small><em>${[i.data?formatDate(i.data):"",i.duracaoMinutos?formatDuration(i.duracaoMinutos):""].filter(Boolean).map(escapeHTML).join(" • ")}</em></div></article>`).join("")}</div></section>`; }
-  function siteVideos() { const items=sortMediaItems("videos",state.content.videos.filter(i=>i.ativo!==false)).slice(0,4); if(!items.length)return ""; return `<section class="site-section alt" data-site-section="videos"><div class="site-section-head"><div><span>Assista</span><h2>Vídeos</h2><p>Entrevistas, música, transmissões e bastidores.</p></div><button class="site-section-link" data-site-list="videos" type="button">Todos os vídeos →</button></div><div class="site-news-grid">${items.map((i,index)=>{const thumb=videoThumbnailURL(i);return `<article class="site-news-card ${(i.destaque||index===0)?"featured":""}" data-site-open="videos" data-site-id="${escapeHTML(i.id)}" role="button" tabindex="0" aria-label="Assistir vídeo ${escapeHTML(i.titulo)}"><div class="site-news-image site-video-thumb">${thumb?`<img src="${escapeHTML(thumb)}" alt="Miniatura de ${escapeHTML(i.titulo)}">`:""}<span class="site-video-play" aria-hidden="true">▶</span>${i.destaque?`<b class="site-media-corner">Destaque</b>`:""}</div><div class="site-news-body"><span>${escapeHTML(i.categoria||"Vídeo")} • ${escapeHTML(videoTypeLabel(i))}</span><h3>${escapeHTML(i.titulo)}</h3><p>${escapeHTML(i.descricao||"")}</p><small class="site-news-meta">${[i.data?formatDate(i.data):"",i.duracaoMinutos?formatDuration(i.duracaoMinutos):""].filter(Boolean).map(escapeHTML).join(" • ")}</small></div></article>`;}).join("")}</div></section>`; }
-  function siteTeam() { const items=[...state.content.locutores].sort((a,b)=>Number(a.ordem||999)-Number(b.ordem||999)).concat(state.content.equipe).filter(i=>i.ativo!==false).slice(0,5); if(!items.length)return ""; return `<section class="site-section" data-site-section="equipe"><div class="site-section-head"><div><span>Quem faz</span><h2>Nossa equipe</h2><p>As vozes e profissionais da emissora.</p></div><button class="site-section-link" data-site-list="equipe" type="button">Conheça a equipe →</button></div><div class="site-team-grid">${items.map(i=>`<article class="site-team-card" data-site-open="${state.content.locutores.some(loc=>loc.id===i.id)?"locutores":"equipe"}" data-site-id="${escapeHTML(i.id)}" role="button" tabindex="0" aria-label="Abrir perfil de ${escapeHTML(i.nome)}"><div class="site-team-photo">${i.foto?`<img src="${escapeHTML(i.foto)}" alt="Foto de ${escapeHTML(i.nome)}">`:""}</div><strong>${escapeHTML(i.nome)}</strong><small>${escapeHTML(i.cargo||"")}</small></article>`).join("")}</div></section>`; }
-  function siteGallery() { const items=state.content.galeria.filter(i=>i.ativo!==false).slice(0,5); if(!items.length)return ""; return `<section class="site-section alt" data-site-section="galeria"><div class="site-section-head"><div><span>Imagens</span><h2>Galeria</h2><p>Eventos, bastidores e momentos da rádio.</p></div><button class="site-section-link" data-site-list="galeria" type="button">Ver galeria →</button></div><div class="site-gallery-grid">${items.map(i=>`<div data-site-open="galeria" data-site-id="${escapeHTML(i.id)}" role="button" tabindex="0" aria-label="Ampliar foto ${escapeHTML(i.titulo)}">${i.imagem?`<img src="${escapeHTML(i.imagem)}" alt="${escapeHTML(i.titulo)}">`:`<span class="site-gallery-placeholder">${escapeHTML(i.titulo||"Foto")}</span>`}</div>`).join("")}</div></section>`; }
-  function siteEvents() { const items=sortEventItems(state.content.eventos.filter(i=>i.ativo!==false&&["hoje","futuro","adiado"].includes(eventStatusValue(i)))).slice(0,3); if(!items.length)return ""; return `<section class="site-section" data-site-section="eventos"><div class="site-section-head"><div><span>Agenda</span><h2>Próximos eventos</h2><p>Shows, ações, transmissões e encontros da rádio.</p></div><button class="site-section-link" data-site-list="eventos" type="button">Agenda completa →</button></div><div class="site-promo-grid">${items.map(i=>`<article class="site-promo-card ${i.destaque?"media-featured":""}" data-site-open="eventos" data-site-id="${escapeHTML(i.id)}" role="button" tabindex="0" aria-label="Abrir evento ${escapeHTML(i.titulo)}" style="${i.imagem?`--card-image:url('${i.imagem}')`:""}"><span class="site-content-status status-evento-${eventStatusValue(i)}">${escapeHTML(eventStatusLabel(i))}</span><strong>${escapeHTML(i.titulo)}</strong><small>${escapeHTML(i.local||i.cidade||i.tipo||"")}</small><em>${escapeHTML(formatEventPeriod(i))}</em></article>`).join("")}</div></section>`; }
+  function siteProgramming() { const items=sortProgrammingItems(state.content.programacao.filter(i=>i.ativo!==false)).slice(0,blockLimit("programacao",4)), hasLive=items.some(isProgramLive); return `<section class="site-section" data-site-section="programacao"><div class="site-section-head"><div><span>${hasLive?"No ar e próximos":"Grade da emissora"}</span><h2>Programação</h2><p>Conteúdo organizado por dia e horário.</p></div><button class="site-section-link" data-site-list="programacao" type="button">Ver grade completa →</button></div><div class="site-program-grid">${items.map(i=>{const live=isProgramLive(i);return `<article class="site-program-card ${live?"live":""}" data-site-open="programacao" data-site-id="${escapeHTML(i.id)}" role="button" tabindex="0" aria-label="Abrir programa ${escapeHTML(i.titulo)}" style="${i.cor?`--program-color:${escapeHTML(i.cor)}`:""}"><div class="site-program-time">${live?"AGORA":escapeHTML(i.inicio||"")}</div><strong>${escapeHTML(i.titulo)}</strong><small>${escapeHTML(i.locutor||formatDays(i.dias||i.dia))}</small></article>`;}).join("")}</div></section>`; }
+  function siteNews() { const items=[...state.content.noticias].filter(isNewsVisible).sort((a,b)=>Number(Boolean(b.destaque))-Number(Boolean(a.destaque)) || String(`${b.data||""}${b.hora||""}`).localeCompare(String(`${a.data||""}${a.hora||""}`))).slice(0,blockLimit("noticias",4)); return `<section class="site-section alt" data-site-section="noticias"><div class="site-section-head"><div><span>Informação</span><h2>Últimas notícias</h2><p>Cidade, esporte, agronegócio e os assuntos do dia.</p></div><button class="site-section-link" data-site-list="noticias" type="button">Todas as notícias →</button></div><div class="site-news-grid">${items.map((i,index)=>`<article class="site-news-card ${index===0?"featured":""}" data-site-open="noticias" data-site-id="${escapeHTML(i.id)}" role="button" tabindex="0" aria-label="Abrir notícia ${escapeHTML(i.titulo)}"><div class="site-news-image">${i.imagem?`<img src="${escapeHTML(i.imagem)}" alt="Capa da notícia ${escapeHTML(i.titulo)}">`:""}</div><div class="site-news-body"><span>${escapeHTML(i.categoria||"Notícias")}</span><h3>${escapeHTML(i.titulo)}</h3><p>${escapeHTML(i.resumo||"")}</p><small class="site-news-meta">${escapeHTML(i.autor||"")} ${i.data?`• ${formatDate(i.data)}`:""}</small></div></article>`).join("")}</div></section>`; }
+  function sitePromotions() { const items=sortPromotionItems(state.content.promocoes.filter(i=>i.ativo!==false&&["ativa","agendada"].includes(promotionStatusValue(i)))).slice(0,blockLimit("promocoes",3)); if(!items.length)return ""; return `<section class="site-section" data-site-section="promocoes"><div class="site-section-head"><div><span>Participe</span><h2>Promoções</h2><p>Campanhas ativas e próximas oportunidades para os ouvintes.</p></div><button class="site-section-link" data-site-list="promocoes" type="button">Ver todas →</button></div><div class="site-promo-grid">${items.map(i=>`<article class="site-promo-card ${i.destaque?"media-featured":""}" data-site-open="promocoes" data-site-id="${escapeHTML(i.id)}" role="button" tabindex="0" aria-label="Abrir promoção ${escapeHTML(i.titulo)}" style="${i.imagem?`--card-image:url('${i.imagem}')`:""}"><span class="site-content-status status-promo-${promotionStatusValue(i)}">${escapeHTML(promotionStatusLabel(i))}</span><strong>${escapeHTML(i.titulo)}</strong><small>${escapeHTML(i.premio||i.descricao||"")}</small><em>${i.fim?`Até ${escapeHTML(formatDate(i.fim))}`:"Sem data de encerramento"}</em></article>`).join("")}</div></section>`; }
+  function sitePodcasts() { const items=sortMediaItems("podcasts",state.content.podcasts.filter(i=>i.ativo!==false)).slice(0,blockLimit("podcasts",4)); if(!items.length)return ""; return `<section class="site-section dark" data-site-section="podcasts"><div class="site-section-head"><div><span>Ouça quando quiser</span><h2>Podcasts</h2><p>Programas, entrevistas e episódios sob demanda.</p></div><button class="site-section-link" data-site-list="podcasts" type="button">Todos os episódios →</button></div><div class="site-podcast-grid">${items.map(i=>`<article class="site-podcast-card ${i.destaque?"media-featured":""}" data-site-open="podcasts" data-site-id="${escapeHTML(i.id)}" role="button" tabindex="0" aria-label="Ouvir podcast ${escapeHTML(i.titulo)}"><div class="site-podcast-cover">${i.imagem?`<img src="${escapeHTML(i.imagem)}" alt="Capa de ${escapeHTML(i.titulo)}">`:`<span aria-hidden="true">◉</span>`}<i class="site-media-play" aria-hidden="true">▶</i></div><div class="site-podcast-copy"><div class="site-media-labels">${i.destaque?`<span>Destaque</span>`:""}<span>${escapeHTML(episodeLabel(i))}</span></div><strong>${escapeHTML(i.titulo)}</strong><small>${escapeHTML(i.programa||"Podcast")}</small><em>${[i.data?formatDate(i.data):"",i.duracaoMinutos?formatDuration(i.duracaoMinutos):""].filter(Boolean).map(escapeHTML).join(" • ")}</em></div></article>`).join("")}</div></section>`; }
+  function siteVideos() { const items=sortMediaItems("videos",state.content.videos.filter(i=>i.ativo!==false)).slice(0,blockLimit("videos",4)); if(!items.length)return ""; return `<section class="site-section alt" data-site-section="videos"><div class="site-section-head"><div><span>Assista</span><h2>Vídeos</h2><p>Entrevistas, música, transmissões e bastidores.</p></div><button class="site-section-link" data-site-list="videos" type="button">Todos os vídeos →</button></div><div class="site-news-grid">${items.map((i,index)=>{const thumb=videoThumbnailURL(i);return `<article class="site-news-card ${(i.destaque||index===0)?"featured":""}" data-site-open="videos" data-site-id="${escapeHTML(i.id)}" role="button" tabindex="0" aria-label="Assistir vídeo ${escapeHTML(i.titulo)}"><div class="site-news-image site-video-thumb">${thumb?`<img src="${escapeHTML(thumb)}" alt="Miniatura de ${escapeHTML(i.titulo)}">`:""}<span class="site-video-play" aria-hidden="true">▶</span>${i.destaque?`<b class="site-media-corner">Destaque</b>`:""}</div><div class="site-news-body"><span>${escapeHTML(i.categoria||"Vídeo")} • ${escapeHTML(videoTypeLabel(i))}</span><h3>${escapeHTML(i.titulo)}</h3><p>${escapeHTML(i.descricao||"")}</p><small class="site-news-meta">${[i.data?formatDate(i.data):"",i.duracaoMinutos?formatDuration(i.duracaoMinutos):""].filter(Boolean).map(escapeHTML).join(" • ")}</small></div></article>`;}).join("")}</div></section>`; }
+  function siteTeam() { const items=[...state.content.locutores].sort((a,b)=>Number(a.ordem||999)-Number(b.ordem||999)).concat(state.content.equipe).filter(i=>i.ativo!==false).slice(0,blockLimit("equipe",5)); if(!items.length)return ""; return `<section class="site-section" data-site-section="equipe"><div class="site-section-head"><div><span>Quem faz</span><h2>Nossa equipe</h2><p>As vozes e profissionais da emissora.</p></div><button class="site-section-link" data-site-list="equipe" type="button">Conheça a equipe →</button></div><div class="site-team-grid">${items.map(i=>`<article class="site-team-card" data-site-open="${state.content.locutores.some(loc=>loc.id===i.id)?"locutores":"equipe"}" data-site-id="${escapeHTML(i.id)}" role="button" tabindex="0" aria-label="Abrir perfil de ${escapeHTML(i.nome)}"><div class="site-team-photo">${i.foto?`<img src="${escapeHTML(i.foto)}" alt="Foto de ${escapeHTML(i.nome)}">`:""}</div><strong>${escapeHTML(i.nome)}</strong><small>${escapeHTML(i.cargo||"")}</small></article>`).join("")}</div></section>`; }
+  function siteGallery() { const items=state.content.galeria.filter(i=>i.ativo!==false).slice(0,blockLimit("galeria",5)); if(!items.length)return ""; return `<section class="site-section alt" data-site-section="galeria"><div class="site-section-head"><div><span>Imagens</span><h2>Galeria</h2><p>Eventos, bastidores e momentos da rádio.</p></div><button class="site-section-link" data-site-list="galeria" type="button">Ver galeria →</button></div><div class="site-gallery-grid">${items.map(i=>`<div data-site-open="galeria" data-site-id="${escapeHTML(i.id)}" role="button" tabindex="0" aria-label="Ampliar foto ${escapeHTML(i.titulo)}">${i.imagem?`<img src="${escapeHTML(i.imagem)}" alt="${escapeHTML(i.titulo)}">`:`<span class="site-gallery-placeholder">${escapeHTML(i.titulo||"Foto")}</span>`}</div>`).join("")}</div></section>`; }
+  function siteEvents() { const items=sortEventItems(state.content.eventos.filter(i=>i.ativo!==false&&["hoje","futuro","adiado"].includes(eventStatusValue(i)))).slice(0,blockLimit("eventos",3)); if(!items.length)return ""; return `<section class="site-section" data-site-section="eventos"><div class="site-section-head"><div><span>Agenda</span><h2>Próximos eventos</h2><p>Shows, ações, transmissões e encontros da rádio.</p></div><button class="site-section-link" data-site-list="eventos" type="button">Agenda completa →</button></div><div class="site-promo-grid">${items.map(i=>`<article class="site-promo-card ${i.destaque?"media-featured":""}" data-site-open="eventos" data-site-id="${escapeHTML(i.id)}" role="button" tabindex="0" aria-label="Abrir evento ${escapeHTML(i.titulo)}" style="${i.imagem?`--card-image:url('${i.imagem}')`:""}"><span class="site-content-status status-evento-${eventStatusValue(i)}">${escapeHTML(eventStatusLabel(i))}</span><strong>${escapeHTML(i.titulo)}</strong><small>${escapeHTML(i.local||i.cidade||i.tipo||"")}</small><em>${escapeHTML(formatEventPeriod(i))}</em></article>`).join("")}</div></section>`; }
   function responsiveCommercialImage(item,alt) {
     const desktop=item?.imagemDesktop || item?.imagem || "", mobile=item?.imagemMobile || desktop;
     if (!desktop) return `<span class="site-commercial-placeholder">ESPAÇO PUBLICITÁRIO</span>`;
@@ -1551,7 +1768,7 @@
     return siteCommercialSlot(position);
   }
 
-  function sitePartners() { const items=sortPartnerItems(state.content.parceiros.filter(i=>i.ativo!==false)).slice(0,8); if(!items.length)return ""; return `<section class="site-section alt" data-site-section="parceiros"><div class="site-section-head"><div><span>Apoio</span><h2>Parceiros e patrocinadores</h2><p>Marcas que apoiam a rádio e seus projetos.</p></div><button class="site-section-link" data-site-list="parceiros" type="button">Ver todos →</button></div><div class="site-partner-grid">${items.map(i=>`<button class="site-partner-card ${i.destaque?"featured":""}" data-site-open="parceiros" data-site-id="${escapeHTML(i.id)}" type="button" aria-label="Abrir parceiro ${escapeHTML(i.nome)}"><span class="site-partner-logo">${i.logo?`<img src="${escapeHTML(i.logo)}" alt="Logomarca de ${escapeHTML(i.nome)}">`:`${escapeHTML(initials(i.nome))}`}</span><strong>${escapeHTML(i.nome)}</strong><small>${escapeHTML(i.categoria||"Parceiro")}</small>${i.destaque?`<em>Destaque</em>`:""}</button>`).join("")}</div></section>`; }
+  function sitePartners() { const items=sortPartnerItems(state.content.parceiros.filter(i=>i.ativo!==false)).slice(0,blockLimit("parceiros",8)); if(!items.length)return ""; return `<section class="site-section alt" data-site-section="parceiros"><div class="site-section-head"><div><span>Apoio</span><h2>Parceiros e patrocinadores</h2><p>Marcas que apoiam a rádio e seus projetos.</p></div><button class="site-section-link" data-site-list="parceiros" type="button">Ver todos →</button></div><div class="site-partner-grid">${items.map(i=>`<button class="site-partner-card ${i.destaque?"featured":""}" data-site-open="parceiros" data-site-id="${escapeHTML(i.id)}" type="button" aria-label="Abrir parceiro ${escapeHTML(i.nome)}"><span class="site-partner-logo">${i.logo?`<img src="${escapeHTML(i.logo)}" alt="Logomarca de ${escapeHTML(i.nome)}">`:`${escapeHTML(initials(i.nome))}`}</span><strong>${escapeHTML(i.nome)}</strong><small>${escapeHTML(i.categoria||"Parceiro")}</small>${i.destaque?`<em>Destaque</em>`:""}</button>`).join("")}</div></section>`; }
   function siteApp() { return `<section class="site-section dark" data-site-section="aplicativo"><div class="site-section-head"><div><span>Leve a rádio com você</span><h2>Baixe nosso aplicativo</h2><p>Ouça a programação no celular e receba novidades.</p></div><button class="site-live-button" data-site-action="app" type="button">Baixar aplicativo</button></div></section>`; }
   function siteContact() { return `<section class="site-section" data-site-section="contato"><div class="site-section-head"><div><span>Fale com a rádio</span><h2>Contato e participação</h2><p>WhatsApp, pedidos de música, comercial e jornalismo.</p></div><button class="site-wa-button" data-site-action="whatsapp" type="button">Abrir WhatsApp</button></div></section>`; }
   function siteFooter(r) { const links=[["inicio","Início"],["noticias","Notícias"],["programacao","Programação"],["promocoes","Promoções"]].filter(([id])=>id === "inicio" || previewSectionAvailable(id)); return `<footer class="site-footer"><div class="site-footer-grid"><div><h3>${escapeHTML(r.nome)}</h3><p>${escapeHTML(r.descricao)}</p></div><div><h3>Navegação</h3><p>${links.map(([id,label])=>`<a href="#" data-site-scroll="${id}">${label}</a>`).join("<br>")}</p></div><div><h3>Contato</h3><p>${escapeHTML(r.email)}<br>${escapeHTML(r.telefone)}<br>${escapeHTML(r.endereco)}</p></div><div><h3>Anuncie</h3><p>Apresente sua marca aos ouvintes da rádio.</p><button class="site-footer-action" data-site-action="whatsapp" type="button">Falar com o comercial</button></div></div><div class="site-footer-bottom"><span>© ${new Date().getFullYear()} ${escapeHTML(r.nome)}</span><span>Site administrado pela Central Rádios Brasil</span></div></footer>`; }
@@ -1885,6 +2102,7 @@
   }
 
   function openPreview(themeId=null) {
+    if(themeId && typeof themeId === "object") themeId=null;
     previewThemeOverride=themeId || null;
     const dialog=$("#preview-dialog");
     if (!dialog.open) dialog.showModal();
@@ -1953,7 +2171,7 @@
 
   function mapRemoteToState(site,dashboard) {
     const fresh=defaultState(), content=site.conteudoRascunho || site.conteudoPublicado || {}, texts=content.textos_institucionais || {}, cms=texts.cms_v2 || {}, contacts=content.contatos || {}, whats=typeof content.whatsapp === "string" ? {numero:content.whatsapp} : (content.whatsapp || {}), colors=content.cores || {}, apps=content.links_aplicativos || {}, banners=content.banners || {};
-    fresh.version="2.6.0-stage1"; fresh.updatedAt=versions[0]?.criado_em || new Date().toISOString(); fresh.status=site.status_publicacao || "sem_rascunho"; fresh.selectedTheme=cms.selectedTheme || "morada";
+    fresh.version="2.6.0-stage2"; fresh.updatedAt=versions[0]?.criado_em || new Date().toISOString(); fresh.status=site.status_publicacao || "sem_rascunho"; fresh.selectedTheme=cms.selectedTheme || "morada"; fresh.editor=normalizeEditorState(cms.editor||{});
     fresh.radio={...fresh.radio,nome:content.nome || site.nome_site || dashboard?.cliente?.nome_radio || "Minha rádio",slogan:content.slogan || "",descricao:content.descricao || texts.sobre || "",cidade:contacts.cidade || dashboard?.cliente?.cidade || "",estado:contacts.estado || dashboard?.cliente?.estado || "",email:contacts.email || dashboard?.cliente?.email || "",telefone:contacts.telefone || "",whatsapp:whats.numero || "",endereco:contacts.endereco || "",streamUrl:site.stream_url || "",musicaAtual:texts.player?.titulo || "Transmissão ao vivo",locutorAtual:texts.player?.subtitulo || "Programação da rádio",logo:content.logo || "",hero:content.capa || "",playerImage:texts.player?.imagem || "",cores:{primaria:colors.primaria || "#e31c45",secundaria:colors.secundaria || "#121d31",destaque:colors.destaque || "#f1a11a",fundo:colors.fundo || "#f4f6f9"},listenersEnabled:false};
     const moduleValues=texts.modulos || {}; const savedModules=safeArray(cms.modules);
     fresh.modules=modulesCatalog.map(([id,label,description],index)=>{const saved=savedModules.find(m=>m.id===id);return{id,label,description,enabled:saved? saved.enabled!==false : moduleValues[id]!==false,order:Number(saved?.order ?? index)};});
@@ -2000,7 +2218,7 @@
     if(can("patrocinadores"))content.patrocinadores=state.content.parceiros.map(i=>({...i,site:i.link}));
     if(can("banners"))content.banners={...(content.banners||{}),destaques:state.content.banners,publicidades:state.content.publicidade};
     if(can("links_aplicativos"))content.links_aplicativos={...(content.links_aplicativos||{}),android:state.integrations.aplicativo.android,ios:state.integrations.aplicativo.ios,pwa:state.integrations.aplicativo.pwa,qr:state.integrations.aplicativo.qrcode};
-    if(can("textos_institucionais"))content.textos_institucionais={...texts,sobre:state.radio.descricao,player:{...(texts.player||{}),titulo:state.radio.musicaAtual,subtitulo:state.radio.locutorAtual,imagem:state.radio.playerImage},seo:state.integrations.seo,podcasts:state.content.podcasts,videos:state.content.videos,promocoes:state.content.promocoes,galeria:state.content.galeria,eventos:state.content.eventos,modulos:Object.fromEntries(state.modules.map(m=>[m.id,m.enabled])),pedidosMusica:{...(texts.pedidosMusica||{}),ativo:state.integrations.whatsapp.pedidos},acessibilidade:{...(texts.acessibilidade||{}),leitorTela:state.integrations.configuracoes.acessibilidade},cms_v2:{...cms,schemaVersion:9,release:"2.6.0-stage1",security:state.security,audit:{entries:(state.audit?.entries||[]).slice(0,500),functionalRuns:(state.audit?.functionalRuns||[]).slice(0,10)},backup:{settings:state.backup?.settings||{},snapshots:(state.backup?.snapshots||[]).slice(0,5)},selectedTheme:state.selectedTheme,modules:state.modules,content:{equipe:state.content.equipe,popups:state.content.popups,anunciantes:state.content.anunciantes},aplicativo:{icone:state.integrations.aplicativo.icone},configuracoes:state.integrations.configuracoes,updatedAt:new Date().toISOString()}};
+    if(can("textos_institucionais"))content.textos_institucionais={...texts,sobre:state.radio.descricao,player:{...(texts.player||{}),titulo:state.radio.musicaAtual,subtitulo:state.radio.locutorAtual,imagem:state.radio.playerImage},seo:state.integrations.seo,podcasts:state.content.podcasts,videos:state.content.videos,promocoes:state.content.promocoes,galeria:state.content.galeria,eventos:state.content.eventos,modulos:Object.fromEntries(state.modules.map(m=>[m.id,m.enabled])),pedidosMusica:{...(texts.pedidosMusica||{}),ativo:state.integrations.whatsapp.pedidos},acessibilidade:{...(texts.acessibilidade||{}),leitorTela:state.integrations.configuracoes.acessibilidade},cms_v2:{...cms,schemaVersion:10,release:"2.6.0-stage2",editor:state.editor,security:state.security,audit:{entries:(state.audit?.entries||[]).slice(0,500),functionalRuns:(state.audit?.functionalRuns||[]).slice(0,10)},backup:{settings:state.backup?.settings||{},snapshots:(state.backup?.snapshots||[]).slice(0,5)},selectedTheme:state.selectedTheme,modules:state.modules,content:{equipe:state.content.equipe,popups:state.content.popups,anunciantes:state.content.anunciantes},aplicativo:{icone:state.integrations.aplicativo.icone},configuracoes:state.integrations.configuracoes,updatedAt:new Date().toISOString()}};
     return content;
   }
 
@@ -2030,7 +2248,8 @@
 
   function ensureV250State() {
     if (!state || typeof state !== "object") state=defaultState();
-    state.version="2.6.0-stage1";
+    state.editor=normalizeEditorState(state.editor||{});
+    state.version="2.6.0-stage2";
     const client=dashboardData?.cliente || {};
     const ownerEmail=String(client.email || state.radio?.email || "cliente@exemplo.com.br").trim().toLowerCase();
     const ownerName=client.nome || client.nome_radio || state.radio?.nome || "Administrador do cliente";
@@ -2301,8 +2520,8 @@
     ensureV250State();const data=stableBackupData(),json=JSON.stringify(data),snapshot={id:uid("snapshot"),label,source,createdAt:new Date().toISOString(),checksum:checksumText(json),size:json.length,counts:contentCounts(data),data:json};state.backup.snapshots.unshift(snapshot);state.backup.snapshots=state.backup.snapshots.slice(0,state.backup.settings.maxSnapshots);recordAudit("backup.criado","backup","snapshot",`${label} • ${source}`);return snapshot;
   }
   function downloadBlob(filename,content,type="application/json") { const blob=new Blob([content],{type}),a=document.createElement("a"),url=URL.createObjectURL(blob);a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),0); }
-  function backupEnvelope(data=stableBackupData()) { const payload=JSON.stringify(data);return{format:"crb-cms-backup",version:"2.6.0-stage1",schemaVersion:9,generatedAt:new Date().toISOString(),checksum:checksumText(payload),counts:contentCounts(data),data}; }
-  function exportBackup() { if(!requirePermission("export","backup"))return;const envelope=backupEnvelope();downloadBlob(`crb-cms-backup-v2.5.0-${new Date().toISOString().slice(0,10)}.json`,JSON.stringify(envelope,null,2));recordAudit("backup.exportado","backup","arquivo",envelope.checksum);notify("Backup completo gerado.","success"); }
+  function backupEnvelope(data=stableBackupData()) { const payload=JSON.stringify(data);return{format:"crb-cms-backup",version:"2.6.0-stage2",schemaVersion:10,generatedAt:new Date().toISOString(),checksum:checksumText(payload),counts:contentCounts(data),data}; }
+  function exportBackup() { if(!requirePermission("export","backup"))return;const envelope=backupEnvelope();downloadBlob(`crb-cms-backup-v2.6.0-${new Date().toISOString().slice(0,10)}.json`,JSON.stringify(envelope,null,2));recordAudit("backup.exportado","backup","arquivo",envelope.checksum);notify("Backup completo gerado.","success"); }
   function downloadSnapshot(id) { if(!requirePermission("export","backup"))return;const snapshot=state.backup.snapshots.find(item=>item.id===id);if(!snapshot)return;const data=JSON.parse(snapshot.data);downloadBlob(`crb-ponto-${slugify(snapshot.label)}-${snapshot.createdAt.slice(0,10)}.json`,JSON.stringify(backupEnvelope(data),null,2));recordAudit("backup.snapshot_exportado","backup","snapshot",snapshot.label); }
   function restoreSnapshot(id) { if(!requirePermission("backup","backup"))return;const snapshot=state.backup.snapshots.find(item=>item.id===id);if(!snapshot)return;if(checksumText(snapshot.data)!==snapshot.checksum)return notify("Este ponto de restauração está corrompido.","error");if(!confirm(`Restaurar “${snapshot.label}”? O estado atual será preservado em um novo ponto.`))return;const existing=[...state.backup.snapshots];createSnapshot("Antes da restauração","automático");const preserved=[...state.backup.snapshots];state=deepMerge(defaultState(),JSON.parse(snapshot.data));ensureV250State();state.backup.snapshots=preserved;recordAudit("backup.restaurado","backup","snapshot",snapshot.label);persist(false);renderPage();notify("Ponto de restauração carregado. Salve o rascunho para confirmar no servidor.","success"); }
   function deleteSnapshot(id) { if(!requirePermission("backup","backup"))return;const snapshot=state.backup.snapshots.find(item=>item.id===id);if(!snapshot)return;if(!confirm(`Excluir o ponto “${snapshot.label}”?`))return;state.backup.snapshots=state.backup.snapshots.filter(item=>item.id!==id);recordAudit("backup.excluido","backup","snapshot",snapshot.label);persist(false);renderBackup($("#page-root")); }
@@ -2313,11 +2532,11 @@
   function renderBackup(root) {
     ensureV250State();const snapshots=state.backup.snapshots,totalSize=snapshots.reduce((sum,item)=>sum+Number(item.size||0),0);
     root.innerHTML=`${pageHeader("Backup e recuperação","Exporte, valide, crie pontos de restauração e recupere o CMS com segurança.",canAccess("backup","backup")?`<button class="button primary" id="create-snapshot" type="button">Criar ponto agora</button>`:"")}
-      <div class="editorial-kpis"><article><span>Pontos disponíveis</span><strong>${snapshots.length}</strong></article><article><span>Limite configurado</span><strong>${state.backup.settings.maxSnapshots}</strong></article><article><span>Espaço estimado</span><strong>${Math.ceil(totalSize/1024)} KB</strong></article><article><span>Schema</span><strong>9</strong></article></div>
+      <div class="editorial-kpis"><article><span>Pontos disponíveis</span><strong>${snapshots.length}</strong></article><article><span>Limite configurado</span><strong>${state.backup.settings.maxSnapshots}</strong></article><article><span>Espaço estimado</span><strong>${Math.ceil(totalSize/1024)} KB</strong></article><article><span>Schema</span><strong>10</strong></article></div>
       <div class="grid-3"><section class="card"><div class="card-body"><h3>Exportar backup completo</h3><p class="field-help">Arquivo com metadados, contagens e checksum de integridade.</p><button class="button primary" id="export-backup" type="button">Baixar backup</button></div></section><section class="card"><div class="card-body"><h3>Importar e validar</h3><p class="field-help">Confere estrutura e checksum antes de carregar os dados.</p><button class="button secondary" id="import-backup" type="button">Selecionar arquivo</button></div></section><section class="card"><div class="card-body"><h3>Recarregar do servidor</h3><p class="field-help">Descarta alterações locais e recupera o último rascunho do D1.</p><button class="button danger" id="reset-demo" type="button">Recarregar dados</button></div></section></div>
       <section class="card" style="margin-top:18px"><header class="card-header"><div><h3>Automação de segurança</h3><p>Proteções antes de operações críticas.</p></div></header><div class="card-body"><form id="backup-settings" class="form-grid"><div class="field full"><div class="toggle-row"><div><strong>Ponto automático antes de importar</strong><small>Preserva o estado atual antes de substituir dados.</small></div><label class="switch"><input type="checkbox" name="autoBeforeImport" ${state.backup.settings.autoBeforeImport?"checked":""}><span></span></label></div><div class="toggle-row"><div><strong>Ponto automático antes de publicar</strong><small>Cria uma referência antes de enviar para revisão.</small></div><label class="switch"><input type="checkbox" name="autoBeforePublication" ${state.backup.settings.autoBeforePublication?"checked":""}><span></span></label></div></div><div class="field"><label for="max-snapshots">Máximo de pontos</label><input id="max-snapshots" name="maxSnapshots" type="number" min="1" max="10" value="${state.backup.settings.maxSnapshots}"></div><div class="field"><button class="button secondary" type="submit">Salvar automação</button></div></form></div></section>
       <section class="table-card" style="margin-top:18px"><div class="table-toolbar"><div><strong>Pontos de restauração</strong><small>O conteúdo atual é preservado antes de restaurar outro ponto.</small></div><span class="badge info">${snapshots.length}</span></div>${snapshots.length?`<div class="table-scroll"><table class="data-table"><thead><tr><th>Ponto</th><th>Origem</th><th>Conteúdo</th><th>Integridade</th><th style="text-align:right">Ações</th></tr></thead><tbody>${snapshots.map(item=>`<tr><td><strong>${escapeHTML(item.label)}</strong><small>${formatDateTime(item.createdAt)}</small></td><td>${escapeHTML(item.source)}</td><td><small>${Object.values(item.counts||{}).reduce((a,b)=>a+Number(b||0),0)} registros • ${Math.ceil(Number(item.size||0)/1024)} KB</small></td><td><span class="badge ${checksumText(item.data||"")===item.checksum?"active":"inactive"}">${checksumText(item.data||"")===item.checksum?"Íntegro":"Corrompido"}</span></td><td><div class="row-actions"><button class="button small primary" data-snapshot-restore="${item.id}" type="button">Restaurar</button><button class="button small secondary" data-snapshot-download="${item.id}" type="button">Baixar</button><button class="button small danger" data-snapshot-delete="${item.id}" type="button">Excluir</button></div></td></tr>`).join("")}</tbody></table></div>`:`<div class="empty-state"><strong>Nenhum ponto criado</strong><span>Crie um ponto antes de grandes alterações.</span></div>`}</section>
-      <section class="card" style="margin-top:18px"><header class="card-header"><div><h3>Sobre esta instalação</h3><p>Informações técnicas.</p></div></header><div class="card-body"><div class="code-box">Modo: produção integrada\nVersão: ${CONFIG.VERSION||"2.6.0-stage1"}\nSchema: 9\nPersistência: Cloudflare D1\nAPI: ${CONFIG.WORKER_URL||"não configurada"}\nÚltima alteração: ${formatDateTime(state.updatedAt)}</div></div></section>`;
+      <section class="card" style="margin-top:18px"><header class="card-header"><div><h3>Sobre esta instalação</h3><p>Informações técnicas.</p></div></header><div class="card-body"><div class="code-box">Modo: produção integrada\nVersão: ${CONFIG.VERSION||"2.6.0-stage2"}\nSchema: 10\nPersistência: Cloudflare D1\nAPI: ${CONFIG.WORKER_URL||"não configurada"}\nÚltima alteração: ${formatDateTime(state.updatedAt)}</div></div></section>`;
     $("#create-snapshot")?.addEventListener("click",()=>{createSnapshot("Ponto manual","manual");persist(false);renderBackup(root);notify("Ponto de restauração criado.","success");});$("#export-backup")?.addEventListener("click",exportBackup);$("#import-backup")?.addEventListener("click",()=>$("#backup-import").click());$("#reset-demo")?.addEventListener("click",()=>{if(confirm("Descartar alterações não salvas e recarregar o rascunho do servidor?")){createSnapshot("Antes de recarregar servidor","automático");recordAudit("servidor.recarregado","backup","site","Recarga solicitada");loadAll();}});
     $("#backup-settings")?.addEventListener("submit",event=>{event.preventDefault();if(!requirePermission("backup","backup"))return;const form=new FormData(event.currentTarget);state.backup.settings.autoBeforeImport=form.has("autoBeforeImport");state.backup.settings.autoBeforePublication=form.has("autoBeforePublication");state.backup.settings.maxSnapshots=Math.max(1,Math.min(10,Number(form.get("maxSnapshots")||5)));state.backup.snapshots=state.backup.snapshots.slice(0,state.backup.settings.maxSnapshots);recordAudit("backup.configurado","backup","configuracao",`Máximo ${state.backup.settings.maxSnapshots}`);persist(false);renderBackup(root);notify("Automação de backup atualizada.","success");});
     $$('[data-snapshot-restore]',root).forEach(button=>button.addEventListener("click",()=>restoreSnapshot(button.dataset.snapshotRestore)));$$('[data-snapshot-download]',root).forEach(button=>button.addEventListener("click",()=>downloadSnapshot(button.dataset.snapshotDownload)));$$('[data-snapshot-delete]',root).forEach(button=>button.addEventListener("click",()=>deleteSnapshot(button.dataset.snapshotDelete)));applyPermissionState(root,"backup");
@@ -2332,6 +2551,9 @@
     navIds.forEach(id=>checks.push(auditCheck(`route-${id}`,`Rota ${id}`,(["dashboard","radio","editor","themes","usuarios","auditoria","publicacao","faturas","contrato"].includes(id)||schemas[id]||["whatsapp","redes","seo","dominio","aplicativo","configuracoes","backup"].includes(id))?"pass":"fail","Renderizador disponível")));
     Object.entries(state.content||{}).forEach(([key,items])=>{if(!Array.isArray(items))return;const ids=items.map(item=>item.id),dups=duplicateValues(ids);checks.push(auditCheck(`ids-${key}`,`${schemas[key]?.title||key}: identificadores únicos`,dups.length?"fail":"pass",`${items.length} registro(s)`));const missing=items.filter(item=>!String(item.titulo||item.nome||"").trim());checks.push(auditCheck(`title-${key}`,`${schemas[key]?.title||key}: conteúdo nomeado`,missing.length?"warning":"pass",missing.length?`${missing.length} sem título/nome`:"Todos identificados"));});
     const moduleDup=duplicateValues(state.modules.map(item=>item.id));checks.push(auditCheck("modules","Blocos do editor visual",moduleDup.length?"fail":"pass",`${state.modules.length} blocos, ${activeModules().length} ativos`));
+    ensureV260EditorState();
+    checks.push(auditCheck("editor-themes","Editor: opções por modelo",themes.every(theme=>state.editor.themeOptions[theme.id])?"pass":"fail",`${Object.keys(state.editor.themeOptions).length} modelos configuráveis`));
+    checks.push(auditCheck("editor-blocks","Editor: opções por bloco",themes.every(theme=>modulesCatalog.every(([id])=>state.editor.blocks[theme.id]?.[id]))?"pass":"fail",`${themes.length*modulesCatalog.length} configurações isoladas`));
     const programConflicts=[];(state.content.programacao||[]).forEach((a,index)=>(state.content.programacao||[]).slice(index+1).forEach(b=>{if(a.ativo===false||b.ativo===false)return;const shared=normalizeDays(a.dias||a.dia).some(day=>normalizeDays(b.dias||b.dia).includes(day));if(shared&&a.inicio<b.fim&&a.fim>b.inicio)programConflicts.push(`${a.titulo} × ${b.titulo}`);}));checks.push(auditCheck("program-conflicts","Programação sem conflitos",programConflicts.length?"warning":"pass",programConflicts.slice(0,5).join("; ")||"Nenhum conflito"));
     const slugs=duplicateValues((state.content.noticias||[]).map(item=>slugify(item.slug||item.titulo)));checks.push(auditCheck("news-slugs","Notícias com endereços únicos",slugs.length?"fail":"pass",slugs.length?slugs.join(", "):"Sem duplicidades"));
     const videoUrls=duplicateValues((state.content.videos||[]).map(item=>normalizeComparableURL(item.url)));checks.push(auditCheck("video-urls","Vídeos sem URLs duplicadas",videoUrls.length?"warning":"pass",videoUrls.length?`${videoUrls.length} duplicidade(s)`:"Sem duplicidades"));
@@ -2341,11 +2563,11 @@
     const badSnapshots=state.backup.snapshots.filter(item=>checksumText(item.data||"")!==item.checksum);checks.push(auditCheck("backup-integrity","Pontos de restauração íntegros",badSnapshots.length?"fail":"pass",`${state.backup.snapshots.length-badSnapshots.length}/${state.backup.snapshots.length} íntegros`));
     const temp=document.createElement("div");temp.className="preview-canvas desktop";try{renderSitePreview(temp);clearPreviewPopupTimer();const unlabeled=$$('button,[role="button"]',temp).filter(el=>!String(el.textContent||"").trim()&&!el.getAttribute("aria-label")&&!el.getAttribute("title"));checks.push(auditCheck("preview-buttons","Botões e cards da prévia identificados",unlabeled.length?"fail":"pass",unlabeled.length?`${unlabeled.length} sem rótulo`:`${$$('button,[role="button"]',temp).length} controles auditados`));const brokenOpen=$$('[data-site-open]',temp).filter(el=>!contentItem(el.dataset.siteOpen,el.dataset.siteId));checks.push(auditCheck("preview-content","Cards da prévia abrem conteúdo existente",brokenOpen.length?"fail":"pass",brokenOpen.length?`${brokenOpen.length} alvo(s) ausente(s)`:"Todos os alvos encontrados"));}catch(error){checks.push(auditCheck("preview-render","Renderização da prévia","fail",error.message));}
     const originalAuditTheme=state.selectedTheme;
-    const themeStructures={morada:".theme-stage-regional",spotify:".theme-music-actions",news:".theme-news-ticker",gospel:".theme-gospel-welcome",young:".theme-stage-young",custom:".theme-stage-clean"};
+    const themeStructures={morada:".theme-stage-regional",spotify:".theme-stage-music",news:".theme-stage-news",gospel:".theme-stage-community",young:".theme-stage-young",custom:".theme-stage-clean"};
     themes.forEach(theme=>{const probe=document.createElement("div");probe.className="preview-canvas desktop";try{state.selectedTheme=theme.id;renderSitePreview(probe);clearPreviewPopupTimer();const preview=$(`.site-preview.theme-${theme.id}`,probe),structure=$(themeStructures[theme.id],probe);const unlabeled=$$('button,[role="button"]',probe).filter(el=>!String(el.textContent||"").trim()&&!el.getAttribute("aria-label")&&!el.getAttribute("title"));const broken=$$('[data-site-open]',probe).filter(el=>!contentItem(el.dataset.siteOpen,el.dataset.siteId));checks.push(auditCheck(`theme-${theme.id}`,`${theme.name}: renderização e estrutura`,preview&&structure?"pass":"fail",preview&&structure?`${themeLayoutLabel(theme.layout)} carregada`:`Estrutura ${themeStructures[theme.id]} ausente`));checks.push(auditCheck(`theme-buttons-${theme.id}`,`${theme.name}: controles identificados`,unlabeled.length?"fail":"pass",unlabeled.length?`${unlabeled.length} sem rótulo`:`${$$('button,[role="button"]',probe).length} controles`));checks.push(auditCheck(`theme-content-${theme.id}`,`${theme.name}: conteúdo navegável`,broken.length?"fail":"pass",broken.length?`${broken.length} alvo(s) ausente(s)`:"Todos os cards apontam para conteúdo existente"));}catch(error){checks.push(auditCheck(`theme-${theme.id}`,`${theme.name}: renderização`,"fail",error.message));}});
     state.selectedTheme=originalAuditTheme;
     const pageButtons=$$('button',document).filter(button=>!String(button.textContent||"").trim()&&!button.getAttribute("aria-label")&&!button.getAttribute("title"));checks.push(auditCheck("page-buttons","Botões da tela atual identificados",pageButtons.length?"fail":"pass",pageButtons.length?`${pageButtons.length} sem rótulo`:`${$$('button',document).length} botões verificados`));
-    const totals={pass:checks.filter(c=>c.status==="pass").length,warning:checks.filter(c=>c.status==="warning").length,fail:checks.filter(c=>c.status==="fail").length};const run={id:uid("run"),timestamp:new Date().toISOString(),version:"2.6.0-stage1",checks,totals};
+    const totals={pass:checks.filter(c=>c.status==="pass").length,warning:checks.filter(c=>c.status==="warning").length,fail:checks.filter(c=>c.status==="fail").length};const run={id:uid("run"),timestamp:new Date().toISOString(),version:"2.6.0-stage2",checks,totals};
     if(save){state.audit.functionalRuns.unshift(run);state.audit.functionalRuns=state.audit.functionalRuns.slice(0,10);recordAudit("auditoria.executada","auditoria","sistema",`${totals.pass} aprovadas, ${totals.warning} alertas, ${totals.fail} falhas`,totals.fail?"error":totals.warning?"warning":"success");persist(false);}return run;
   }
   function exportAuditCSV() { if(!requirePermission("export","auditoria"))return;const rows=[["Data/hora","Resultado","Ação","Área","Alvo","Usuário","Detalhes"],...state.audit.entries.map(item=>[item.timestamp,item.result,item.action,item.area,item.target,item.actor?.email||item.actor?.nome||"",item.details])];const csv=rows.map(row=>row.map(value=>`"${String(value??"").replaceAll('"','""')}"`).join(";")).join("\n");downloadBlob(`crb-auditoria-${new Date().toISOString().slice(0,10)}.csv`,`\ufeff${csv}`,"text/csv;charset=utf-8");recordAudit("auditoria.exportada","auditoria","csv",`${state.audit.entries.length} eventos`); }

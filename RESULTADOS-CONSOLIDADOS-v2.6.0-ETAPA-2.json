@@ -1,0 +1,26 @@
+{
+  "version": "2.6.0-stage2",
+  "browserChecks": {
+    "total": 94,
+    "pass": 94,
+    "fail": 0
+  },
+  "persistence": {
+    "status": "pass",
+    "endpoint": "/api/cliente/site/rascunho",
+    "schemaVersion": 10
+  },
+  "isolation": {
+    "status": "pass",
+    "endpointsBefore": 9,
+    "endpointsAfter": 9,
+    "added": [],
+    "removed": []
+  },
+  "html": {
+    "duplicateIds": []
+  },
+  "javascript": {
+    "syntax": "pass"
+  }
+}

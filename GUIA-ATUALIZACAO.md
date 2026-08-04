@@ -1,28 +1,25 @@
-# Guia de atualização — v2.6.0 Etapa 1
+# Guia de atualização — v2.6.0 Etapa 2
 
 ## Repositório correto
 
-Publique somente em:
+Publique somente no repositório do **Portal do Cliente**. Não envie estes arquivos para o Portal Público/PWA, Worker, Admin ou firmware.
 
-`CentralRádiosBrasil-Portal-Cliente`
+## Atualização
 
-Branch utilizada pelo projeto: `principal`.
+1. Faça uma cópia da v2.6.0 Etapa 1 instalada.
+2. Descompacte o ZIP desta entrega.
+3. Envie o conteúdo interno para a raiz do repositório do Portal do Cliente.
+4. Substitua `index.html`, `app.js`, `styles.css`, `config.js` e `manifest.webmanifest`.
+5. Preserve arquivos próprios do repositório que não estejam no pacote.
+6. Confirme o commit na branch usada pelo Portal do Cliente.
+7. Aguarde a publicação e pressione `Ctrl + F5`.
 
-## Procedimento
+Mensagem sugerida do commit:
 
-1. Baixe e descompacte o pacote.
-2. Faça backup dos arquivos atuais do repositório.
-3. No GitHub, use **Adicionar arquivo → Carregar arquivos**.
-4. Envie o conteúdo interno da pasta descompactada.
-5. Substitua os arquivos com nomes iguais.
-6. Mensagem sugerida do commit: `Portal do Cliente v2.6.0 Etapa 1 — modelos diferenciados`.
-7. Aguarde o GitHub Pages concluir.
-8. Pressione `Ctrl + F5`.
+`Portal do Cliente v2.6.0 Etapa 2 — Editor Visual consolidado`
 
-## Não fazer
+## Depois da instalação
 
-- Não enviar o ZIP fechado.
-- Não publicar no Portal Público/PWA.
-- Não publicar no Worker.
-- Não alterar o Painel Administrativo.
-- Não substituir configurações de outros repositórios.
+Abra **Editor Visual**, escolha um modelo, selecione um bloco e altere uma opção. Confira a prévia em desktop, tablet e celular. Depois salve o rascunho.
+
+Nenhuma alteração no Worker ou no D1 é necessária.

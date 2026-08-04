@@ -51,7 +51,8 @@
     { id: "eventos", label: "Eventos", icon: "◫" },
     { id: "equipe", label: "Equipe", icon: "♣" },
     { section: "Comercial" },
-    { id: "publicidade", label: "Publicidade", icon: "▰" },
+    { id: "anunciantes", label: "Anunciantes", icon: "▥" },
+    { id: "publicidade", label: "Campanhas", icon: "▰" },
     { id: "parceiros", label: "Parceiros", icon: "◇" },
     { id: "banners", label: "Banners", icon: "▱" },
     { id: "popups", label: "Popups", icon: "▣" },
@@ -192,10 +193,29 @@
       fields: [["nome","Nome","text",true],["cargo","Cargo","text",true],["bio","Apresentação","textarea"],["foto","Foto","image",false,"square"],["email","E-mail público","email"],["ativo","Exibir no site","checkbox"]],
       summary: item => item.cargo || "Equipe"
     },
+    anunciantes: {
+      title: "Anunciantes", singular: "anunciante", imageProfile: "logo", description: "Cadastre empresas e contatos comerciais para reutilizar em campanhas publicitárias.",
+      fields: [
+        ["nome","Nome fantasia","text",true], ["razaoSocial","Razão social","text"], ["documento","CPF ou CNPJ","text"],
+        ["responsavel","Responsável","text"], ["email","E-mail comercial","email"], ["telefone","Telefone","text"],
+        ["whatsapp","WhatsApp","text"], ["site","Site","url"], ["categoria","Segmento","text"],
+        ["observacoes","Observações internas","textarea"], ["logo","Logomarca","image",false,"logo"], ["ativo","Cadastro ativo","checkbox"]
+      ],
+      summary: item => `${item.categoria || "Anunciante"}${item.responsavel ? ` • ${item.responsavel}` : ""}`
+    },
     publicidade: {
-      title: "Publicidade", singular: "anúncio", imageProfile: "ad", description: "Gerencie anunciantes, posições e período de exibição.",
-      fields: [["titulo","Nome da campanha","text",true],["anunciante","Anunciante","text"],["posicao","Posição","select",true,["Topo 728×90","Entre seções","Lateral 300×250","Rodapé","Player"]],["inicio","Início","date"],["fim","Fim","date"],["link","Link do anúncio","url"],["imagem","Peça publicitária","image",true,"ad"],["ativo","Campanha ativa","checkbox"]],
-      summary: item => `${item.anunciante || "Anunciante"} • ${item.posicao || "Posição"}`
+      title: "Campanhas publicitárias", singular: "campanha", imageProfile: "ad", description: "Gerencie campanhas, posições, períodos, peças responsivas, prioridade e métricas reais.",
+      fields: [
+        ["titulo","Nome interno da campanha","text",true], ["anuncianteId","Anunciante","advertiser-select",true],
+        ["posicao","Posição no site","select",true,["Topo do site","Após o player","Entre programação e notícias","Entre seções","Antes do rodapé","Player"]],
+        ["formato","Formato","select",true,["Banner horizontal","Retângulo médio","Faixa do player","Banner de rodapé"]],
+        ["inicio","Data inicial","date",true], ["horaInicio","Horário inicial","time"], ["fim","Data final","date"], ["horaFim","Horário final","time"],
+        ["situacao","Controle da situação","select",true,["Automático pelo período","Pausada","Cancelada"]],
+        ["prioridade","Prioridade","number"], ["link","Link de destino","url"], ["textoBotao","Texto do botão","text"],
+        ["imagemDesktop","Peça para desktop","image",true,"ad"], ["imagemMobile","Peça para celular","image",false,"ad"],
+        ["descricao","Observações internas","textarea"], ["ativo","Publicada","checkbox"]
+      ],
+      summary: item => `${advertiserName(item)} • ${item.posicao || "Posição"} • ${campaignStatusLabel(item)}`
     },
     parceiros: {
       title: "Parceiros", singular: "parceiro", imageProfile: "logo", description: "Logos de patrocinadores e parceiros institucionais.",
@@ -203,9 +223,17 @@
       summary: item => item.categoria || "Parceiro"
     },
     banners: {
-      title: "Banners", singular: "banner", imageProfile: "banner", description: "Banners editoriais e comerciais fora da área de publicidade.",
-      fields: [["titulo","Título interno","text",true],["posicao","Posição","select",true,["Banner principal","Página interna","Antes de notícias","Antes do rodapé"]],["link","Link","url"],["imagem","Imagem do banner","image",true,"banner"],["ativo","Ativo","checkbox"]],
-      summary: item => item.posicao || "Banner"
+      title: "Banners", singular: "banner", imageProfile: "banner", description: "Banners editoriais ou comerciais com peças responsivas, posição, período e prioridade.",
+      fields: [
+        ["titulo","Título interno","text",true], ["tipo","Tipo","select",true,["Editorial","Comercial","Institucional"]],
+        ["posicao","Posição","select",true,["Após o cabeçalho","Antes de notícias","Entre seções","Antes do rodapé","Página interna"]],
+        ["inicio","Data inicial","date"], ["horaInicio","Horário inicial","time"], ["fim","Data final","date"], ["horaFim","Horário final","time"],
+        ["situacao","Controle da situação","select",true,["Automático pelo período","Pausado","Cancelado"]],
+        ["prioridade","Prioridade","number"], ["link","Link de destino","url"], ["textoBotao","Texto do botão","text"],
+        ["imagemDesktop","Imagem para desktop","image",true,"banner"], ["imagemMobile","Imagem para celular","image",false,"banner"],
+        ["descricao","Descrição interna","textarea"], ["ativo","Publicado","checkbox"]
+      ],
+      summary: item => `${item.tipo || "Banner"} • ${item.posicao || "Posição"} • ${bannerStatusLabel(item)}`
     },
     popups: {
       title: "Popups", singular: "popup", imageProfile: "popup", description: "Avisos promocionais exibidos com frequência controlada.",
@@ -226,7 +254,7 @@
   function defaultState() {
     const today = new Date().toISOString().slice(0, 10);
     return {
-      version: "2.3.0-final",
+      version: "2.4.0-etapa-1",
       updatedAt: new Date().toISOString(),
       status: "rascunho",
       selectedTheme: "morada",
@@ -289,6 +317,7 @@
           { id: uid("team"), nome: "Equipe de Jornalismo", cargo: "Redação", bio: "Produção de notícias e entrevistas.", foto: "", email: "", ativo: true },
           { id: uid("team"), nome: "Equipe Comercial", cargo: "Publicidade", bio: "Relacionamento com anunciantes.", foto: "", email: "", ativo: true }
         ],
+        anunciantes: [],
         publicidade: [],
         parceiros: [
           { id: uid("part"), nome: "Parceiro 01", categoria: "Patrocinador", link: "", logo: "", ordem: 1, ativo: true },
@@ -437,7 +466,7 @@
   function pageEyebrow(page) {
     if (["dashboard", "radio", "editor", "themes"].includes(page)) return "Gestão do site";
     if (["programacao","locutores","noticias","podcasts","videos","promocoes","galeria","eventos","equipe"].includes(page)) return "Conteúdo editorial";
-    if (["publicidade","parceiros","banners","popups"].includes(page)) return "Comercial e monetização";
+    if (["anunciantes","publicidade","parceiros","banners","popups"].includes(page)) return "Comercial e monetização";
     if (["whatsapp","redes","seo","dominio","aplicativo"].includes(page)) return "Integrações";
     return "Configuração do sistema";
   }
@@ -452,7 +481,8 @@
     if (id === "podcasts" || id === "videos" || id === "galeria") return (state.content[id] || []).some(item => item.ativo !== false);
     if (id === "eventos") return state.content.eventos.some(item => item.ativo !== false && ["hoje","futuro","adiado"].includes(eventStatusValue(item)));
     if (id === "equipe") return [...state.content.locutores,...state.content.equipe].some(item => item.ativo !== false);
-    if (id === "publicidade" || id === "parceiros") return (state.content[id] || []).some(item => item.ativo !== false);
+    if (id === "publicidade") return (state.content.publicidade || []).some(item => item.ativo !== false && campaignStatusValue(item) === "ativa");
+    if (id === "parceiros") return (state.content.parceiros || []).some(item => item.ativo !== false);
     return true;
   }
   function countContent() { return Object.values(state.content).reduce((total, list) => total + (Array.isArray(list) ? list.length : 0), 0); }
@@ -475,7 +505,7 @@
         <article class="kpi-card"><span>Imagens armazenadas</span><strong>${mediaCount}</strong><small>arquivos vinculados ao site</small></article>
         <article class="kpi-card"><span>Faturas em aberto</span><strong>${openInvoices.length}</strong><small>${contract ? `Contrato ${escapeHTML(contract.numero || "ativo")}` : "Nenhum contrato"}</small></article>
       </div>
-      <section class="card" style="margin-bottom:18px"><header class="card-header"><div><h3>Conteúdo v2.3.0 consolidado</h3><p>Podcasts, vídeos, promoções e eventos integrados ao mesmo rascunho e à prévia pública.</p></div><span class="badge active">Auditoria integrada</span></header><div class="card-body"><div class="module-health">${[["podcasts","Podcasts",state.content.podcasts.length],["videos","Vídeos",state.content.videos.length],["promocoes","Promoções",state.content.promocoes.length],["eventos","Eventos",state.content.eventos.length]].map(([id,label,total])=>`<div class="health-row"><div><strong><span class="health-dot"></span>${label}</strong><span>${total} registro${total===1?"":"s"} no rascunho</span></div><button class="button small secondary" data-go="${id}" type="button">Revisar</button></div>`).join("")}</div></div></section>
+      <section class="card" style="margin-bottom:18px"><header class="card-header"><div><h3>Comercial v2.4.0 — Etapa 1</h3><p>Anunciantes, campanhas e banners responsivos integrados ao rascunho e à prévia.</p></div><span class="badge active">Publicidade e banners</span></header><div class="card-body"><div class="module-health">${[["anunciantes","Anunciantes",state.content.anunciantes.length],["publicidade","Campanhas",state.content.publicidade.length],["banners","Banners",state.content.banners.length]].map(([id,label,total])=>`<div class="health-row"><div><strong><span class="health-dot"></span>${label}</strong><span>${total} registro${total===1?"":"s"} no rascunho</span></div><button class="button small secondary" data-go="${id}" type="button">Revisar</button></div>`).join("")}</div><div class="notice" style="margin-top:14px">Impressões e cliques só aparecem quando recebidos de uma fonte real do site/Worker. A prévia do CMS não gera métricas.</div></div></section>
       <div class="grid-2">
         <section class="card"><header class="card-header"><div><h3>Estrutura do site</h3><p>Módulos ativados no editor visual.</p></div><button class="button small secondary" data-go="editor" type="button">Organizar</button></header><div class="card-body"><div class="module-health">${activeModules().slice(0,10).map(module => `<div class="health-row"><div><strong><span class="health-dot"></span>${escapeHTML(module.label)}</strong><span>${escapeHTML(module.description)}</span></div><span class="badge active">Ativo</span></div>`).join("") || `<div class="empty-state"><strong>Nenhum módulo ativo</strong></div>`}</div></div></section>
         <section class="card"><header class="card-header"><div><h3>Publicação e versões</h3><p>Situação real do site no Worker.</p></div><button class="button small secondary" data-go="publicacao" type="button">Gerenciar</button></header><div class="card-body"><div class="activity-list">
@@ -486,7 +516,7 @@
       </div>
       <div class="grid-2 equal" style="margin-top:18px">
         <section class="card"><header class="card-header"><div><h3>Dados reais, sem números inventados</h3><p>Audiência e ouvintes.</p></div></header><div class="card-body"><div class="notice">O painel não exibe audiência fictícia. O número de ouvintes só será mostrado quando existir uma fonte técnica confiável do streaming.</div></div></section>
-        <section class="card"><header class="card-header"><div><h3>Integração ativa</h3><p>Ambiente utilizado nesta instalação.</p></div></header><div class="card-body"><div class="code-box">Portal: ${escapeHTML(CONFIG.VERSION || "2.3.0-final")}\nWorker: ${escapeHTML(CONFIG.WORKER_URL || "—")}\nPersistência: Cloudflare D1\nMídias: API do site\nPublicação: supervisionada pela Central</div></div></section>
+        <section class="card"><header class="card-header"><div><h3>Integração ativa</h3><p>Ambiente utilizado nesta instalação.</p></div></header><div class="card-body"><div class="code-box">Portal: ${escapeHTML(CONFIG.VERSION || "2.4.0-etapa-1")}\nWorker: ${escapeHTML(CONFIG.WORKER_URL || "—")}\nPersistência: Cloudflare D1\nMídias: API do site\nPublicação: supervisionada pela Central</div></div></section>
       </div>`;
     bindGoButtons(root);
   }
@@ -742,6 +772,9 @@
     if (key === "videos") return [["Vídeos",items.length],["Publicados",active],["Destaques",items.filter(i=>i.destaque&&i.ativo!==false).length],["Categorias",new Set(items.map(i=>i.categoria).filter(Boolean)).size]];
     if (key === "promocoes") return [["Promoções",items.length],["Ativas",items.filter(i=>i.ativo!==false&&promotionStatusValue(i)==="ativa").length],["Agendadas",items.filter(i=>i.ativo!==false&&promotionStatusValue(i)==="agendada").length],["Encerradas",items.filter(i=>promotionStatusValue(i)==="encerrada").length]];
     if (key === "eventos") return [["Eventos",items.length],["Próximos",items.filter(i=>i.ativo!==false&&eventStatusValue(i)==="futuro").length],["Hoje",items.filter(i=>i.ativo!==false&&eventStatusValue(i)==="hoje").length],["Encerrados",items.filter(i=>eventStatusValue(i)==="encerrado").length]];
+    if (key === "anunciantes") return [["Anunciantes",items.length],["Ativos",active],["Com campanhas",new Set(state.content.publicidade.map(i=>i.anuncianteId).filter(Boolean)).size],["Com contato",items.filter(i=>i.email||i.telefone||i.whatsapp).length]];
+    if (key === "publicidade") return [["Campanhas",items.length],["Ativas",items.filter(i=>i.ativo!==false&&campaignStatusValue(i)==="ativa").length],["Agendadas",items.filter(i=>i.ativo!==false&&campaignStatusValue(i)==="agendada").length],["Encerradas",items.filter(i=>campaignStatusValue(i)==="encerrada").length]];
+    if (key === "banners") return [["Banners",items.length],["Ativos",items.filter(i=>i.ativo!==false&&bannerStatusValue(i)==="ativo").length],["Agendados",items.filter(i=>i.ativo!==false&&bannerStatusValue(i)==="agendado").length],["Encerrados",items.filter(i=>bannerStatusValue(i)==="encerrado").length]];
     return [];
   }
 
@@ -755,6 +788,9 @@
       : key === "promocoes" ? [["padrao","Situação e prazo"],["destaques","Destaques primeiro"],["inicio","Início próximo"],["fim","Encerramento próximo"],["titulo","Título A–Z"],["antigos","Mais antigas"]]
       : key === "eventos" ? [["padrao","Próximos eventos"],["destaques","Destaques primeiro"],["recentes","Mais recentes"],["titulo","Título A–Z"],["antigos","Eventos passados"]]
       : key === "noticias" ? [["padrao","Destaques e recentes"],["recentes","Mais recentes"],["titulo","Título A–Z"],["antigos","Mais antigas"]]
+      : key === "publicidade" ? [["padrao","Prioridade e período"],["prioridade","Maior prioridade"],["inicio","Início próximo"],["titulo","Título A–Z"],["antigos","Mais antigas"]]
+      : key === "banners" ? [["padrao","Prioridade e período"],["prioridade","Maior prioridade"],["inicio","Início próximo"],["titulo","Título A–Z"],["antigos","Mais antigos"]]
+      : key === "anunciantes" ? [["titulo","Nome A–Z"],["recentes","Mais recentes"],["antigos","Mais antigos"]]
       : [];
     return options.length ? `<select id="collection-sort" aria-label="Ordenar conteúdos">${options.map(([value,label])=>`<option value="${value}" ${collectionSort===value?"selected":""}>${label}</option>`).join("")}</select>` : "";
   }
@@ -767,6 +803,9 @@
     if (key === "videos") return `${base}<select id="collection-context-filter" aria-label="Filtrar categoria"><option value="todos" ${collectionContextFilter === "todos" ? "selected" : ""}>Todas as categorias</option>${selectOptions(allItems.map(i=>i.categoria),"categoria")}</select>${sortOptions(key)}`;
     if (key === "promocoes") return `<select id="collection-filter" aria-label="Filtrar situação da promoção"><option value="todos" ${collectionFilter === "todos" ? "selected" : ""}>Todas as situações</option>${[["ativa","Ativas"],["agendada","Agendadas"],["encerrada","Encerradas"],["cancelada","Canceladas"]].map(([value,label])=>`<option value="promo:${value}" ${collectionFilter === `promo:${value}` ? "selected" : ""}>${label}</option>`).join("")}</select><select id="collection-context-filter" aria-label="Filtrar categoria"><option value="todos" ${collectionContextFilter === "todos" ? "selected" : ""}>Todas as categorias</option>${selectOptions(allItems.map(i=>i.categoria),"categoria")}</select>${sortOptions(key)}`;
     if (key === "eventos") return `<select id="collection-filter" aria-label="Filtrar situação do evento"><option value="todos" ${collectionFilter === "todos" ? "selected" : ""}>Todas as situações</option>${[["futuro","Próximos"],["hoje","Hoje"],["encerrado","Encerrados"],["adiado","Adiados"],["cancelado","Cancelados"]].map(([value,label])=>`<option value="evento:${value}" ${collectionFilter === `evento:${value}` ? "selected" : ""}>${label}</option>`).join("")}</select><select id="collection-context-filter" aria-label="Filtrar categoria"><option value="todos" ${collectionContextFilter === "todos" ? "selected" : ""}>Todas as categorias</option>${selectOptions(allItems.map(i=>i.categoria||i.tipo),"categoria")}</select>${sortOptions(key)}`;
+    if (key === "publicidade") return `<select id="collection-filter" aria-label="Filtrar situação da campanha"><option value="todos" ${collectionFilter === "todos" ? "selected" : ""}>Todas as situações</option>${[["ativa","Ativas"],["agendada","Agendadas"],["encerrada","Encerradas"],["pausada","Pausadas"],["cancelada","Canceladas"]].map(([value,label])=>`<option value="campanha:${value}" ${collectionFilter === `campanha:${value}` ? "selected" : ""}>${label}</option>`).join("")}</select><select id="collection-context-filter" aria-label="Filtrar posição"><option value="todos" ${collectionContextFilter === "todos" ? "selected" : ""}>Todas as posições</option>${selectOptions(allItems.map(i=>i.posicao),"posicao")}</select>${sortOptions(key)}`;
+    if (key === "banners") return `<select id="collection-filter" aria-label="Filtrar situação do banner"><option value="todos" ${collectionFilter === "todos" ? "selected" : ""}>Todas as situações</option>${[["ativo","Ativos"],["agendado","Agendados"],["encerrado","Encerrados"],["pausado","Pausados"],["cancelado","Cancelados"]].map(([value,label])=>`<option value="banner:${value}" ${collectionFilter === `banner:${value}` ? "selected" : ""}>${label}</option>`).join("")}</select><select id="collection-context-filter" aria-label="Filtrar posição"><option value="todos" ${collectionContextFilter === "todos" ? "selected" : ""}>Todas as posições</option>${selectOptions(allItems.map(i=>i.posicao),"posicao")}</select>${sortOptions(key)}`;
+    if (key === "anunciantes") return `${base}${sortOptions(key)}`;
     return base;
   }
 
@@ -783,9 +822,12 @@
     else if (collectionFilter.startsWith("news:")) items = items.filter(item => newsStatusValue(item) === collectionFilter.slice(5));
     else if (collectionFilter.startsWith("promo:")) items = items.filter(item => promotionStatusValue(item) === collectionFilter.slice(6));
     else if (collectionFilter.startsWith("evento:")) items = items.filter(item => eventStatusValue(item) === collectionFilter.slice(7));
+    else if (collectionFilter.startsWith("campanha:")) items = items.filter(item => campaignStatusValue(item) === collectionFilter.slice(9));
+    else if (collectionFilter.startsWith("banner:")) items = items.filter(item => bannerStatusValue(item) === collectionFilter.slice(7));
     if (collectionContextFilter.startsWith("dia:")) items = items.filter(item => normalizeDays(item.dias || item.dia).includes(collectionContextFilter.slice(4)));
     else if (collectionContextFilter.startsWith("programa:")) items = items.filter(item => String(item.programa||"") === collectionContextFilter.slice(9));
     else if (collectionContextFilter.startsWith("categoria:")) items = items.filter(item => String(item.categoria||item.tipo||"") === collectionContextFilter.slice(10));
+    else if (collectionContextFilter.startsWith("posicao:")) items = items.filter(item => String(item.posicao||"") === collectionContextFilter.slice(8));
     items = [...items];
     if (key === "programacao") items.sort((a,b)=>Math.min(...normalizeDays(a.dias||a.dia).map(d=>weekOrder.indexOf(d)).filter(i=>i>=0),99)-Math.min(...normalizeDays(b.dias||b.dia).map(d=>weekOrder.indexOf(d)).filter(i=>i>=0),99) || compareTime(a.inicio,b.inicio));
     else if (key === "locutores") items.sort((a,b)=>Number(a.ordem||999)-Number(b.ordem||999) || String(a.nome||"").localeCompare(String(b.nome||"")));
@@ -796,6 +838,10 @@
     else if (collectionSort === "categoria") items.sort((a,b)=>String(a.categoria||"").localeCompare(String(b.categoria||""),"pt-BR") || contentTimestamp(b)-contentTimestamp(a));
     else if (collectionSort === "inicio") items.sort((a,b)=>dateKey(a.inicio).localeCompare(dateKey(b.inicio)));
     else if (collectionSort === "fim") items.sort((a,b)=>(dateKey(a.fim)||"9999-12-31").localeCompare(dateKey(b.fim)||"9999-12-31"));
+    else if (collectionSort === "prioridade") items.sort((a,b)=>Number(b.prioridade||0)-Number(a.prioridade||0) || contentTimestamp(b)-contentTimestamp(a));
+    else if (key === "publicidade") items=sortCampaignItems(items);
+    else if (key === "banners") items=sortBannerItems(items);
+    else if (key === "anunciantes") items.sort((a,b)=>String(a.nome||"").localeCompare(String(b.nome||""),"pt-BR"));
     else if (key === "promocoes") items=sortPromotionItems(items);
     else if (key === "eventos") items=sortEventItems(items);
     else if (key === "noticias") items.sort((a,b)=>Number(Boolean(b.destaque))-Number(Boolean(a.destaque)) || contentTimestamp(b)-contentTimestamp(a));
@@ -831,12 +877,13 @@
       const status = newsStatusValue(item);
       return `<span class="badge status-${status}">${escapeHTML(statusNewsLabel(item))}</span>`;
     }
-    const automatic = key === "promocoes" ? `<span class="badge status-promo-${promotionStatusValue(item)}">${escapeHTML(promotionStatusLabel(item))}</span>` : key === "eventos" ? `<span class="badge status-evento-${eventStatusValue(item)}">${escapeHTML(eventStatusLabel(item))}</span>` : "";
-    return `<div class="collection-status-stack"><button class="badge ${item.ativo === false ? "inactive" : "active"}" data-toggle-item="${item.id}" type="button">${item.ativo === false ? "Não publicado" : "Publicado"}</button>${automatic}${item.destaque ? `<span class="badge featured">Destaque</span>` : ""}</div>`;
+    const automatic = key === "promocoes" ? `<span class="badge status-promo-${promotionStatusValue(item)}">${escapeHTML(promotionStatusLabel(item))}</span>` : key === "eventos" ? `<span class="badge status-evento-${eventStatusValue(item)}">${escapeHTML(eventStatusLabel(item))}</span>` : key === "publicidade" ? `<span class="badge status-campaign-${campaignStatusValue(item)}">${escapeHTML(campaignStatusLabel(item))}</span>` : key === "banners" ? `<span class="badge status-banner-${bannerStatusValue(item)}">${escapeHTML(bannerStatusLabel(item))}</span>` : "";
+    const metrics=key === "publicidade" ? `<span class="badge metric-real" title="Somente dados recebidos do site/Worker">${escapeHTML(campaignMetricsLabel(item))}</span>` : "";
+    return `<div class="collection-status-stack"><button class="badge ${item.ativo === false ? "inactive" : "active"}" data-toggle-item="${item.id}" type="button">${item.ativo === false ? "Não publicado" : "Publicado"}</button>${automatic}${metrics}${item.destaque ? `<span class="badge featured">Destaque</span>` : ""}</div>`;
   }
 
   function collectionRow(schema,key,item) {
-    const imageKey = ["imagem","foto","logo"].find(name => item[name]);
+    const imageKey = ["imagemDesktop","imagemMobile","imagem","foto","logo"].find(name => item[name]);
     const description = item.descricao || item.resumo || item.bio || (key === "noticias" ? item.tags : "") || "Sem descrição";
     return `<tr><td><div class="row-main">${imageKey ? `<img class="row-thumb" src="${escapeHTML(item[imageKey])}" alt="">` : `<span class="row-thumb row-thumb-placeholder">${escapeHTML((item.titulo || item.nome || "CR").slice(0,2).toUpperCase())}</span>`}<div><strong>${escapeHTML(item.titulo || item.nome || "Sem título")}</strong><small>${escapeHTML(description)}</small></div></div></td><td>${escapeHTML(schema.summary ? schema.summary(item) : "—")}</td><td>${collectionStatus(key,item)}</td><td><div class="row-actions"><button class="button small ghost" data-view-item="${item.id}" type="button">Visualizar</button><button class="button small secondary" data-edit-item="${item.id}" type="button">Editar</button><button class="button small ghost" data-duplicate-item="${item.id}" type="button">Duplicar</button><button class="button small danger" data-delete-item="${item.id}" type="button">Excluir</button></div></td></tr>`;
   }
@@ -850,6 +897,8 @@
       : key === "videos" ? { ativo:true, destaque:false, data:today, tipo:"Automático", duracaoMinutos:0 }
       : key === "promocoes" ? { ativo:true, destaque:false, inicio:today, fim:"", situacao:"Automático pelas datas", participacao:"WhatsApp", mensagemWhatsApp:"" }
       : key === "eventos" ? { ativo:true, destaque:false, data:today, dataFim:"", situacao:"Automático pela data", tipo:"Evento da rádio" }
+      : key === "publicidade" ? { ativo:true, inicio:today, fim:"", horaInicio:"", horaFim:"", situacao:"Automático pelo período", posicao:"Entre seções", formato:"Banner horizontal", prioridade:10, textoBotao:"Saiba mais", metricas:{impressoes:0,cliques:0,fonte:""} }
+      : key === "banners" ? { ativo:true, inicio:today, fim:"", horaInicio:"", horaFim:"", situacao:"Automático pelo período", tipo:"Editorial", posicao:"Após o cabeçalho", prioridade:10, textoBotao:"Saiba mais" }
       : { ativo:true };
     const item = id ? state.content[key].find(entry => entry.id === id) : base;
     editing = { key, id };
@@ -868,6 +917,7 @@
     if (type === "textarea" || type === "richtext") return `<div class="field full"><label for="${inputId}">${escapeHTML(label)}</label><textarea id="${inputId}" class="${type === "richtext" ? "rich-editor" : ""}" name="${name}" ${required ? "required" : ""}>${escapeHTML(value)}</textarea>${type === "richtext" ? `<small class="field-help">Use parágrafos curtos. A formatação avançada será incorporada na etapa do editor editorial.</small>` : ""}</div>`;
     if (type === "select") return `<div class="field"><label for="${inputId}">${escapeHTML(label)}</label><select id="${inputId}" name="${name}" ${required ? "required" : ""}><option value="">Selecione</option>${extra.map(option => `<option value="${escapeHTML(option)}" ${String(option).toLowerCase() === String(value).toLowerCase() ? "selected" : ""}>${escapeHTML(option)}</option>`).join("")}</select></div>`;
     if (type === "locutor-select") { const options=state.content.locutores.filter(i=>i.ativo!==false); return `<div class="field"><label for="${inputId}">${escapeHTML(label)}</label><select id="${inputId}" name="${name}"><option value="">Sem vínculo</option>${options.map(loc=>`<option value="${escapeHTML(loc.nome)}" ${loc.nome === value ? "selected" : ""}>${escapeHTML(loc.nome)}${loc.cargo?` — ${escapeHTML(loc.cargo)}`:""}</option>`).join("")}</select></div>`; }
+    if (type === "advertiser-select") { const options=(state.content.anunciantes||[]).filter(i=>i.ativo!==false || String(i.id)===String(value)); const selected=String(value||item.anuncianteId||""); const legacy=item.anunciante && !options.some(i=>String(i.id)===selected) ? `<option value="${escapeHTML(selected||`legacy:${item.anunciante}`)}" selected>${escapeHTML(item.anunciante)} (cadastro legado)</option>` : ""; return `<div class="field"><label for="${inputId}">${escapeHTML(label)}</label><select id="${inputId}" name="${name}" ${required?"required":""}><option value="">Selecione um anunciante</option>${legacy}${options.map(ad=>`<option value="${escapeHTML(ad.id)}" ${String(ad.id)===selected?"selected":""}>${escapeHTML(ad.nome)}${ad.categoria?` — ${escapeHTML(ad.categoria)}`:""}</option>`).join("")}</select><small class="field-help">Cadastre a empresa em Anunciantes antes de criar a campanha.</small></div>`; }
     if (type === "multicheck") { const selected=normalizeDays(value); return `<fieldset class="field full checkbox-fieldset"><legend>${escapeHTML(label)}${required?" *":""}</legend><div class="checkbox-grid">${extra.map(option=>`<label><input type="checkbox" name="${name}" value="${escapeHTML(option)}" ${selected.includes(option)?"checked":""}><span>${escapeHTML(option)}</span></label>`).join("")}</div></fieldset>`; }
     if (type === "checkbox") { const checked=value === true || (!hasValue && name === "ativo"); return `<div class="field"><span class="field-label">${escapeHTML(label)}</span><div class="toggle-row"><div><strong>${checked ? "Ativado" : "Desativado"}</strong><small>Altere o status deste registro.</small></div><label class="switch"><input aria-label="${escapeHTML(label)}" type="checkbox" name="${name}" ${checked ? "checked" : ""}><span></span></label></div></div>`; }
     if (type === "image") return mediaFieldHTML(name,label,extra || "news",value);
@@ -931,6 +981,28 @@
       const duplicate=state.content.eventos.find(other=>other.id!==id && String(other.titulo||"").trim().toLowerCase()===String(item.titulo||"").trim().toLowerCase() && String(other.data||"")===String(item.data||"") && String(other.hora||"")===String(item.hora||""));
       if (duplicate) return "Já existe um evento com o mesmo título, data e horário.";
     }
+    if (key === "anunciantes") {
+      if (item.site && !absoluteHttpURL(item.site)) return "O site do anunciante deve começar com https:// ou http://.";
+      const normalizedDocument=String(item.documento||"").replace(/\D/g,""); item.documento=item.documento||"";
+      const duplicate=(state.content.anunciantes||[]).find(other=>other.id!==id && (String(other.nome||"").trim().toLowerCase()===String(item.nome||"").trim().toLowerCase() || (normalizedDocument && String(other.documento||"").replace(/\D/g,"")===normalizedDocument)));
+      if (duplicate) return "Já existe um anunciante com o mesmo nome ou documento.";
+    }
+    if (key === "publicidade" || key === "banners") {
+      item.prioridade=Math.max(0,Math.min(999,Math.trunc(Number(item.prioridade||0))));
+      item.situacao=item.situacao||"Automático pelo período";
+      if (item.fim && item.inicio && item.fim < item.inicio) return "A data final não pode ser anterior à data inicial.";
+      if (item.fim === item.inicio && item.horaInicio && item.horaFim && item.horaFim <= item.horaInicio) return "O horário final deve ser posterior ao horário inicial quando termina no mesmo dia.";
+      if (item.link && !absoluteHttpURL(item.link)) return "O link de destino deve começar com https:// ou http://.";
+      if (!item.imagemDesktop) return key === "publicidade" ? "Adicione a peça publicitária para desktop." : "Adicione a imagem do banner para desktop.";
+      const duplicate=(state.content[key]||[]).find(other=>other.id!==id && String(other.titulo||"").trim().toLowerCase()===String(item.titulo||"").trim().toLowerCase() && String(other.posicao||"")===String(item.posicao||"") && String(other.inicio||"")===String(item.inicio||""));
+      if (duplicate) return `Já existe ${key === "publicidade" ? "uma campanha" : "um banner"} com o mesmo título, posição e início.`;
+      if (key === "publicidade") {
+        const advertiser=(state.content.anunciantes||[]).find(ad=>String(ad.id)===String(item.anuncianteId));
+        if (!advertiser && !String(item.anuncianteId||"").startsWith("legacy:")) return "Selecione um anunciante cadastrado e ativo.";
+        item.anunciante=advertiser?.nome || item.anunciante || String(item.anuncianteId||"").replace(/^legacy:/,"");
+        item.metricas=item.metricas && typeof item.metricas === "object" ? item.metricas : {impressoes:0,cliques:0,fonte:""};
+      }
+    }
     if (key === "locutores") item.ordem=Number(item.ordem||0);
     return "";
   }
@@ -964,7 +1036,9 @@
     if (clone.nome) clone.nome=`${clone.nome} — cópia`;
     if (key === "noticias") { clone.slug=slugify(`${clone.slug||clone.titulo}-copia`); clone.status="Rascunho"; clone.destaque=false; }
     if (key === "programacao") { clone.ativo=false; }
-    if (["podcasts","videos","promocoes","eventos"].includes(key)) { clone.ativo=false; clone.destaque=false; }
+    if (["podcasts","videos","promocoes","eventos","publicidade","banners"].includes(key)) { clone.ativo=false; clone.destaque=false; }
+    if (key === "publicidade") { clone.situacao="Pausada"; clone.metricas={impressoes:0,cliques:0,fonte:"",atualizadoEm:""}; }
+    if (key === "banners") clone.situacao="Pausado";
     if (key === "promocoes") clone.situacao="Automático pelas datas";
     if (key === "eventos") clone.situacao="Automático pela data";
     state.content[key].unshift(clone); persist(false); renderPage(); notify("Cópia criada para revisão.","success");
@@ -1095,7 +1169,7 @@
         <section class="card"><div class="card-body"><h3>Exportar JSON</h3><p class="field-help">Baixa configurações, módulos, temas e conteúdos.</p><button class="button primary" id="export-backup" type="button">Baixar backup</button></div></section>
         <section class="card"><div class="card-body"><h3>Importar JSON</h3><p class="field-help">Carrega o arquivo no editor; clique em Salvar rascunho para gravar no D1.</p><button class="button secondary" id="import-backup" type="button">Selecionar arquivo</button></div></section>
         <section class="card"><div class="card-body"><h3>Recarregar do servidor</h3><p class="field-help">Descarta alterações ainda não salvas e recarrega o último rascunho do servidor.</p><button class="button danger" id="reset-demo" type="button">Recarregar dados</button></div></section>
-      </div><section class="card" style="margin-top:18px"><header class="card-header"><div><h3>Sobre esta instalação</h3><p>Informações técnicas.</p></div></header><div class="card-body"><div class="code-box">Modo: produção integrada\nVersão: ${CONFIG.VERSION || "2.3.0-final"}\nPersistência: Cloudflare D1\nAPI: ${CONFIG.WORKER_URL || "não configurada"}\nÚltima alteração: ${formatDateTime(state.updatedAt)}</div></div></section>`;
+      </div><section class="card" style="margin-top:18px"><header class="card-header"><div><h3>Sobre esta instalação</h3><p>Informações técnicas.</p></div></header><div class="card-body"><div class="code-box">Modo: produção integrada\nVersão: ${CONFIG.VERSION || "2.4.0-etapa-1"}\nPersistência: Cloudflare D1\nAPI: ${CONFIG.WORKER_URL || "não configurada"}\nÚltima alteração: ${formatDateTime(state.updatedAt)}</div></div></section>`;
     $("#export-backup").addEventListener("click",exportBackup);
     $("#import-backup").addEventListener("click",()=>$("#backup-import").click());
     $("#reset-demo").addEventListener("click",()=>{if(confirm("Descartar alterações não salvas e recarregar o rascunho do servidor?")) loadAll();});
@@ -1172,7 +1246,14 @@
     else if (state.selectedTheme === "young") body=`${siteHeader(r)}<div class="theme-stage theme-stage-young">${section("player")}${section("hero")}</div><div class="theme-young-featured">${section("promocoes")}${section("videos")}</div>${rest(new Set(["hero","player","promocoes","videos"]))}`;
     else if (state.selectedTheme === "custom") body=`${siteHeader(r)}<div class="theme-stage theme-stage-clean">${section("hero")}${section("player")}</div>${rest(new Set(["hero","player"]))}`;
     else body=`${siteHeader(r)}${ordered.filter(id=>enabled.has(id)&&sections[id]).map(id=>sections[id]()).join("")}`;
-    container.innerHTML = `<div class="site-preview theme-${state.selectedTheme}" data-site-section="inicio" style="${customStyle}${r.hero ? `--hero-image:url('${escapeHTML(r.hero)}')` : ""}">${body}${siteFooter(r)}</div>`;
+    const headerBanner=siteBannerSlot("Após o cabeçalho");
+    const beforeNewsBanner=siteBannerSlot("Antes de notícias");
+    const betweenBanner=siteBannerSlot("Entre seções");
+    const footerBanner=siteBannerSlot("Antes do rodapé");
+    if (headerBanner) body=body.replace("</header>",`</header>${headerBanner}`);
+    if (beforeNewsBanner) body=body.replace(/(<section class="site-section[^>]*data-site-section="noticias")/,`${beforeNewsBanner}$1`);
+    if (betweenBanner) body+=betweenBanner;
+    container.innerHTML = `<div class="site-preview theme-${state.selectedTheme}" data-site-section="inicio" style="${customStyle}${r.hero ? `--hero-image:url('${escapeHTML(r.hero)}')` : ""}">${body}${footerBanner}${siteFooter(r)}</div>`;
     bindSitePreviewInteractions(container);
     syncAudioButtons();
   }
@@ -1221,7 +1302,23 @@
   function siteTeam() { const items=[...state.content.locutores].sort((a,b)=>Number(a.ordem||999)-Number(b.ordem||999)).concat(state.content.equipe).filter(i=>i.ativo!==false).slice(0,5); if(!items.length)return ""; return `<section class="site-section" data-site-section="equipe"><div class="site-section-head"><div><span>Quem faz</span><h2>Nossa equipe</h2><p>As vozes e profissionais da emissora.</p></div><button class="site-section-link" data-site-list="equipe" type="button">Conheça a equipe →</button></div><div class="site-team-grid">${items.map(i=>`<article class="site-team-card" data-site-open="${state.content.locutores.some(loc=>loc.id===i.id)?"locutores":"equipe"}" data-site-id="${escapeHTML(i.id)}" role="button" tabindex="0" aria-label="Abrir perfil de ${escapeHTML(i.nome)}"><div class="site-team-photo">${i.foto?`<img src="${escapeHTML(i.foto)}" alt="Foto de ${escapeHTML(i.nome)}">`:""}</div><strong>${escapeHTML(i.nome)}</strong><small>${escapeHTML(i.cargo||"")}</small></article>`).join("")}</div></section>`; }
   function siteGallery() { const items=state.content.galeria.filter(i=>i.ativo!==false).slice(0,5); if(!items.length)return ""; return `<section class="site-section alt" data-site-section="galeria"><div class="site-section-head"><div><span>Imagens</span><h2>Galeria</h2><p>Eventos, bastidores e momentos da rádio.</p></div><button class="site-section-link" data-site-list="galeria" type="button">Ver galeria →</button></div><div class="site-gallery-grid">${items.map(i=>`<div data-site-open="galeria" data-site-id="${escapeHTML(i.id)}" role="button" tabindex="0" aria-label="Ampliar foto ${escapeHTML(i.titulo)}">${i.imagem?`<img src="${escapeHTML(i.imagem)}" alt="${escapeHTML(i.titulo)}">`:`<span class="site-gallery-placeholder">${escapeHTML(i.titulo||"Foto")}</span>`}</div>`).join("")}</div></section>`; }
   function siteEvents() { const items=sortEventItems(state.content.eventos.filter(i=>i.ativo!==false&&["hoje","futuro","adiado"].includes(eventStatusValue(i)))).slice(0,3); if(!items.length)return ""; return `<section class="site-section" data-site-section="eventos"><div class="site-section-head"><div><span>Agenda</span><h2>Próximos eventos</h2><p>Shows, ações, transmissões e encontros da rádio.</p></div><button class="site-section-link" data-site-list="eventos" type="button">Agenda completa →</button></div><div class="site-promo-grid">${items.map(i=>`<article class="site-promo-card ${i.destaque?"media-featured":""}" data-site-open="eventos" data-site-id="${escapeHTML(i.id)}" role="button" tabindex="0" aria-label="Abrir evento ${escapeHTML(i.titulo)}" style="${i.imagem?`--card-image:url('${i.imagem}')`:""}"><span class="site-content-status status-evento-${eventStatusValue(i)}">${escapeHTML(eventStatusLabel(i))}</span><strong>${escapeHTML(i.titulo)}</strong><small>${escapeHTML(i.local||i.cidade||i.tipo||"")}</small><em>${escapeHTML(formatEventPeriod(i))}</em></article>`).join("")}</div></section>`; }
-  function siteAdvertising() { const item=state.content.publicidade.find(i=>i.ativo!==false); if(!item)return ""; const link=safeExternalURL(item.link); return `<section class="site-section" data-site-section="publicidade"><${link?"a":"button"} class="site-sponsor site-ad-link" ${link?`href="${escapeHTML(link)}" target="_blank" rel="noopener noreferrer"`:`data-site-open="publicidade" data-site-id="${escapeHTML(item.id)}" type="button"`} style="height:80px" aria-label="Abrir publicidade ${escapeHTML(item.titulo||item.anunciante||"")}">${item.imagem?`<img src="${escapeHTML(item.imagem)}" alt="Publicidade ${escapeHTML(item.titulo||"")}">`:`ESPAÇO PUBLICITÁRIO`}</${link?"a":"button"}></section>`; }
+  function responsiveCommercialImage(item,alt) {
+    const desktop=item?.imagemDesktop || item?.imagem || "", mobile=item?.imagemMobile || desktop;
+    if (!desktop) return `<span class="site-commercial-placeholder">ESPAÇO PUBLICITÁRIO</span>`;
+    return `<picture>${mobile?`<source media="(max-width:640px)" srcset="${escapeHTML(mobile)}">`:""}<img src="${escapeHTML(desktop)}" alt="${escapeHTML(alt)}"></picture>`;
+  }
+  function siteAdvertising() {
+    const item=sortCampaignItems((state.content.publicidade||[]).filter(i=>i.ativo!==false && campaignStatusValue(i)==="ativa"))[0];
+    if(!item)return "";
+    const link=safeExternalURL(item.link), tag=link?"a":"button", attrs=link?`href="${escapeHTML(link)}" target="_blank" rel="noopener noreferrer"`:`data-site-open="publicidade" data-site-id="${escapeHTML(item.id)}" type="button"`;
+    return `<section class="site-section site-commercial-section" data-site-section="publicidade"><span class="site-ad-disclosure">Publicidade</span><${tag} class="site-responsive-commercial site-ad-link format-${slugify(item.formato||"banner")}" ${attrs} data-campaign-id="${escapeHTML(item.id)}" data-ad-position="${escapeHTML(item.posicao||"")}" aria-label="Abrir publicidade ${escapeHTML(item.titulo||advertiserName(item))}">${responsiveCommercialImage(item,`Publicidade ${item.titulo||advertiserName(item)}`)}${item.textoBotao?`<span class="site-commercial-cta">${escapeHTML(item.textoBotao)}</span>`:""}</${tag}></section>`;
+  }
+  function normalizedBannerPosition(value) { return ({"Banner principal":"Após o cabeçalho","Antes de notícias":"Antes de notícias","Antes do rodapé":"Antes do rodapé","Página interna":"Página interna"})[value] || value || "Após o cabeçalho"; }
+  function siteBannerSlot(position) {
+    const items=sortBannerItems((state.content.banners||[]).filter(item=>item.ativo!==false && bannerStatusValue(item)==="ativo" && normalizedBannerPosition(item.posicao)===position)).slice(0,2);
+    if (!items.length) return "";
+    return `<section class="site-banner-slot position-${slugify(position)}" data-site-section="banners" data-banner-position="${escapeHTML(position)}">${items.map(item=>{const link=safeExternalURL(item.link),tag=link?"a":"button",attrs=link?`href="${escapeHTML(link)}" target="_blank" rel="noopener noreferrer"`:`data-site-open="banners" data-site-id="${escapeHTML(item.id)}" type="button"`;return `<${tag} class="site-responsive-commercial site-banner-link" ${attrs} aria-label="Abrir banner ${escapeHTML(item.titulo||"")}">${responsiveCommercialImage(item,item.titulo||"Banner")}${item.textoBotao?`<span class="site-commercial-cta">${escapeHTML(item.textoBotao)}</span>`:""}</${tag}>`;}).join("")}</section>`;
+  }
   function sitePartners() { const items=state.content.parceiros.filter(i=>i.ativo!==false).slice(0,6); if(!items.length)return ""; return `<section class="site-section alt" data-site-section="parceiros"><div class="site-section-head"><div><span>Apoio</span><h2>Patrocinadores</h2></div></div><div class="site-sponsor-grid">${items.map(i=>{const link=safeExternalURL(i.link);return `<${link?"a":"button"} class="site-sponsor" ${link?`href="${escapeHTML(link)}" target="_blank" rel="noopener noreferrer"`:`data-site-open="parceiros" data-site-id="${escapeHTML(i.id)}" type="button"`} aria-label="Abrir parceiro ${escapeHTML(i.nome)}">${i.logo?`<img src="${escapeHTML(i.logo)}" alt="${escapeHTML(i.nome)}">`:escapeHTML(i.nome)}</${link?"a":"button"}>`;}).join("")}</div></section>`; }
   function siteApp() { return `<section class="site-section dark" data-site-section="aplicativo"><div class="site-section-head"><div><span>Leve a rádio com você</span><h2>Baixe nosso aplicativo</h2><p>Ouça a programação no celular e receba novidades.</p></div><button class="site-live-button" data-site-action="app" type="button">Baixar aplicativo</button></div></section>`; }
   function siteContact() { return `<section class="site-section" data-site-section="contato"><div class="site-section-head"><div><span>Fale com a rádio</span><h2>Contato e participação</h2><p>WhatsApp, pedidos de música, comercial e jornalismo.</p></div><button class="site-wa-button" data-site-action="whatsapp" type="button">Abrir WhatsApp</button></div></section>`; }
@@ -1326,6 +1423,37 @@
     try { return new Intl.DateTimeFormat("en-CA",{timeZone:timezone,year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date()); }
     catch { return new Date().toISOString().slice(0,10); }
   }
+  function periodStatus(item, labels={scheduled:"agendada",active:"ativa",ended:"encerrada",paused:"pausada",cancelled:"cancelada"}) {
+    const manual=String(item?.situacao||"").toLowerCase();
+    if (manual.includes("cancel")) return labels.cancelled;
+    if (manual.includes("paus")) return labels.paused;
+    const today=currentDateKey(), now=currentTimeKey(), start=dateKey(item?.inicio), end=dateKey(item?.fim);
+    if (start && (start > today || (start === today && item?.horaInicio && item.horaInicio > now))) return labels.scheduled;
+    if (end && (end < today || (end === today && item?.horaFim && item.horaFim <= now))) return labels.ended;
+    return labels.active;
+  }
+  function campaignStatusValue(item) { return periodStatus(item); }
+  function campaignStatusLabel(item) { return ({ativa:"Ativa",agendada:"Agendada",encerrada:"Encerrada",pausada:"Pausada",cancelada:"Cancelada"})[campaignStatusValue(item)] || "Campanha"; }
+  function bannerStatusValue(item) { return periodStatus(item,{scheduled:"agendado",active:"ativo",ended:"encerrado",paused:"pausado",cancelled:"cancelado"}); }
+  function bannerStatusLabel(item) { return ({ativo:"Ativo",agendado:"Agendado",encerrado:"Encerrado",pausado:"Pausado",cancelado:"Cancelado"})[bannerStatusValue(item)] || "Banner"; }
+  function advertiserName(item) {
+    const advertiser=(state.content.anunciantes||[]).find(ad=>String(ad.id)===String(item?.anuncianteId));
+    return advertiser?.nome || item?.anunciante || "Anunciante não vinculado";
+  }
+  function campaignMetrics(item) {
+    const data=item?.metricas && typeof item.metricas === "object" ? item.metricas : {};
+    const imp=Math.max(0,Number(data.impressoes||0)), clicks=Math.max(0,Number(data.cliques||0));
+    return {impressoes:imp,cliques:clicks,ctr:imp>0?(clicks/imp)*100:0,fonte:String(data.fonte||""),atualizadoEm:String(data.atualizadoEm||"")};
+  }
+  function campaignMetricsLabel(item) {
+    const m=campaignMetrics(item);
+    return m.fonte || m.impressoes || m.cliques ? `${m.impressoes} imp. • ${m.cliques} cliques` : "Sem métricas reais";
+  }
+  function campaignRank(item) { return ({ativa:0,agendada:1,pausada:2,encerrada:3,cancelada:4})[campaignStatusValue(item)] ?? 9; }
+  function bannerRank(item) { return ({ativo:0,agendado:1,pausado:2,encerrado:3,cancelado:4})[bannerStatusValue(item)] ?? 9; }
+  function sortCampaignItems(items) { return [...items].sort((a,b)=>campaignRank(a)-campaignRank(b) || Number(b.prioridade||0)-Number(a.prioridade||0) || dateKey(a.inicio).localeCompare(dateKey(b.inicio)) || String(a.titulo||"").localeCompare(String(b.titulo||""),"pt-BR")); }
+  function sortBannerItems(items) { return [...items].sort((a,b)=>bannerRank(a)-bannerRank(b) || Number(b.prioridade||0)-Number(a.prioridade||0) || dateKey(a.inicio).localeCompare(dateKey(b.inicio)) || String(a.titulo||"").localeCompare(String(b.titulo||""),"pt-BR")); }
+
   function promotionStatusValue(item) {
     if (/cancelad/i.test(String(item?.situacao||""))) return "cancelada";
     const today=currentDateKey(), start=dateKey(item?.inicio), end=dateKey(item?.fim);
@@ -1439,7 +1567,9 @@
     if (key === "galeria") return `${detailImage(item)}${detailMeta([item.album,item.data?formatDate(item.data):""])}<div class="site-detail-text">${multilineHTML(item.descricao)}</div>`;
     if (["locutores","equipe"].includes(key)) return `${detailImage(item,"foto")}${detailMeta([item.cargo,item.email,item.telefone])}<div class="site-detail-text">${multilineHTML(item.bio || item.descricao)}</div>`;
     if (key === "parceiros") { const url=safeExternalURL(item.link); return `${detailImage(item,"logo")}${detailMeta([item.categoria])}${url?`<a class="button primary site-detail-external" href="${escapeHTML(url)}" target="_blank" rel="noopener noreferrer">Abrir site do parceiro</a>`:"<div class=\"site-detail-notice\">Parceiro sem link cadastrado.</div>"}`; }
-    if (key === "publicidade") { const url=safeExternalURL(item.link); return `${detailImage(item)}${detailMeta([item.anunciante,item.posicao,item.inicio?formatDate(item.inicio):"",item.fim?formatDate(item.fim):""])}${url?`<a class="button primary site-detail-external" href="${escapeHTML(url)}" target="_blank" rel="noopener noreferrer">Abrir anúncio</a>`:""}`; }
+    if (key === "anunciantes") { const url=safeExternalURL(item.site); return `${detailImage(item,"logo")}${detailMeta([item.razaoSocial,item.categoria,item.documento,item.responsavel,item.email,item.telefone,item.whatsapp])}<div class="site-detail-text">${multilineHTML(item.observacoes)}</div>${url?`<a class="button primary site-detail-external" href="${escapeHTML(url)}" target="_blank" rel="noopener noreferrer">Abrir site do anunciante</a>`:""}`; }
+    if (key === "publicidade") { const url=safeExternalURL(item.link),m=campaignMetrics(item); return `${responsiveCommercialImage(item,item.titulo||"Campanha")} ${detailMeta([advertiserName(item),item.posicao,item.formato,campaignStatusLabel(item),item.inicio?`Início: ${formatDate(item.inicio)}${item.horaInicio?` ${item.horaInicio}`:""}`:"",item.fim?`Fim: ${formatDate(item.fim)}${item.horaFim?` ${item.horaFim}`:""}`:"Sem data final",`Prioridade ${item.prioridade||0}`])}<div class="real-metrics-panel"><div><span>Impressões reais</span><strong>${m.impressoes}</strong></div><div><span>Cliques reais</span><strong>${m.cliques}</strong></div><div><span>CTR</span><strong>${m.ctr.toFixed(2)}%</strong></div><small>${m.fonte?`Fonte: ${escapeHTML(m.fonte)}${m.atualizadoEm?` • atualizado em ${escapeHTML(formatDateTime(m.atualizadoEm))}`:""}`:"Aguardando dados reais do site/Worker. A prévia não gera contagem."}</small></div><div class="site-detail-text">${multilineHTML(item.descricao)}</div>${url?`<a class="button primary site-detail-external" href="${escapeHTML(url)}" target="_blank" rel="noopener noreferrer">Abrir destino da campanha</a>`:""}`; }
+    if (key === "banners") { const url=safeExternalURL(item.link); return `${responsiveCommercialImage(item,item.titulo||"Banner")}${detailMeta([item.tipo,item.posicao,bannerStatusLabel(item),item.inicio?`Início: ${formatDate(item.inicio)}`:"",item.fim?`Fim: ${formatDate(item.fim)}`:"",`Prioridade ${item.prioridade||0}`])}<div class="site-detail-text">${multilineHTML(item.descricao)}</div>${url?`<a class="button primary site-detail-external" href="${escapeHTML(url)}" target="_blank" rel="noopener noreferrer">Abrir destino do banner</a>`:""}`; }
     return `${detailImage(item,item.foto?"foto":item.logo?"logo":"imagem")}${genericDetailHTML(key,item)}`;
   }
 
@@ -1460,6 +1590,8 @@
     if (["podcasts","videos"].includes(key)) return sortMediaItems(key,(state.content[key] || []).filter(i=>i.ativo!==false));
     if (key === "promocoes") return sortPromotionItems((state.content.promocoes||[]).filter(i=>i.ativo!==false));
     if (key === "eventos") return sortEventItems((state.content.eventos||[]).filter(i=>i.ativo!==false));
+    if (key === "publicidade") return sortCampaignItems((state.content.publicidade||[]).filter(i=>i.ativo!==false));
+    if (key === "banners") return sortBannerItems((state.content.banners||[]).filter(i=>i.ativo!==false));
     return (state.content[key] || []).filter(i=>i.ativo!==false);
   }
 
@@ -1578,7 +1710,7 @@
 
   function mapRemoteToState(site,dashboard) {
     const fresh=defaultState(), content=site.conteudoRascunho || site.conteudoPublicado || {}, texts=content.textos_institucionais || {}, cms=texts.cms_v2 || {}, contacts=content.contatos || {}, whats=typeof content.whatsapp === "string" ? {numero:content.whatsapp} : (content.whatsapp || {}), colors=content.cores || {}, apps=content.links_aplicativos || {}, banners=content.banners || {};
-    fresh.version="2.3.0-final"; fresh.updatedAt=versions[0]?.criado_em || new Date().toISOString(); fresh.status=site.status_publicacao || "sem_rascunho"; fresh.selectedTheme=cms.selectedTheme || "morada";
+    fresh.version="2.4.0-etapa-1"; fresh.updatedAt=versions[0]?.criado_em || new Date().toISOString(); fresh.status=site.status_publicacao || "sem_rascunho"; fresh.selectedTheme=cms.selectedTheme || "morada";
     fresh.radio={...fresh.radio,nome:content.nome || site.nome_site || dashboard?.cliente?.nome_radio || "Minha rádio",slogan:content.slogan || "",descricao:content.descricao || texts.sobre || "",cidade:contacts.cidade || dashboard?.cliente?.cidade || "",estado:contacts.estado || dashboard?.cliente?.estado || "",email:contacts.email || dashboard?.cliente?.email || "",telefone:contacts.telefone || "",whatsapp:whats.numero || "",endereco:contacts.endereco || "",streamUrl:site.stream_url || "",musicaAtual:texts.player?.titulo || "Transmissão ao vivo",locutorAtual:texts.player?.subtitulo || "Programação da rádio",logo:content.logo || "",hero:content.capa || "",playerImage:texts.player?.imagem || "",cores:{primaria:colors.primaria || "#e31c45",secundaria:colors.secundaria || "#121d31",destaque:colors.destaque || "#f1a11a",fundo:colors.fundo || "#f4f6f9"},listenersEnabled:false};
     const moduleValues=texts.modulos || {}; const savedModules=safeArray(cms.modules);
     fresh.modules=modulesCatalog.map(([id,label,description],index)=>{const saved=savedModules.find(m=>m.id===id);return{id,label,description,enabled:saved? saved.enabled!==false : moduleValues[id]!==false,order:Number(saved?.order ?? index)};});
@@ -1591,9 +1723,11 @@
       promocoes:ensureIds(safeArray(texts.promocoes).map(i=>({...i,categoria:i.categoria||"",premio:i.premio||"",situacao:i.situacao||"Automático pelas datas",participacao:i.participacao||(/whatsapp/i.test(i.descricao||"")?"WhatsApp":"Somente informativa"),linkParticipacao:i.linkParticipacao||"",mensagemWhatsApp:i.mensagemWhatsApp||"",resultado:i.resultado||"",destaque:Boolean(i.destaque),ativo:i.ativo!==false})),"promo"),
       galeria:ensureIds(texts.galeria,"foto"),
       eventos:ensureIds(safeArray(texts.eventos).map(i=>({...i,tipo:i.tipo||"Evento da rádio",categoria:i.categoria||"",dataFim:i.dataFim||"",horaFim:i.horaFim||"",situacao:i.situacao||"Automático pela data",endereco:i.endereco||"",cidade:i.cidade||"",linkMapa:i.linkMapa||"",linkInformacoes:i.linkInformacoes||"",destaque:Boolean(i.destaque),ativo:i.ativo!==false})),"evento"),
-      equipe:ensureIds(cms.content?.equipe,"team"), publicidade:ensureIds(banners.publicidades,"ad"),
+      equipe:ensureIds(cms.content?.equipe,"team"),
+      anunciantes:ensureIds(safeArray(cms.content?.anunciantes).map(i=>({...i,site:i.site||i.link||"",ativo:i.ativo!==false})),"adv"),
+      publicidade:ensureIds(safeArray(banners.publicidades).map(i=>({...i,anuncianteId:i.anuncianteId||"",anunciante:i.anunciante||"",posicao:i.posicao||"Entre seções",formato:i.formato||"Banner horizontal",inicio:i.inicio||"",horaInicio:i.horaInicio||"",fim:i.fim||"",horaFim:i.horaFim||"",situacao:i.situacao||"Automático pelo período",prioridade:Number(i.prioridade||0),imagemDesktop:i.imagemDesktop||i.imagem||"",imagemMobile:i.imagemMobile||"",textoBotao:i.textoBotao||"Saiba mais",metricas:i.metricas&&typeof i.metricas==="object"?i.metricas:{impressoes:Number(i.impressoes||0),cliques:Number(i.cliques||0),fonte:i.fonteMetricas||"",atualizadoEm:i.metricasAtualizadoEm||""},ativo:i.ativo!==false})),"ad"),
       parceiros:ensureIds(safeArray(content.patrocinadores).map(i=>({...i,link:i.link||i.site||"",ativo:i.ativo!==false})),"part"),
-      banners:ensureIds(banners.destaques,"banner"), popups:ensureIds(cms.content?.popups,"popup"), usuarios:[]
+      banners:ensureIds(safeArray(banners.destaques).map(i=>({...i,tipo:i.tipo||"Editorial",posicao:normalizedBannerPosition(i.posicao),inicio:i.inicio||"",horaInicio:i.horaInicio||"",fim:i.fim||"",horaFim:i.horaFim||"",situacao:i.situacao||"Automático pelo período",prioridade:Number(i.prioridade||0),imagemDesktop:i.imagemDesktop||i.imagem||"",imagemMobile:i.imagemMobile||"",textoBotao:i.textoBotao||"Saiba mais",ativo:i.ativo!==false})),"banner"), popups:ensureIds(cms.content?.popups,"popup"), usuarios:[]
     };
     fresh.integrations={
       whatsapp:{numero:whats.numero||"",mensagem:whats.mensagem||"Olá! Vim pelo site da rádio.",flutuante:whats.flutuante!==false,pedidos:texts.pedidosMusica?.ativo!==false},
@@ -1619,7 +1753,7 @@
     if(can("patrocinadores"))content.patrocinadores=state.content.parceiros.map(i=>({...i,site:i.link}));
     if(can("banners"))content.banners={...(content.banners||{}),destaques:state.content.banners,publicidades:state.content.publicidade};
     if(can("links_aplicativos"))content.links_aplicativos={...(content.links_aplicativos||{}),android:state.integrations.aplicativo.android,ios:state.integrations.aplicativo.ios,pwa:state.integrations.aplicativo.pwa,qr:state.integrations.aplicativo.qrcode};
-    if(can("textos_institucionais"))content.textos_institucionais={...texts,sobre:state.radio.descricao,player:{...(texts.player||{}),titulo:state.radio.musicaAtual,subtitulo:state.radio.locutorAtual,imagem:state.radio.playerImage},seo:state.integrations.seo,podcasts:state.content.podcasts,videos:state.content.videos,promocoes:state.content.promocoes,galeria:state.content.galeria,eventos:state.content.eventos,modulos:Object.fromEntries(state.modules.map(m=>[m.id,m.enabled])),pedidosMusica:{...(texts.pedidosMusica||{}),ativo:state.integrations.whatsapp.pedidos},acessibilidade:{...(texts.acessibilidade||{}),leitorTela:state.integrations.configuracoes.acessibilidade},cms_v2:{...cms,schemaVersion:5,selectedTheme:state.selectedTheme,modules:state.modules,content:{equipe:state.content.equipe,popups:state.content.popups},aplicativo:{icone:state.integrations.aplicativo.icone},configuracoes:state.integrations.configuracoes,updatedAt:new Date().toISOString()}};
+    if(can("textos_institucionais"))content.textos_institucionais={...texts,sobre:state.radio.descricao,player:{...(texts.player||{}),titulo:state.radio.musicaAtual,subtitulo:state.radio.locutorAtual,imagem:state.radio.playerImage},seo:state.integrations.seo,podcasts:state.content.podcasts,videos:state.content.videos,promocoes:state.content.promocoes,galeria:state.content.galeria,eventos:state.content.eventos,modulos:Object.fromEntries(state.modules.map(m=>[m.id,m.enabled])),pedidosMusica:{...(texts.pedidosMusica||{}),ativo:state.integrations.whatsapp.pedidos},acessibilidade:{...(texts.acessibilidade||{}),leitorTela:state.integrations.configuracoes.acessibilidade},cms_v2:{...cms,schemaVersion:6,selectedTheme:state.selectedTheme,modules:state.modules,content:{equipe:state.content.equipe,popups:state.content.popups,anunciantes:state.content.anunciantes},aplicativo:{icone:state.integrations.aplicativo.icone},configuracoes:state.integrations.configuracoes,updatedAt:new Date().toISOString()}};
     return content;
   }
 

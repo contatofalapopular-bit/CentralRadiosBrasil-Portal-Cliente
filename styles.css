@@ -553,3 +553,27 @@ button.site-sponsor{font:inherit}.site-footer-action{border:1px solid rgba(255,2
 .site-detail-actions{display:flex;flex-wrap:wrap;gap:9px;align-items:center}.site-detail-actions .site-detail-external{margin-bottom:0}
 
 /* v2.3.0 final — consolidação integrada de podcasts, vídeos, promoções e eventos */
+
+
+/* v2.4.0 — Etapa 1: publicidade, anunciantes e banners */
+.badge.status-campaign-ativa,.badge.status-banner-ativo{background:#dcfce7;color:#166534;border:1px solid #86efac}
+.badge.status-campaign-agendada,.badge.status-banner-agendado{background:#dbeafe;color:#1d4ed8;border:1px solid #93c5fd}
+.badge.status-campaign-encerrada,.badge.status-banner-encerrado{background:#e5e7eb;color:#374151;border:1px solid #cbd5e1}
+.badge.status-campaign-pausada,.badge.status-banner-pausado{background:#fef3c7;color:#92400e;border:1px solid #fcd34d}
+.badge.status-campaign-cancelada,.badge.status-banner-cancelado{background:#fee2e2;color:#991b1b;border:1px solid #fca5a5}
+.badge.metric-real{background:#eef2ff;color:#4338ca;border:1px solid #c7d2fe}
+.site-commercial-section{position:relative;padding-top:34px!important;padding-bottom:34px!important;background:#f7f9fc}
+.site-ad-disclosure{position:absolute;left:5%;top:15px;text-transform:uppercase;font-size:7px;letter-spacing:.12em;font-weight:900;color:#64748b}
+.site-responsive-commercial{position:relative;display:block;width:100%;border:0;border-radius:12px;overflow:hidden;background:#eef2f6;min-height:72px;padding:0;cursor:pointer;text-decoration:none;color:inherit;box-shadow:0 7px 20px rgba(15,23,42,.08)}
+.site-responsive-commercial picture,.site-responsive-commercial img{display:block;width:100%}
+.site-responsive-commercial img{height:auto;max-height:240px;object-fit:cover}
+.site-responsive-commercial.format-retangulo-medio{max-width:420px;margin:auto}.site-responsive-commercial.format-faixa-do-player{max-height:110px}.site-responsive-commercial.format-banner-de-rodape{max-width:1120px;margin:auto}
+.site-commercial-placeholder{min-height:82px;display:grid;place-items:center;font-size:10px;font-weight:900;color:#64748b;letter-spacing:.12em}
+.site-commercial-cta{position:absolute;right:14px;bottom:12px;background:rgba(15,23,42,.88);color:#fff;border-radius:999px;padding:7px 11px;font-size:8px;font-weight:900;box-shadow:0 4px 12px rgba(0,0,0,.2)}
+.site-banner-slot{display:grid;gap:10px;padding:14px 5%;background:var(--site-bg,#f4f6f9)}
+.site-banner-slot.position-antes-do-rodape{padding-top:28px;padding-bottom:28px}
+.site-banner-slot .site-responsive-commercial{max-width:1200px;margin:auto}
+.real-metrics-panel{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0;padding:14px;border:1px solid #dbe4ef;border-radius:12px;background:#f8fafc}
+.real-metrics-panel>div{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:12px}.real-metrics-panel span{display:block;color:#64748b;font-size:.68rem;font-weight:800}.real-metrics-panel strong{display:block;font-size:1.15rem;margin-top:4px}.real-metrics-panel small{grid-column:1/-1;color:#64748b;line-height:1.5}
+.site-content-body>.site-responsive-commercial,.site-content-body>picture{margin-bottom:16px}
+@media(max-width:640px){.site-banner-slot{padding:10px 14px}.site-commercial-section{padding:28px 14px!important}.site-ad-disclosure{left:14px;top:10px}.site-responsive-commercial img{max-height:210px}.real-metrics-panel{grid-template-columns:1fr}.real-metrics-panel small{grid-column:auto}.site-commercial-cta{right:8px;bottom:8px;padding:6px 9px}}

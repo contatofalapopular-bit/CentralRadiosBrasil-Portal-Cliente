@@ -1,29 +1,18 @@
-# Portal do Cliente v2.3.0 — Versão final consolidada
+# Portal do Cliente — Central Rádios Brasil
 
-Base anterior: **v2.3.0 — Etapa 2: Promoções e Eventos**.
+## v2.4.0 — Etapa 1: Publicidade e Banners
 
-Esta entrega consolida, em uma única versão estável, os módulos:
+Base: v2.3.0 Final Consolidada.
 
-- Podcasts;
-- Vídeos;
-- Promoções;
-- Eventos.
+### Incluído
+- Cadastro reutilizável de anunciantes e contatos comerciais.
+- Campanhas vinculadas a anunciantes, com posição, formato, período, prioridade e situação automática.
+- Peças responsivas separadas para desktop e celular.
+- Banners editoriais, comerciais e institucionais com período, prioridade e posições na prévia.
+- Filtros, ordenação, duplicação segura, validações e visualização completa.
+- Métricas somente quando recebidas de fonte real; a prévia não incrementa impressões ou cliques.
+- Compatibilidade com registros antigos de publicidade e banners.
+- Persistência no Worker/D1 atual, sem migração SQL.
 
-Também preserva integralmente as entregas anteriores de usabilidade, prévia, programação, locutores, notícias, temas e auditoria funcional.
-
-## Correções da consolidação
-
-- A programação só mostra **AGORA** quando o dia e o horário realmente correspondem ao programa.
-- A grade completa é ordenada de forma consistente por dia e horário.
-- Os botões de reprodução da prévia passam a manter o mesmo estado visual.
-- A navegação do cabeçalho e do rodapé exibe apenas seções realmente disponíveis.
-- Registros legados sem campo de destaque não são mais marcados automaticamente como destacados durante a edição.
-- O Dashboard ganhou um resumo integrado dos quatro módulos da v2.3.0.
-- Identificação interna atualizada para `2.3.0-final` e schema interno `5`.
-
-## Compatibilidade
-
-- Nenhuma migração SQL é necessária.
-- O formato atual do Worker/D1 foi preservado.
-- Registros das etapas anteriores continuam compatíveis.
-- A publicação continua supervisionada pela Central Rádios Brasil.
+### Instalação
+Publique os arquivos sobre a v2.3.0 Final Consolidada, preservando um backup anterior. Depois use Ctrl + F5.

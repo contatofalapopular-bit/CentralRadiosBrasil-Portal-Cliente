@@ -1,16 +1,21 @@
 CENTRAL RÁDIOS BRASIL — PORTAL DO CLIENTE
-VERSÃO: 2.3.0 FINAL CONSOLIDADA
-DATA: 04/08/2026
+VERSÃO: 2.4.0 — ETAPA 1: PUBLICIDADE E BANNERS
 
-STATUS: APROVADA PARA INSTALAÇÃO E VALIDAÇÃO DO USUÁRIO
+VALIDAÇÃO ESTÁTICA
+- JavaScript validado com node --check: APROVADO
+- Estrutura do pacote: APROVADA
+- Versionamento interno: 2.4.0-etapa-1
+- Schema interno CMS: 6
+- Migração SQL: NÃO NECESSÁRIA
 
-VALIDAÇÕES:
-- Sintaxe JavaScript: aprovada
-- Auditoria integrada em Chromium: 63/63
+VALIDAÇÃO EM NAVEGADOR CHROMIUM
+- Regressão integrada: 64/64
+- Publicidade e banners: 38/38
+- Total: 102/102
 - Exceções JavaScript: 0
 - Erros de console: 0
-- Migração SQL: não necessária
-- Worker/D1 de produção alterado durante testes: não
 
-PRÓXIMA VERSÃO DO ROADMAP:
-v2.4.0 — Publicidade, banners, parceiros e popups.
+SEGURANÇA DOS DADOS
+- API simulada durante os testes
+- Nenhum dado de produção alterado
+- A prévia não fabrica impressões ou cliques

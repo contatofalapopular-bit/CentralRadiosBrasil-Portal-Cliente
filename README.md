@@ -1,4 +1,19 @@
-# Portal do Cliente v2.2.0 — Etapa 2 Editorial e Temas
+# Portal do Cliente v2.2.1 — Auditoria Funcional
+
+Correção incremental sobre a v2.2.0. Mantém a arquitetura Worker + D1 e adiciona auditoria funcional dos botões, ícones e conteúdos salvos.
+
+## Correções principais
+
+- seta **Ver grade completa** abre toda a programação;
+- notícias salvas abrem o conteúdo completo;
+- vídeos salvos abrem player incorporado ou link externo;
+- podcasts abrem o áudio salvo;
+- cards de promoções, eventos, equipe e galeria abrem detalhes;
+- links de navegação, WhatsApp, aplicativo, redes sociais, parceiros e publicidade foram vinculados;
+- cada tabela de conteúdo ganhou o botão **Visualizar**;
+- navegação por teclado e foco visível nos cards interativos.
+
+## Base preservada: v2.2.0 — Etapa 2 Editorial e Temas
 
 Evolução da base v2.0.0 aprovada pelo usuário.
 

@@ -195,7 +195,7 @@
   function defaultState() {
     const today = new Date().toISOString().slice(0, 10);
     return {
-      version: "2.2.0",
+      version: "2.2.1",
       updatedAt: new Date().toISOString(),
       status: "rascunho",
       selectedTheme: "morada",
@@ -440,7 +440,7 @@
       </div>
       <div class="grid-2 equal" style="margin-top:18px">
         <section class="card"><header class="card-header"><div><h3>Dados reais, sem números inventados</h3><p>Audiência e ouvintes.</p></div></header><div class="card-body"><div class="notice">O painel não exibe audiência fictícia. O número de ouvintes só será mostrado quando existir uma fonte técnica confiável do streaming.</div></div></section>
-        <section class="card"><header class="card-header"><div><h3>Integração ativa</h3><p>Ambiente utilizado nesta instalação.</p></div></header><div class="card-body"><div class="code-box">Portal: ${escapeHTML(CONFIG.VERSION || "2.2.0")}\nWorker: ${escapeHTML(CONFIG.WORKER_URL || "—")}\nPersistência: Cloudflare D1\nMídias: API do site\nPublicação: supervisionada pela Central</div></div></section>
+        <section class="card"><header class="card-header"><div><h3>Integração ativa</h3><p>Ambiente utilizado nesta instalação.</p></div></header><div class="card-body"><div class="code-box">Portal: ${escapeHTML(CONFIG.VERSION || "2.2.1")}\nWorker: ${escapeHTML(CONFIG.WORKER_URL || "—")}\nPersistência: Cloudflare D1\nMídias: API do site\nPublicação: supervisionada pela Central</div></div></section>
       </div>`;
     bindGoButtons(root);
   }
@@ -677,7 +677,7 @@
         return `<article class="theme-card ${theme.id === state.selectedTheme ? "selected" : ""}" data-theme-card="${theme.id}">${theme.id === state.selectedTheme ? `<span class="theme-selected-tag">Tema ativo</span>` : ""}<div class="theme-shot" style="--shot-bg:${bg};--shot-dark:${dark};--shot-accent:${accent};--shot-highlight:${highlight};--shot-muted:${highlight}22">${themeShotMarkup(theme)}</div><div class="theme-meta"><span class="theme-layout-label">Composição ${escapeHTML(themeLayoutLabel(theme.layout))}</span><h3>${escapeHTML(theme.name)}</h3><p>${escapeHTML(theme.description)}</p><button class="button ${theme.id === state.selectedTheme ? "secondary" : "primary"} small" data-select-theme="${theme.id}" type="button">${theme.id === state.selectedTheme ? "Selecionado" : "Usar este tema"}</button> <button class="button ghost small" data-theme-preview="${theme.id}" type="button">Visualizar</button></div></article>`;
       }).join("")}</div>`;
     $$('[data-select-theme]', root).forEach(button => button.addEventListener("click", () => { state.selectedTheme = button.dataset.selectTheme; persist(); renderPage(); }));
-    $$('[data-theme-preview]', root).forEach(button => button.addEventListener("click", () => { const old = state.selectedTheme; state.selectedTheme = button.dataset.themePreview; openPreview(); state.selectedTheme = old; }));
+    $$('[data-theme-preview]', root).forEach(button => button.addEventListener("click", () => openPreview(button.dataset.themePreview)));
   }
 
   function editorialStats(key, items) {
@@ -730,6 +730,7 @@
     $("#collection-search").addEventListener("input", event => { searchTerm = event.target.value; renderCollection(root,key); $("#collection-search")?.focus(); });
     $("#collection-filter")?.addEventListener("change", event => { collectionFilter=event.target.value; renderCollection(root,key); });
     $("#collection-context-filter")?.addEventListener("change", event => { collectionFilter=event.target.value; renderCollection(root,key); });
+    $$('[data-view-item]', root).forEach(button => button.addEventListener("click", () => openSiteDetail(key,button.dataset.viewItem)));
     $$('[data-edit-item]', root).forEach(button => button.addEventListener("click", () => openItemModal(key,button.dataset.editItem)));
     $$('[data-duplicate-item]', root).forEach(button => button.addEventListener("click", () => duplicateItem(key,button.dataset.duplicateItem)));
     $$('[data-delete-item]', root).forEach(button => button.addEventListener("click", () => deleteItem(key,button.dataset.deleteItem)));
@@ -747,7 +748,7 @@
   function collectionRow(schema,key,item) {
     const imageKey = ["imagem","foto","logo"].find(name => item[name]);
     const description = item.descricao || item.resumo || item.bio || (key === "noticias" ? item.tags : "") || "Sem descrição";
-    return `<tr><td><div class="row-main">${imageKey ? `<img class="row-thumb" src="${item[imageKey]}" alt="">` : `<span class="row-thumb row-thumb-placeholder">${escapeHTML((item.titulo || item.nome || "CR").slice(0,2).toUpperCase())}</span>`}<div><strong>${escapeHTML(item.titulo || item.nome || "Sem título")}</strong><small>${escapeHTML(description)}</small></div></div></td><td>${escapeHTML(schema.summary ? schema.summary(item) : "—")}</td><td>${collectionStatus(key,item)}</td><td><div class="row-actions"><button class="button small secondary" data-edit-item="${item.id}" type="button">Editar</button><button class="button small ghost" data-duplicate-item="${item.id}" type="button">Duplicar</button><button class="button small danger" data-delete-item="${item.id}" type="button">Excluir</button></div></td></tr>`;
+    return `<tr><td><div class="row-main">${imageKey ? `<img class="row-thumb" src="${item[imageKey]}" alt="">` : `<span class="row-thumb row-thumb-placeholder">${escapeHTML((item.titulo || item.nome || "CR").slice(0,2).toUpperCase())}</span>`}<div><strong>${escapeHTML(item.titulo || item.nome || "Sem título")}</strong><small>${escapeHTML(description)}</small></div></div></td><td>${escapeHTML(schema.summary ? schema.summary(item) : "—")}</td><td>${collectionStatus(key,item)}</td><td><div class="row-actions"><button class="button small ghost" data-view-item="${item.id}" type="button">Visualizar</button><button class="button small secondary" data-edit-item="${item.id}" type="button">Editar</button><button class="button small ghost" data-duplicate-item="${item.id}" type="button">Duplicar</button><button class="button small danger" data-delete-item="${item.id}" type="button">Excluir</button></div></td></tr>`;
   }
 
   function openItemModal(key,id=null) {
@@ -952,7 +953,7 @@
         <section class="card"><div class="card-body"><h3>Exportar JSON</h3><p class="field-help">Baixa configurações, módulos, temas e conteúdos.</p><button class="button primary" id="export-backup" type="button">Baixar backup</button></div></section>
         <section class="card"><div class="card-body"><h3>Importar JSON</h3><p class="field-help">Carrega o arquivo no editor; clique em Salvar rascunho para gravar no D1.</p><button class="button secondary" id="import-backup" type="button">Selecionar arquivo</button></div></section>
         <section class="card"><div class="card-body"><h3>Recarregar do servidor</h3><p class="field-help">Descarta alterações ainda não salvas e recarrega o último rascunho do servidor.</p><button class="button danger" id="reset-demo" type="button">Recarregar dados</button></div></section>
-      </div><section class="card" style="margin-top:18px"><header class="card-header"><div><h3>Sobre esta instalação</h3><p>Informações técnicas.</p></div></header><div class="card-body"><div class="code-box">Modo: produção integrada\nVersão: ${CONFIG.VERSION || "2.2.0"}\nPersistência: Cloudflare D1\nAPI: ${CONFIG.WORKER_URL || "não configurada"}\nÚltima alteração: ${formatDateTime(state.updatedAt)}</div></div></section>`;
+      </div><section class="card" style="margin-top:18px"><header class="card-header"><div><h3>Sobre esta instalação</h3><p>Informações técnicas.</p></div></header><div class="card-body"><div class="code-box">Modo: produção integrada\nVersão: ${CONFIG.VERSION || "2.2.1"}\nPersistência: Cloudflare D1\nAPI: ${CONFIG.WORKER_URL || "não configurada"}\nÚltima alteração: ${formatDateTime(state.updatedAt)}</div></div></section>`;
     $("#export-backup").addEventListener("click",exportBackup);
     $("#import-backup").addEventListener("click",()=>$("#backup-import").click());
     $("#reset-demo").addEventListener("click",()=>{if(confirm("Descartar alterações não salvas e recarregar o rascunho do servidor?")) loadAll();});
@@ -1029,31 +1030,166 @@
     else if (state.selectedTheme === "young") body=`${siteHeader(r)}<div class="theme-stage theme-stage-young">${section("player")}${section("hero")}</div><div class="theme-young-featured">${section("promocoes")}${section("videos")}</div>${rest(new Set(["hero","player","promocoes","videos"]))}`;
     else if (state.selectedTheme === "custom") body=`${siteHeader(r)}<div class="theme-stage theme-stage-clean">${section("hero")}${section("player")}</div>${rest(new Set(["hero","player"]))}`;
     else body=`${siteHeader(r)}${ordered.filter(id=>enabled.has(id)&&sections[id]).map(id=>sections[id]()).join("")}`;
-    container.innerHTML = `<div class="site-preview theme-${state.selectedTheme}" style="${customStyle}${r.hero ? `--hero-image:url('${r.hero}')` : ""}">${body}${siteFooter(r)}</div>`;
-    $$('[data-site-play]',container).forEach(play=>play.addEventListener("click",()=>toggleAudio(play)));
+    container.innerHTML = `<div class="site-preview theme-${state.selectedTheme}" data-site-section="inicio" style="${customStyle}${r.hero ? `--hero-image:url('${r.hero}')` : ""}">${body}${siteFooter(r)}</div>`;
+    bindSitePreviewInteractions(container);
+  }
+
+  function socialEntries() {
+    const d=state.integrations.redes || {};
+    return [
+      ["facebook","f","Facebook"], ["instagram","in","Instagram"], ["youtube","▶","YouTube"],
+      ["tiktok","♪","TikTok"], ["x","X","X"], ["spotify","●","Spotify"]
+    ].filter(([key])=>safeExternalURL(d[key])).map(([key,icon,label])=>({key,icon,label,url:safeExternalURL(d[key])}));
   }
 
   function siteHeader(r) {
-    return `<div class="site-topline"><span>${escapeHTML(r.cidade)} • ${escapeHTML(r.estado)} — Informação e música ao vivo</span><div class="site-social"><span>f</span><span>in</span><span>▶</span></div></div><header class="site-header"><div class="site-logo">${r.logo?`<img src="${r.logo}" alt="Logomarca">`:`<span class="site-logo-placeholder">CRB</span>`}<div><strong>${escapeHTML(r.nome)}</strong><small>${escapeHTML(r.slogan)}</small></div></div><nav class="site-nav"><a href="#">Início</a><a href="#">Notícias</a><a href="#">Programação</a><a href="#">Promoções</a><a href="#">Equipe</a><a href="#">Contato</a></nav><div class="site-header-actions"><button class="site-wa-button" type="button">WhatsApp</button><button class="site-live-button" data-site-play type="button"><span class="site-live-dot"></span>OUVIR AO VIVO</button></div></header>`;
+    const socials=socialEntries();
+    return `<div class="site-topline"><span>${escapeHTML(r.cidade)} • ${escapeHTML(r.estado)} — Informação e música ao vivo</span>${socials.length?`<div class="site-social">${socials.map(item=>`<a href="${escapeHTML(item.url)}" target="_blank" rel="noopener noreferrer" aria-label="Abrir ${escapeHTML(item.label)}" title="${escapeHTML(item.label)}">${escapeHTML(item.icon)}</a>`).join("")}</div>`:""}</div><header class="site-header"><button class="site-logo site-logo-button" data-site-scroll="inicio" type="button" aria-label="Voltar ao início">${r.logo?`<img src="${r.logo}" alt="Logomarca">`:`<span class="site-logo-placeholder">CRB</span>`}<span><strong>${escapeHTML(r.nome)}</strong><small>${escapeHTML(r.slogan)}</small></span></button><nav class="site-nav" aria-label="Navegação da prévia"><a href="#" data-site-scroll="inicio">Início</a><a href="#" data-site-scroll="noticias">Notícias</a><a href="#" data-site-scroll="programacao">Programação</a><a href="#" data-site-scroll="promocoes">Promoções</a><a href="#" data-site-scroll="equipe">Equipe</a><a href="#" data-site-scroll="contato">Contato</a></nav><div class="site-header-actions"><button class="site-wa-button" data-site-action="whatsapp" type="button">WhatsApp</button><button class="site-live-button" data-site-play type="button"><span class="site-live-dot"></span>OUVIR AO VIVO</button></div></header>`;
   }
 
-  function siteHero(r) { return `<section class="site-hero"><div class="site-hero-content"><span class="site-kicker">● Rádio e notícias de ${escapeHTML(r.cidade)}</span><h1>${escapeHTML(r.slogan || r.nome)}</h1><p>${escapeHTML(r.descricao)}</p><div class="site-hero-actions"><button class="primary" data-site-play type="button">▶ Ouvir agora</button><button class="secondary" type="button">Conheça a programação</button></div></div></section>`; }
-  function sitePlayer(r) { return `<div class="site-player-wrap"><section class="site-player"><div class="site-cover">${r.playerImage?`<img src="${r.playerImage}" alt="Capa do player">`:`♫`}</div><div class="site-track"><span>Ao vivo agora</span><strong>${escapeHTML(r.musicaAtual||"Transmissão ao vivo")}</strong><small>${escapeHTML(r.locutorAtual||"Programação da rádio")}</small></div><div class="site-player-controls"><button class="site-app" type="button">Baixar app</button><button class="site-play" data-site-play type="button">▶</button></div></section></div>`; }
-  function siteProgramming() { const items=[...state.content.programacao].filter(i=>i.ativo!==false).sort((a,b)=>compareTime(a.inicio,b.inicio)).slice(0,4); return `<section class="site-section"><div class="site-section-head"><div><span>No ar e próximos</span><h2>Programação</h2><p>Conteúdo organizado por dia e horário.</p></div><strong class="site-section-link">Ver grade completa →</strong></div><div class="site-program-grid">${items.map((i,index)=>`<article class="site-program-card ${index===0?"live":""}" style="${i.cor?`--program-color:${i.cor}`:""}"><div class="site-program-time">${index===0?"AGORA":escapeHTML(i.inicio||"")}</div><strong>${escapeHTML(i.titulo)}</strong><small>${escapeHTML(i.locutor||formatDays(i.dias||i.dia))}</small></article>`).join("")}</div></section>`; }
-  function siteNews() { const items=[...state.content.noticias].filter(isNewsVisible).sort((a,b)=>Number(Boolean(b.destaque))-Number(Boolean(a.destaque)) || String(`${b.data||""}${b.hora||""}`).localeCompare(String(`${a.data||""}${a.hora||""}`))).slice(0,4); return `<section class="site-section alt"><div class="site-section-head"><div><span>Informação</span><h2>Últimas notícias</h2><p>Cidade, esporte, agronegócio e os assuntos do dia.</p></div><strong class="site-section-link">Todas as notícias →</strong></div><div class="site-news-grid">${items.map((i,index)=>`<article class="site-news-card ${index===0?"featured":""}"><div class="site-news-image">${i.imagem?`<img src="${i.imagem}" alt="">`:""}</div><div class="site-news-body"><span>${escapeHTML(i.categoria||"Notícias")}</span><h3>${escapeHTML(i.titulo)}</h3><p>${escapeHTML(i.resumo||"")}</p><small class="site-news-meta">${escapeHTML(i.autor||"")} ${i.data?`• ${formatDate(i.data)}`:""}</small></div></article>`).join("")}</div></section>`; }
-  function sitePromotions() { const items=state.content.promocoes.filter(i=>i.ativo!==false).slice(0,3); if(!items.length)return ""; return `<section class="site-section"><div class="site-section-head"><div><span>Participe</span><h2>Promoções</h2><p>Ações para aproximar a rádio e seus ouvintes.</p></div></div><div class="site-promo-grid">${items.map(i=>`<article class="site-promo-card" style="${i.imagem?`--card-image:url('${i.imagem}')`:""}"><span>Promoção</span><strong>${escapeHTML(i.titulo)}</strong><small>${escapeHTML(i.descricao||"")}</small></article>`).join("")}</div></section>`; }
-  function sitePodcasts() { const items=state.content.podcasts.filter(i=>i.ativo!==false).slice(0,3); if(!items.length)return ""; return `<section class="site-section dark"><div class="site-section-head"><div><span>Ouça quando quiser</span><h2>Podcasts</h2><p>Entrevistas, boletins e programas gravados.</p></div></div><div class="site-podcast-grid">${items.map(i=>`<article class="site-podcast-card"><div class="site-podcast-cover">${i.imagem?`<img src="${i.imagem}" alt="">`:`◉`}</div><div><strong>${escapeHTML(i.titulo)}</strong><small>${escapeHTML(i.programa||i.descricao||"")}</small></div></article>`).join("")}</div></section>`; }
-  function siteVideos() { const items=state.content.videos.filter(i=>i.ativo!==false).slice(0,3); if(!items.length)return ""; return `<section class="site-section alt"><div class="site-section-head"><div><span>Assista</span><h2>Vídeos</h2><p>Entrevistas, música e bastidores.</p></div></div><div class="site-news-grid">${items.map((i,index)=>`<article class="site-news-card ${index===0?"featured":""}"><div class="site-news-image">${i.imagem?`<img src="${i.imagem}" alt="">`:""}</div><div class="site-news-body"><span>${escapeHTML(i.categoria||"Vídeo")}</span><h3>▶ ${escapeHTML(i.titulo)}</h3><p>${escapeHTML(i.descricao||"")}</p></div></article>`).join("")}</div></section>`; }
-  function siteTeam() { const items=[...state.content.locutores].sort((a,b)=>Number(a.ordem||999)-Number(b.ordem||999)).concat(state.content.equipe).filter(i=>i.ativo!==false).slice(0,5); if(!items.length)return ""; return `<section class="site-section"><div class="site-section-head"><div><span>Quem faz</span><h2>Nossa equipe</h2><p>As vozes e profissionais da emissora.</p></div></div><div class="site-team-grid">${items.map(i=>`<article class="site-team-card"><div class="site-team-photo">${i.foto?`<img src="${i.foto}" alt="">`:""}</div><strong>${escapeHTML(i.nome)}</strong><small>${escapeHTML(i.cargo||"")}</small></article>`).join("")}</div></section>`; }
-  function siteGallery() { const items=state.content.galeria.filter(i=>i.ativo!==false).slice(0,5); if(!items.length)return ""; return `<section class="site-section alt"><div class="site-section-head"><div><span>Imagens</span><h2>Galeria</h2><p>Eventos, bastidores e momentos da rádio.</p></div></div><div class="site-gallery-grid">${items.map(i=>`<div>${i.imagem?`<img src="${i.imagem}" alt="${escapeHTML(i.titulo)}">`:""}</div>`).join("")}</div></section>`; }
-  function siteEvents() { const items=state.content.eventos.filter(i=>i.ativo!==false).slice(0,3); if(!items.length)return ""; return `<section class="site-section"><div class="site-section-head"><div><span>Agenda</span><h2>Próximos eventos</h2></div></div><div class="site-promo-grid">${items.map(i=>`<article class="site-promo-card" style="${i.imagem?`--card-image:url('${i.imagem}')`:""}"><span>${formatDate(i.data)}</span><strong>${escapeHTML(i.titulo)}</strong><small>${escapeHTML(i.local||"")}</small></article>`).join("")}</div></section>`; }
-  function siteAdvertising() { const item=state.content.publicidade.find(i=>i.ativo!==false); if(!item)return ""; return `<section class="site-section"><div class="site-sponsor" style="height:80px">${item.imagem?`<img src="${item.imagem}" alt="Publicidade">`:`ESPAÇO PUBLICITÁRIO`}</div></section>`; }
-  function sitePartners() { const items=state.content.parceiros.filter(i=>i.ativo!==false).slice(0,6); if(!items.length)return ""; return `<section class="site-section alt"><div class="site-section-head"><div><span>Apoio</span><h2>Patrocinadores</h2></div></div><div class="site-sponsor-grid">${items.map(i=>`<div class="site-sponsor">${i.logo?`<img src="${i.logo}" alt="${escapeHTML(i.nome)}">`:escapeHTML(i.nome)}</div>`).join("")}</div></section>`; }
-  function siteApp() { const d=state.integrations.aplicativo; return `<section class="site-section dark"><div class="site-section-head"><div><span>Leve a rádio com você</span><h2>Baixe nosso aplicativo</h2><p>Ouça a programação no celular e receba novidades.</p></div><button class="site-live-button" type="button">Baixar aplicativo</button></div></section>`; }
-  function siteContact() { return `<section class="site-section"><div class="site-section-head"><div><span>Fale com a rádio</span><h2>Contato e participação</h2><p>WhatsApp, pedidos de música, comercial e jornalismo.</p></div><button class="site-wa-button" type="button">Abrir WhatsApp</button></div></section>`; }
-  function siteFooter(r) { return `<footer class="site-footer"><div class="site-footer-grid"><div><h3>${escapeHTML(r.nome)}</h3><p>${escapeHTML(r.descricao)}</p></div><div><h3>Navegação</h3><p>Início<br>Notícias<br>Programação<br>Promoções</p></div><div><h3>Contato</h3><p>${escapeHTML(r.email)}<br>${escapeHTML(r.telefone)}<br>${escapeHTML(r.endereco)}</p></div><div><h3>Anuncie</h3><p>Apresente sua marca aos ouvintes da rádio.</p></div></div><div class="site-footer-bottom"><span>© ${new Date().getFullYear()} ${escapeHTML(r.nome)}</span><span>Site administrado pela Central Rádios Brasil</span></div></footer>`; }
+  function siteHero(r) { return `<section class="site-hero" data-site-section="hero"><div class="site-hero-content"><span class="site-kicker">● Rádio e notícias de ${escapeHTML(r.cidade)}</span><h1>${escapeHTML(r.slogan || r.nome)}</h1><p>${escapeHTML(r.descricao)}</p><div class="site-hero-actions"><button class="primary" data-site-play type="button">▶ Ouvir agora</button><button class="secondary" data-site-scroll="programacao" type="button">Conheça a programação</button></div></div></section>`; }
+  function sitePlayer(r) { return `<div class="site-player-wrap" data-site-section="player"><section class="site-player"><div class="site-cover">${r.playerImage?`<img src="${r.playerImage}" alt="Capa do player">`:`♫`}</div><div class="site-track"><span>Ao vivo agora</span><strong>${escapeHTML(r.musicaAtual||"Transmissão ao vivo")}</strong><small>${escapeHTML(r.locutorAtual||"Programação da rádio")}</small></div><div class="site-player-controls"><button class="site-app" data-site-action="app" type="button">Baixar app</button><button class="site-play" data-site-play type="button" aria-label="Reproduzir ou pausar transmissão">▶</button></div></section></div>`; }
+  function siteProgramming() { const items=[...state.content.programacao].filter(i=>i.ativo!==false).sort((a,b)=>compareTime(a.inicio,b.inicio)).slice(0,4); return `<section class="site-section" data-site-section="programacao"><div class="site-section-head"><div><span>No ar e próximos</span><h2>Programação</h2><p>Conteúdo organizado por dia e horário.</p></div><button class="site-section-link" data-site-list="programacao" type="button">Ver grade completa →</button></div><div class="site-program-grid">${items.map((i,index)=>`<article class="site-program-card ${index===0?"live":""}" data-site-open="programacao" data-site-id="${escapeHTML(i.id)}" role="button" tabindex="0" aria-label="Abrir programa ${escapeHTML(i.titulo)}" style="${i.cor?`--program-color:${i.cor}`:""}"><div class="site-program-time">${index===0?"AGORA":escapeHTML(i.inicio||"")}</div><strong>${escapeHTML(i.titulo)}</strong><small>${escapeHTML(i.locutor||formatDays(i.dias||i.dia))}</small></article>`).join("")}</div></section>`; }
+  function siteNews() { const items=[...state.content.noticias].filter(isNewsVisible).sort((a,b)=>Number(Boolean(b.destaque))-Number(Boolean(a.destaque)) || String(`${b.data||""}${b.hora||""}`).localeCompare(String(`${a.data||""}${a.hora||""}`))).slice(0,4); return `<section class="site-section alt" data-site-section="noticias"><div class="site-section-head"><div><span>Informação</span><h2>Últimas notícias</h2><p>Cidade, esporte, agronegócio e os assuntos do dia.</p></div><button class="site-section-link" data-site-list="noticias" type="button">Todas as notícias →</button></div><div class="site-news-grid">${items.map((i,index)=>`<article class="site-news-card ${index===0?"featured":""}" data-site-open="noticias" data-site-id="${escapeHTML(i.id)}" role="button" tabindex="0" aria-label="Abrir notícia ${escapeHTML(i.titulo)}"><div class="site-news-image">${i.imagem?`<img src="${i.imagem}" alt="Capa da notícia ${escapeHTML(i.titulo)}">`:""}</div><div class="site-news-body"><span>${escapeHTML(i.categoria||"Notícias")}</span><h3>${escapeHTML(i.titulo)}</h3><p>${escapeHTML(i.resumo||"")}</p><small class="site-news-meta">${escapeHTML(i.autor||"")} ${i.data?`• ${formatDate(i.data)}`:""}</small></div></article>`).join("")}</div></section>`; }
+  function sitePromotions() { const items=state.content.promocoes.filter(i=>i.ativo!==false).slice(0,3); if(!items.length)return ""; return `<section class="site-section" data-site-section="promocoes"><div class="site-section-head"><div><span>Participe</span><h2>Promoções</h2><p>Ações para aproximar a rádio e seus ouvintes.</p></div><button class="site-section-link" data-site-list="promocoes" type="button">Ver todas →</button></div><div class="site-promo-grid">${items.map(i=>`<article class="site-promo-card" data-site-open="promocoes" data-site-id="${escapeHTML(i.id)}" role="button" tabindex="0" aria-label="Abrir promoção ${escapeHTML(i.titulo)}" style="${i.imagem?`--card-image:url('${i.imagem}')`:""}"><span>Promoção</span><strong>${escapeHTML(i.titulo)}</strong><small>${escapeHTML(i.descricao||"")}</small></article>`).join("")}</div></section>`; }
+  function sitePodcasts() { const items=state.content.podcasts.filter(i=>i.ativo!==false).slice(0,3); if(!items.length)return ""; return `<section class="site-section dark" data-site-section="podcasts"><div class="site-section-head"><div><span>Ouça quando quiser</span><h2>Podcasts</h2><p>Entrevistas, boletins e programas gravados.</p></div><button class="site-section-link" data-site-list="podcasts" type="button">Todos os episódios →</button></div><div class="site-podcast-grid">${items.map(i=>`<article class="site-podcast-card" data-site-open="podcasts" data-site-id="${escapeHTML(i.id)}" role="button" tabindex="0" aria-label="Abrir podcast ${escapeHTML(i.titulo)}"><div class="site-podcast-cover">${i.imagem?`<img src="${i.imagem}" alt="Capa de ${escapeHTML(i.titulo)}">`:`◉`}</div><div><strong>${escapeHTML(i.titulo)}</strong><small>${escapeHTML(i.programa||i.descricao||"")}</small></div></article>`).join("")}</div></section>`; }
+  function siteVideos() { const items=state.content.videos.filter(i=>i.ativo!==false).slice(0,3); if(!items.length)return ""; return `<section class="site-section alt" data-site-section="videos"><div class="site-section-head"><div><span>Assista</span><h2>Vídeos</h2><p>Entrevistas, música e bastidores.</p></div><button class="site-section-link" data-site-list="videos" type="button">Todos os vídeos →</button></div><div class="site-news-grid">${items.map((i,index)=>`<article class="site-news-card ${index===0?"featured":""}" data-site-open="videos" data-site-id="${escapeHTML(i.id)}" role="button" tabindex="0" aria-label="Abrir vídeo ${escapeHTML(i.titulo)}"><div class="site-news-image site-video-thumb">${i.imagem?`<img src="${i.imagem}" alt="Miniatura de ${escapeHTML(i.titulo)}">`:""}<span class="site-video-play" aria-hidden="true">▶</span></div><div class="site-news-body"><span>${escapeHTML(i.categoria||"Vídeo")}</span><h3>${escapeHTML(i.titulo)}</h3><p>${escapeHTML(i.descricao||"")}</p></div></article>`).join("")}</div></section>`; }
+  function siteTeam() { const items=[...state.content.locutores].sort((a,b)=>Number(a.ordem||999)-Number(b.ordem||999)).concat(state.content.equipe).filter(i=>i.ativo!==false).slice(0,5); if(!items.length)return ""; return `<section class="site-section" data-site-section="equipe"><div class="site-section-head"><div><span>Quem faz</span><h2>Nossa equipe</h2><p>As vozes e profissionais da emissora.</p></div><button class="site-section-link" data-site-list="equipe" type="button">Conheça a equipe →</button></div><div class="site-team-grid">${items.map(i=>`<article class="site-team-card" data-site-open="${state.content.locutores.some(loc=>loc.id===i.id)?"locutores":"equipe"}" data-site-id="${escapeHTML(i.id)}" role="button" tabindex="0" aria-label="Abrir perfil de ${escapeHTML(i.nome)}"><div class="site-team-photo">${i.foto?`<img src="${i.foto}" alt="Foto de ${escapeHTML(i.nome)}">`:""}</div><strong>${escapeHTML(i.nome)}</strong><small>${escapeHTML(i.cargo||"")}</small></article>`).join("")}</div></section>`; }
+  function siteGallery() { const items=state.content.galeria.filter(i=>i.ativo!==false).slice(0,5); if(!items.length)return ""; return `<section class="site-section alt" data-site-section="galeria"><div class="site-section-head"><div><span>Imagens</span><h2>Galeria</h2><p>Eventos, bastidores e momentos da rádio.</p></div><button class="site-section-link" data-site-list="galeria" type="button">Ver galeria →</button></div><div class="site-gallery-grid">${items.map(i=>`<div data-site-open="galeria" data-site-id="${escapeHTML(i.id)}" role="button" tabindex="0" aria-label="Ampliar foto ${escapeHTML(i.titulo)}">${i.imagem?`<img src="${i.imagem}" alt="${escapeHTML(i.titulo)}">`:`<span class="site-gallery-placeholder">${escapeHTML(i.titulo||"Foto")}</span>`}</div>`).join("")}</div></section>`; }
+  function siteEvents() { const items=state.content.eventos.filter(i=>i.ativo!==false).slice(0,3); if(!items.length)return ""; return `<section class="site-section" data-site-section="eventos"><div class="site-section-head"><div><span>Agenda</span><h2>Próximos eventos</h2></div><button class="site-section-link" data-site-list="eventos" type="button">Agenda completa →</button></div><div class="site-promo-grid">${items.map(i=>`<article class="site-promo-card" data-site-open="eventos" data-site-id="${escapeHTML(i.id)}" role="button" tabindex="0" aria-label="Abrir evento ${escapeHTML(i.titulo)}" style="${i.imagem?`--card-image:url('${i.imagem}')`:""}"><span>${formatDate(i.data)}</span><strong>${escapeHTML(i.titulo)}</strong><small>${escapeHTML(i.local||"")}</small></article>`).join("")}</div></section>`; }
+  function siteAdvertising() { const item=state.content.publicidade.find(i=>i.ativo!==false); if(!item)return ""; const link=safeExternalURL(item.link); return `<section class="site-section" data-site-section="publicidade"><${link?"a":"button"} class="site-sponsor site-ad-link" ${link?`href="${escapeHTML(link)}" target="_blank" rel="noopener noreferrer"`:`data-site-open="publicidade" data-site-id="${escapeHTML(item.id)}" type="button"`} style="height:80px" aria-label="Abrir publicidade ${escapeHTML(item.titulo||item.anunciante||"")}">${item.imagem?`<img src="${item.imagem}" alt="Publicidade ${escapeHTML(item.titulo||"")}">`:`ESPAÇO PUBLICITÁRIO`}</${link?"a":"button"}></section>`; }
+  function sitePartners() { const items=state.content.parceiros.filter(i=>i.ativo!==false).slice(0,6); if(!items.length)return ""; return `<section class="site-section alt" data-site-section="parceiros"><div class="site-section-head"><div><span>Apoio</span><h2>Patrocinadores</h2></div></div><div class="site-sponsor-grid">${items.map(i=>{const link=safeExternalURL(i.link);return `<${link?"a":"button"} class="site-sponsor" ${link?`href="${escapeHTML(link)}" target="_blank" rel="noopener noreferrer"`:`data-site-open="parceiros" data-site-id="${escapeHTML(i.id)}" type="button"`} aria-label="Abrir parceiro ${escapeHTML(i.nome)}">${i.logo?`<img src="${i.logo}" alt="${escapeHTML(i.nome)}">`:escapeHTML(i.nome)}</${link?"a":"button"}>`;}).join("")}</div></section>`; }
+  function siteApp() { return `<section class="site-section dark" data-site-section="aplicativo"><div class="site-section-head"><div><span>Leve a rádio com você</span><h2>Baixe nosso aplicativo</h2><p>Ouça a programação no celular e receba novidades.</p></div><button class="site-live-button" data-site-action="app" type="button">Baixar aplicativo</button></div></section>`; }
+  function siteContact() { return `<section class="site-section" data-site-section="contato"><div class="site-section-head"><div><span>Fale com a rádio</span><h2>Contato e participação</h2><p>WhatsApp, pedidos de música, comercial e jornalismo.</p></div><button class="site-wa-button" data-site-action="whatsapp" type="button">Abrir WhatsApp</button></div></section>`; }
+  function siteFooter(r) { return `<footer class="site-footer"><div class="site-footer-grid"><div><h3>${escapeHTML(r.nome)}</h3><p>${escapeHTML(r.descricao)}</p></div><div><h3>Navegação</h3><p><a href="#" data-site-scroll="inicio">Início</a><br><a href="#" data-site-scroll="noticias">Notícias</a><br><a href="#" data-site-scroll="programacao">Programação</a><br><a href="#" data-site-scroll="promocoes">Promoções</a></p></div><div><h3>Contato</h3><p>${escapeHTML(r.email)}<br>${escapeHTML(r.telefone)}<br>${escapeHTML(r.endereco)}</p></div><div><h3>Anuncie</h3><p>Apresente sua marca aos ouvintes da rádio.</p><button class="site-footer-action" data-site-action="whatsapp" type="button">Falar com o comercial</button></div></div><div class="site-footer-bottom"><span>© ${new Date().getFullYear()} ${escapeHTML(r.nome)}</span><span>Site administrado pela Central Rádios Brasil</span></div></footer>`; }
+
+  function bindSitePreviewInteractions(container) {
+    if (container.dataset.siteInteractionsBound === "true") return;
+    container.dataset.siteInteractionsBound = "true";
+    container.addEventListener("click", event => {
+      const target=event.target.closest("[data-site-play],[data-site-scroll],[data-site-open],[data-site-list],[data-site-action]");
+      if (!target || !container.contains(target)) return;
+      if (target.matches("a")) event.preventDefault();
+      if (target.hasAttribute("data-site-play")) return toggleAudio(target);
+      if (target.dataset.siteScroll) return scrollPreviewTo(container,target.dataset.siteScroll);
+      if (target.dataset.siteOpen) return openSiteDetail(target.dataset.siteOpen,target.dataset.siteId);
+      if (target.dataset.siteList) return openSiteCollection(target.dataset.siteList);
+      if (target.dataset.siteAction) return runSiteAction(target.dataset.siteAction);
+    });
+    container.addEventListener("keydown", event => {
+      if (!["Enter"," "].includes(event.key)) return;
+      const target=event.target.closest("[data-site-open],[data-site-scroll],[data-site-list],[data-site-action]");
+      if (!target || !container.contains(target)) return;
+      event.preventDefault(); target.click();
+    });
+  }
+
+  function scrollPreviewTo(container,section) {
+    const target=$(`[data-site-section="${CSS.escape(section)}"]`,container);
+    if (!target) { notify(`A seção ${section} não está ativa nesta prévia.`,"error"); return; }
+    target.scrollIntoView({behavior:"smooth",block:"start"});
+  }
+
+  function safeExternalURL(value) {
+    if (!value) return "";
+    try { const url=new URL(String(value),window.location.href); return ["http:","https:"].includes(url.protocol)?url.href:""; }
+    catch { return ""; }
+  }
+
+  function runSiteAction(action) {
+    if (action === "whatsapp") {
+      const number=String(state.integrations.whatsapp?.numero || state.radio.whatsapp || "").replace(/\D/g,"");
+      if (!number) { notify("Configure o número do WhatsApp antes de testar este botão.","error"); return; }
+      const message=encodeURIComponent(state.integrations.whatsapp?.mensagem || "Olá! Vim pelo site da rádio.");
+      window.open(`https://wa.me/${number}?text=${message}`,"_blank","noopener"); return;
+    }
+    if (action === "app") {
+      const app=state.integrations.aplicativo || {};
+      const preferred=/iPhone|iPad|iPod/i.test(navigator.userAgent)?app.ios:app.android;
+      const url=safeExternalURL(preferred)||safeExternalURL(app.android)||safeExternalURL(app.ios);
+      if (url) { window.open(url,"_blank","noopener"); return; }
+      if (app.pwa) { notify("O PWA está ativo. No site publicado, a instalação será oferecida pelo navegador.","success"); return; }
+      notify("Cadastre um link da Google Play, App Store ou ative o PWA.","error");
+    }
+  }
+
+  function contentItem(key,id) { return (state.content[key] || []).find(item=>String(item.id)===String(id)); }
+  function multilineHTML(value) { const text=escapeHTML(value || "").trim(); return text?`<p>${text.replace(/\n{2,}/g,"</p><p>").replace(/\n/g,"<br>")}</p>`:"<p>Sem conteúdo adicional cadastrado.</p>"; }
+  function detailImage(item,key="imagem") { return item?.[key]?`<img class="site-detail-cover" src="${item[key]}" alt="${escapeHTML(item.titulo||item.nome||"Conteúdo")}">`:""; }
+  function detailMeta(parts) { const values=parts.filter(Boolean); return values.length?`<div class="site-detail-meta">${values.map(value=>`<span>${escapeHTML(value)}</span>`).join("")}</div>`:""; }
+
+  function videoPlayerHTML(urlValue,title) {
+    const url=safeExternalURL(urlValue);
+    if (!url) return `<div class="site-detail-notice">Este vídeo foi salvo sem um endereço válido. Edite o cadastro e informe a URL do vídeo.</div>`;
+    try {
+      const parsed=new URL(url); let id="";
+      if (["youtube.com","www.youtube.com","m.youtube.com"].includes(parsed.hostname)) id=parsed.searchParams.get("v") || parsed.pathname.split("/").filter(Boolean).pop();
+      if (parsed.hostname === "youtu.be") id=parsed.pathname.split("/").filter(Boolean)[0] || "";
+      if (id) return `<div class="site-video-frame"><iframe src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(id)}" title="${escapeHTML(title)}" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>`;
+      if (["vimeo.com","www.vimeo.com","player.vimeo.com"].includes(parsed.hostname)) { const vid=parsed.pathname.split("/").filter(Boolean).find(part=>/^\d+$/.test(part)); if(vid)return `<div class="site-video-frame"><iframe src="https://player.vimeo.com/video/${vid}" title="${escapeHTML(title)}" loading="lazy" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe></div>`; }
+      if (/\.(mp4|webm|ogg)(?:$|\?)/i.test(url)) return `<video class="site-native-video" src="${escapeHTML(url)}" controls preload="metadata">Seu navegador não suporta vídeo.</video>`;
+    } catch {}
+    return `<div class="site-detail-notice">A prévia não reconheceu um formato incorporável.</div><a class="button primary site-detail-external" href="${escapeHTML(url)}" target="_blank" rel="noopener noreferrer">Abrir vídeo salvo</a>`;
+  }
+
+  function podcastPlayerHTML(item) {
+    const url=safeExternalURL(item.audio);
+    return url?`<audio class="site-audio-player" src="${escapeHTML(url)}" controls preload="metadata"></audio>`:`<div class="site-detail-notice">Este episódio foi salvo sem um endereço de áudio válido.</div>`;
+  }
+
+  function genericDetailHTML(key,item) {
+    const schema=schemas[key];
+    if (!schema) return multilineHTML(item?.descricao || item?.resumo || "");
+    const rows=schema.fields.filter(([name])=>!['imagem','foto','logo'].includes(name)).map(([name,label,type])=>{
+      const value=item[name];
+      if (value === undefined || value === null || value === "" || (Array.isArray(value)&&!value.length)) return "";
+      const shown=type === "checkbox" ? (value?"Sim":"Não") : Array.isArray(value)?value.join(", "):String(value);
+      return `<div><dt>${escapeHTML(label)}</dt><dd>${escapeHTML(shown)}</dd></div>`;
+    }).join("");
+    return `<dl class="site-detail-list">${rows || "<div><dt>Informações</dt><dd>Sem detalhes adicionais.</dd></div>"}</dl>`;
+  }
+
+  function siteDetailContent(key,item) {
+    if (key === "noticias") return `${detailImage(item)}${detailMeta([item.categoria,item.autor,item.data?formatDate(item.data):"",item.hora])}<div class="site-detail-text">${multilineHTML(item.conteudo || item.resumo)}</div>`;
+    if (key === "videos") return `${videoPlayerHTML(item.url,item.titulo)}${detailMeta([item.categoria])}<div class="site-detail-text">${multilineHTML(item.descricao)}</div>`;
+    if (key === "podcasts") return `${detailImage(item)}${podcastPlayerHTML(item)}${detailMeta([item.programa,item.data?formatDate(item.data):""])}<div class="site-detail-text">${multilineHTML(item.descricao)}</div>`;
+    if (key === "programacao") return `${detailImage(item)}${detailMeta([item.categoria,formatDays(item.dias||item.dia),item.inicio&&item.fim?`${item.inicio} às ${item.fim}`:"",item.locutor])}<div class="site-detail-text">${multilineHTML(item.descricao)}</div>`;
+    if (key === "promocoes") return `${detailImage(item)}${detailMeta([item.inicio?`Início: ${formatDate(item.inicio)}`:"",item.fim?`Encerramento: ${formatDate(item.fim)}`:""])}<div class="site-detail-text">${multilineHTML(item.descricao)}${item.regulamento?`<h3>Regulamento</h3>${multilineHTML(item.regulamento)}`:""}</div><button class="button primary" data-site-action="whatsapp" type="button">Participar pelo WhatsApp</button>`;
+    if (key === "eventos") return `${detailImage(item)}${detailMeta([item.data?formatDate(item.data):"",item.hora,item.local])}<div class="site-detail-text">${multilineHTML(item.descricao)}</div>`;
+    if (key === "galeria") return `${detailImage(item)}${detailMeta([item.album,item.data?formatDate(item.data):""])}<div class="site-detail-text">${multilineHTML(item.descricao)}</div>`;
+    if (["locutores","equipe"].includes(key)) return `${detailImage(item,"foto")}${detailMeta([item.cargo,item.email,item.telefone])}<div class="site-detail-text">${multilineHTML(item.bio || item.descricao)}</div>`;
+    if (key === "parceiros") { const url=safeExternalURL(item.link); return `${detailImage(item,"logo")}${detailMeta([item.categoria])}${url?`<a class="button primary site-detail-external" href="${escapeHTML(url)}" target="_blank" rel="noopener noreferrer">Abrir site do parceiro</a>`:"<div class=\"site-detail-notice\">Parceiro sem link cadastrado.</div>"}`; }
+    if (key === "publicidade") { const url=safeExternalURL(item.link); return `${detailImage(item)}${detailMeta([item.anunciante,item.posicao,item.inicio?formatDate(item.inicio):"",item.fim?formatDate(item.fim):""])}${url?`<a class="button primary site-detail-external" href="${escapeHTML(url)}" target="_blank" rel="noopener noreferrer">Abrir anúncio</a>`:""}`; }
+    return `${detailImage(item,item.foto?"foto":item.logo?"logo":"imagem")}${genericDetailHTML(key,item)}`;
+  }
+
+  function openSiteDetail(key,id) {
+    const item=contentItem(key,id);
+    if (!item) { notify("O conteúdo selecionado não foi encontrado.","error"); return; }
+    const title=item.titulo || item.nome || schemas[key]?.singular || "Conteúdo";
+    $("#site-content-eyebrow").textContent=schemas[key]?.title || "Conteúdo";
+    $("#site-content-title").textContent=title;
+    $("#site-content-body").innerHTML=siteDetailContent(key,item);
+    $("#site-content-dialog").showModal();
+  }
+
+  function collectionVisibleItems(key) {
+    if (key === "noticias") return state.content.noticias.filter(isNewsVisible);
+    if (key === "equipe") return [...state.content.locutores.map(i=>({...i,_collection:"locutores"})),...state.content.equipe.map(i=>({...i,_collection:"equipe"}))].filter(i=>i.ativo!==false);
+    return (state.content[key] || []).filter(i=>i.ativo!==false);
+  }
+
+  function openSiteCollection(key) {
+    const items=collectionVisibleItems(key);
+    const title=key === "programacao"?"Grade completa":schemas[key]?.title || "Conteúdos";
+    $("#site-content-eyebrow").textContent="Visualização completa";
+    $("#site-content-title").textContent=title;
+    $("#site-content-body").innerHTML=items.length?`<div class="site-detail-collection">${items.map(item=>`<button class="site-detail-item" data-site-open="${escapeHTML(item._collection||key)}" data-site-id="${escapeHTML(item.id)}" type="button"><strong>${escapeHTML(item.titulo||item.nome||"Sem título")}</strong><span>${escapeHTML(schemas[item._collection||key]?.summary?.(item) || item.descricao || item.resumo || "Abrir conteúdo")}</span></button>`).join("")}</div>`:`<div class="site-detail-notice">Nenhum conteúdo publicado nesta seção.</div>`;
+    $("#site-content-dialog").showModal();
+  }
 
   let audio = null;
+  let previewThemeOverride = null;
   function toggleAudio(button) {
     if (!state.radio.streamUrl) { notify("Informe uma URL de stream em Minha Rádio para testar o áudio.","error"); return; }
     if (!audio) audio = new Audio(state.radio.streamUrl);
@@ -1061,9 +1197,17 @@
     else { audio.pause(); button.textContent="▶"; }
   }
 
-  function openPreview() {
+  function renderPreviewDialog() {
+    const originalTheme=state.selectedTheme;
+    if (previewThemeOverride) state.selectedTheme=previewThemeOverride;
     $("#preview-theme-name").textContent = themeById(state.selectedTheme).name;
     renderSitePreview($("#preview-canvas"));
+    state.selectedTheme=originalTheme;
+  }
+
+  function openPreview(themeId=null) {
+    previewThemeOverride=themeId || null;
+    renderPreviewDialog();
     $("#preview-dialog").showModal();
   }
 
@@ -1128,7 +1272,7 @@
 
   function mapRemoteToState(site,dashboard) {
     const fresh=defaultState(), content=site.conteudoRascunho || site.conteudoPublicado || {}, texts=content.textos_institucionais || {}, cms=texts.cms_v2 || {}, contacts=content.contatos || {}, whats=typeof content.whatsapp === "string" ? {numero:content.whatsapp} : (content.whatsapp || {}), colors=content.cores || {}, apps=content.links_aplicativos || {}, banners=content.banners || {};
-    fresh.version="2.2.0"; fresh.updatedAt=versions[0]?.criado_em || new Date().toISOString(); fresh.status=site.status_publicacao || "sem_rascunho"; fresh.selectedTheme=cms.selectedTheme || "morada";
+    fresh.version="2.2.1"; fresh.updatedAt=versions[0]?.criado_em || new Date().toISOString(); fresh.status=site.status_publicacao || "sem_rascunho"; fresh.selectedTheme=cms.selectedTheme || "morada";
     fresh.radio={...fresh.radio,nome:content.nome || site.nome_site || dashboard?.cliente?.nome_radio || "Minha rádio",slogan:content.slogan || "",descricao:content.descricao || texts.sobre || "",cidade:contacts.cidade || dashboard?.cliente?.cidade || "",estado:contacts.estado || dashboard?.cliente?.estado || "",email:contacts.email || dashboard?.cliente?.email || "",telefone:contacts.telefone || "",whatsapp:whats.numero || "",endereco:contacts.endereco || "",streamUrl:site.stream_url || "",musicaAtual:texts.player?.titulo || "Transmissão ao vivo",locutorAtual:texts.player?.subtitulo || "Programação da rádio",logo:content.logo || "",hero:content.capa || "",playerImage:texts.player?.imagem || "",cores:{primaria:colors.primaria || "#e31c45",secundaria:colors.secundaria || "#121d31",destaque:colors.destaque || "#f1a11a",fundo:colors.fundo || "#f4f6f9"},listenersEnabled:false};
     const moduleValues=texts.modulos || {}; const savedModules=safeArray(cms.modules);
     fresh.modules=modulesCatalog.map(([id,label,description],index)=>{const saved=savedModules.find(m=>m.id===id);return{id,label,description,enabled:saved? saved.enabled!==false : moduleValues[id]!==false,order:Number(saved?.order ?? index)};});
@@ -1174,14 +1318,17 @@
     $("#logout-button").addEventListener("click",logout);
     $("#save-button").addEventListener("click",()=>persist(true));
     $("#preview-top-button").addEventListener("click",openPreview);
-    $("#preview-close").addEventListener("click",()=>$("#preview-dialog").close());
-    $("#preview-refresh").addEventListener("click",()=>renderSitePreview($("#preview-canvas")));
+    $("#preview-close").addEventListener("click",()=>{previewThemeOverride=null;$("#preview-dialog").close();});
+    $("#site-content-close").addEventListener("click",()=>$("#site-content-dialog").close());
+    $("#site-content-dialog").addEventListener("click",event=>{if(event.target===$("#site-content-dialog"))$("#site-content-dialog").close();});
+    $("#site-content-body").addEventListener("click",event=>{const open=event.target.closest("[data-site-open]");if(open)return openSiteDetail(open.dataset.siteOpen,open.dataset.siteId);const action=event.target.closest("[data-site-action]");if(action)return runSiteAction(action.dataset.siteAction);});
+    $("#preview-refresh").addEventListener("click",renderPreviewDialog);
     $$('[data-preview-device]').forEach(button=>button.addEventListener("click",()=>{ $$('[data-preview-device]').forEach(i=>i.classList.remove("active"));button.classList.add("active");$("#preview-canvas").className=`preview-canvas ${button.dataset.previewDevice}`;}));
     $("#menu-toggle").addEventListener("click",()=>{const sidebar=$("#sidebar");sidebar.classList.toggle("open");$("#menu-toggle").setAttribute("aria-expanded",String(sidebar.classList.contains("open")));});
     $("#editor-form").addEventListener("submit",saveModal);
     $$('#editor-modal [value="cancel"]').forEach(button=>button.addEventListener("click",event=>{event.preventDefault();editing=null;$("#editor-modal").close();}));
     $("#backup-import").addEventListener("change",event=>{const file=event.target.files?.[0];if(file)importBackup(file);event.target.value="";});
-    document.addEventListener("keydown",event=>{if(event.key==="Escape"&&$("#preview-dialog").open)$("#preview-dialog").close();});
+    document.addEventListener("keydown",event=>{if(event.key!=="Escape")return;if($("#site-content-dialog").open)$("#site-content-dialog").close();else if($("#preview-dialog").open){previewThemeOverride=null;$("#preview-dialog").close();}});
     resumeSession();
   }
 

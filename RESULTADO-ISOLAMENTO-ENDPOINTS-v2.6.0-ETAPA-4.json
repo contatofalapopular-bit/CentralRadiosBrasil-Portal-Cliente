@@ -1,0 +1,32 @@
+{
+  "base": "2.6.0-stage3",
+  "release": "2.6.0-stage4",
+  "workerUrlChanged": false,
+  "stage3Endpoints": [
+    "/api/cliente/dashboard",
+    "/api/cliente/login",
+    "/api/cliente/logout",
+    "/api/cliente/sessao",
+    "/api/cliente/site",
+    "/api/cliente/site/midias",
+    "/api/cliente/site/rascunho",
+    "/api/cliente/site/solicitar-publicacao",
+    "/api/cliente/trocar-senha"
+  ],
+  "stage4Endpoints": [
+    "/api/cliente/dashboard",
+    "/api/cliente/login",
+    "/api/cliente/logout",
+    "/api/cliente/sessao",
+    "/api/cliente/site",
+    "/api/cliente/site/midias",
+    "/api/cliente/site/rascunho",
+    "/api/cliente/site/solicitar-publicacao",
+    "/api/cliente/trocar-senha"
+  ],
+  "added": [],
+  "removed": [],
+  "unchanged": true,
+  "sqlMigrationRequired": false,
+  "otherRepositoriesChanged": false
+}

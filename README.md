@@ -1,70 +1,60 @@
 # Central Rádios Brasil — Portal do Cliente
 
-## v2.6.0 — Etapa 3: Personalização completa de cores por bloco
+## v2.6.0 — Etapa 4.1: Reorganização do Editor Visual
 
-Esta entrega evolui exclusivamente o **Portal do Cliente**, usando a v2.6.0 Etapa 2 como base. Nenhum arquivo do Worker, Portal Público/PWA, Painel Administrativo, firmware ou outro repositório foi alterado.
+Esta entrega evolui exclusivamente o **Portal do Cliente**, usando a v2.6.0 Etapa 3 como base. Nenhum arquivo do Worker, Portal Público/PWA, Painel Administrativo, firmware ou outro repositório foi alterado.
 
-### O que foi implementado
+### Validação antes do envio
 
-Cada um dos 14 blocos, em cada um dos 6 modelos, pode manter uma paleta própria com:
+Todo novo arquivo de imagem é conferido antes da chamada ao endpoint de mídia:
 
-- fundo do bloco;
-- títulos;
-- textos e descrições;
-- chamadas, categorias e metadados;
-- fundo dos botões;
-- texto dos botões.
+- formatos permitidos: JPG, PNG e WEBP;
+- largura e altura reais em pixels;
+- proporção correspondente ao padrão informado;
+- peso máximo original do arquivo;
+- obrigatoriedade da imagem nos cadastros que exigem peça, capa ou logomarca.
 
-As configurações ficam isoladas por **modelo + bloco**. Alterar Notícias no News 24h não modifica Notícias no Gospel, Popular, Regional, Jovem ou Personalizado.
+O Portal **não recorta, não redimensiona e não comprime automaticamente**. Um arquivo fora do padrão é rejeitado e a mensagem mostra o valor recebido e o padrão exigido.
 
-### Controles adicionados
+### Campos abrangidos
 
-- seletor visual de cor;
-- campo hexadecimal sincronizado;
-- opção “Usar cores originais do modelo”;
-- botão “Restaurar cores” sem apagar composição, título ou ordem do bloco;
-- verificação automática de contraste;
-- alerta para combinações abaixo de 3:1 ou 4,5:1, conforme o tipo de texto.
+Logomarca da rádio, banner principal, player, programação, locutores, notícias, podcasts, vídeos, promoções, galeria, eventos, equipe, anunciantes, campanhas desktop/mobile, parceiros, banners desktop/mobile, popups, SEO, ícone do aplicativo e QR Code.
 
-### Compatibilidade
+### Compatibilidade e isolamento
 
-- o modelo Jovem continua com a identidade original por padrão;
-- registros da Etapa 2 são normalizados automaticamente;
-- o mesmo endpoint de rascunho continua sendo usado;
-- nenhuma migração SQL é necessária;
-- nenhuma biblioteca externa foi adicionada.
-
-### Persistência
-
-Endpoint preservado:
-
-`/api/cliente/site/rascunho`
-
-Estrutura:
-
-`textos_institucionais.cms_v2.editor.blocks[modelo][bloco]`
-
-Campos de cor:
-
-- `useThemeColors`;
-- `backgroundColor`;
-- `titleColor`;
-- `textColor`;
-- `eyebrowColor`;
-- `buttonColor`;
-- `buttonTextColor`.
-
-Release interna: `2.6.0-stage3`  
-Schema interno: `11`
-
-### Validação
-
-- bateria específica da Etapa 3: 56/56;
-- regressão da Etapa 2: 46/46;
-- regressão da Etapa 1: 48/48;
-- total em navegador: 150/150;
-- persistência real simulada no endpoint existente: aprovada;
-- exceções JavaScript: 0;
-- erros relevantes de console: 0;
+- endpoint de mídia preservado: `/api/cliente/site/midias`;
+- endpoint de rascunho preservado: `/api/cliente/site/rascunho`;
 - endpoints adicionados: 0;
-- endpoints removidos: 0.
+- endpoints removidos: 0;
+- Worker e D1 não alterados;
+- nenhuma migração SQL;
+- conteúdos anteriores preservados;
+- imagens já cadastradas não são apagadas automaticamente;
+- toda nova seleção passa pela validação obrigatória.
+
+### Auditoria
+
+- testes específicos: 39/39;
+- regressão Etapa 1: 48/48;
+- regressão Etapa 2: 46/46;
+- regressão Etapa 3: 56/56;
+- total: **189/189 verificações aprovadas**;
+- persistência: aprovada;
+- exceções JavaScript: 0;
+- erros relevantes de console: 0.
+
+Release interna: `2.6.0-stage4`  
+Schema interno: `12`
+
+
+## Correção de usabilidade — Editor Visual
+
+- elimina a rolagem horizontal geral do módulo em resoluções comuns de notebook e desktop;
+- mantém lista de blocos, controles e prévia organizados em colunas proporcionais;
+- prévia ao vivo permanece fixa enquanto os controles possuem rolagem independente;
+- ao selecionar um bloco, a coluna de controles desloca-se para a configuração correspondente sem retirar a prévia da tela;
+- reduz espaçamentos e tamanhos internos para aproveitar melhor a área útil;
+- adapta o editor para desktop, tablet e celular sem alterar os modelos do site;
+- preserva validação de imagens, cores por bloco, schema 12 e os endpoints existentes.
+
+Release interna: `2.6.0-stage4.1`.

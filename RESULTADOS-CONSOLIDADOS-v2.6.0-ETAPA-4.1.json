@@ -1,0 +1,46 @@
+{
+  "version": "2.6.0-stage4.1",
+  "summary": {
+    "total": 231,
+    "pass": 231,
+    "fail": 0
+  },
+  "suites": [
+    {
+      "suite": "Etapa 4 — imagens",
+      "total": 39,
+      "pass": 39,
+      "fail": 0
+    },
+    {
+      "suite": "Regressão Etapa 1",
+      "total": 48,
+      "pass": 48,
+      "fail": 0
+    },
+    {
+      "suite": "Regressão Etapa 2",
+      "total": 46,
+      "pass": 46,
+      "fail": 0
+    },
+    {
+      "suite": "Regressão Etapa 3",
+      "total": 56,
+      "pass": 56,
+      "fail": 0
+    },
+    {
+      "suite": "Correção 4.1 — layout",
+      "total": 42,
+      "pass": 42,
+      "fail": 0
+    }
+  ],
+  "isolation": {
+    "workerModified": false,
+    "otherRepositoriesModified": false,
+    "schemaVersion": 12,
+    "migrationSQL": false
+  }
+}

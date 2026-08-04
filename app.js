@@ -14,6 +14,7 @@
   let previewPopupReturnFocus = null;
   let saveQueue = Promise.resolve();
   let isLoading = false;
+  const activeImageProcesses = new Set();
 
   const imageProfiles = {
     logo: { label: "Logomarca", width: 800, height: 400, maxKB: 300, fit: "contain" },
@@ -419,7 +420,7 @@
   function defaultState() {
     const today = new Date().toISOString().slice(0, 10);
     return {
-      version: "2.6.0-stage3",
+      version: "2.6.0-stage4",
       updatedAt: new Date().toISOString(),
       status: "rascunho",
       selectedTheme: "morada",
@@ -715,7 +716,7 @@
       </div>
       <div class="grid-2 equal" style="margin-top:18px">
         <section class="card"><header class="card-header"><div><h3>Dados reais, sem números inventados</h3><p>Audiência e ouvintes.</p></div></header><div class="card-body"><div class="notice">O painel não exibe audiência fictícia. O número de ouvintes só será mostrado quando existir uma fonte técnica confiável do streaming.</div></div></section>
-        <section class="card"><header class="card-header"><div><h3>Integração ativa</h3><p>Ambiente utilizado nesta instalação.</p></div></header><div class="card-body"><div class="code-box">Portal: ${escapeHTML(CONFIG.VERSION || "2.6.0-stage3")}\nWorker: ${escapeHTML(CONFIG.WORKER_URL || "—")}\nPersistência: Cloudflare D1\nMídias: API do site\nPublicação: supervisionada pela Central</div></div></section>
+        <section class="card"><header class="card-header"><div><h3>Integração ativa</h3><p>Ambiente utilizado nesta instalação.</p></div></header><div class="card-body"><div class="code-box">Portal: ${escapeHTML(CONFIG.VERSION || "2.6.0-stage4")}\nWorker: ${escapeHTML(CONFIG.WORKER_URL || "—")}\nPersistência: Cloudflare D1\nMídias: API do site\nPublicação: supervisionada pela Central</div></div></section>
       </div>`;
     bindGoButtons(root);
   }
@@ -764,6 +765,8 @@
     $$("[data-preview]", root).forEach(button => button.addEventListener("click", openPreview));
     $("#radio-form").addEventListener("submit", event => {
       event.preventDefault();
+      const imageValidation=validateImageControls(event.currentTarget);
+      if(!imageValidation.ok)return notify(imageValidation.message,"error");
       const form = new FormData(event.currentTarget);
       ["nome","slogan","descricao","cidade","estado","endereco","email","telefone","whatsapp","musicaAtual","locutorAtual"].forEach(key => state.radio[key] = String(form.get(key) || "").trim());
       ["logo","hero","playerImage"].forEach(key => state.radio[key] = String(form.get(key) || state.radio[key] || ""));
@@ -784,40 +787,79 @@
     return `<div class="field"><label>${escapeHTML(label)}</label><div style="display:flex;gap:9px;align-items:center"><input type="color" name="cor_${name}" value="${escapeHTML(value)}"><input type="text" value="${escapeHTML(value)}" data-color-text="cor_${name}" aria-label="Código da cor"></div></div>`;
   }
 
-  function mediaFieldHTML(name,label,profileId,value="") {
+  function imageRatioLabel(width,height) {
+    const gcd=(a,b)=>b?gcd(b,a%b):a, divisor=gcd(Number(width)||1,Number(height)||1);
+    return `${Math.round(width/divisor)}:${Math.round(height/divisor)}`;
+  }
+
+  function mediaFieldHTML(name,label,profileId,value="",required=false) {
     const profile = resolvedImageSpec(profileId,name);
-    return `<div class="field full"><span class="field-label">${escapeHTML(label)}</span><div class="media-uploader" data-media-field="${name}" data-profile="${profileId}">
+    const requiredText=required?`<span class="media-required">Obrigatória</span>`:"";
+    return `<div class="field full"><span class="field-label">${escapeHTML(label)} ${requiredText}</span><div class="media-uploader" data-media-field="${name}" data-profile="${profileId}" data-required="${required?"true":"false"}" data-required-width="${profile.width}" data-required-height="${profile.height}" data-max-kb="${profile.maxKB}" data-validation-state="${value?"existing":"empty"}">
       <div class="media-preview ${profile.width === profile.height ? "square" : ""}" data-media-preview>${value ? `<img src="${escapeHTML(value)}" alt="Prévia de ${escapeHTML(label)}">` : `<span>Sem imagem</span>`}</div>
-      <div class="media-copy"><strong>${profile.width} × ${profile.height} px</strong><p>JPG, PNG ou WEBP. O navegador recorta, redimensiona e comprime automaticamente para até ${profile.maxKB} KB.</p>
-      <input type="hidden" name="${name}" value="${value}"><label class="file-button">Selecionar imagem<input type="file" accept="image/jpeg,image/png,image/webp" data-image-input></label> <button class="button small ghost" type="button" data-remove-image>Remover</button><div class="media-status" data-media-status></div></div>
+      <div class="media-copy"><strong>${profile.width} × ${profile.height} px • proporção ${imageRatioLabel(profile.width,profile.height)}</strong><p><b>Tamanho obrigatório.</b> JPG, PNG ou WEBP, com no máximo ${profile.maxKB} KB. Imagens fora do padrão são rejeitadas; o Portal não recorta nem redimensiona.</p>
+      <input type="hidden" name="${name}" value="${value}" data-image-value><label class="file-button">Selecionar imagem<input type="file" accept="image/jpeg,image/png,image/webp" data-image-input></label> <button class="button small ghost" type="button" data-remove-image>Remover</button><div class="media-status ${value?"info":""}" data-media-status aria-live="polite">${value?"Imagem existente. Uma nova seleção será validada antes do envio.":"Aguardando uma imagem no padrão informado."}</div></div>
     </div></div>`;
+  }
+
+  function setMediaValidationState(control,stateName,message="") {
+    control.dataset.validationState=stateName;
+    control.classList.toggle("media-valid",stateName==="valid");
+    control.classList.toggle("media-invalid",stateName==="invalid");
+    control.classList.toggle("media-processing",stateName==="processing");
+    const status=$('[data-media-status]',control);
+    if(status){status.className=`media-status ${stateName}`;status.textContent=message;}
+  }
+
+  function validateImageControls(root=document,{focus=true}={}) {
+    const controls=$$('[data-media-field]',root);
+    for(const control of controls){
+      const hidden=$('[data-image-value]',control), stateName=control.dataset.validationState||"empty";
+      if(stateName==="processing"){
+        setMediaValidationState(control,"invalid","Aguarde o término da validação da imagem antes de salvar.");
+        if(focus) $('[data-image-input]',control)?.focus();
+        return {ok:false,message:"Há uma imagem ainda em validação."};
+      }
+      if(control.dataset.required==="true" && !String(hidden?.value||"").trim()){
+        setMediaValidationState(control,"invalid",`Imagem obrigatória. Envie exatamente ${control.dataset.requiredWidth} × ${control.dataset.requiredHeight} px.`);
+        if(focus) $('[data-image-input]',control)?.focus();
+        return {ok:false,message:"Preencha a imagem obrigatória no tamanho exigido."};
+      }
+    }
+    return {ok:true,message:""};
   }
 
   function bindImageInputs(root) {
     $$('[data-media-field]', root).forEach(control => {
       const input = $('[data-image-input]', control);
-      const hidden = $('input[type="hidden"]', control);
+      const hidden = $('[data-image-value]', control);
       const preview = $('[data-media-preview]', control);
-      const status = $('[data-media-status]', control);
       input?.addEventListener("change", async () => {
         const file = input.files?.[0];
         if (!file) return;
-        status.textContent = "Processando imagem…";
+        const token=`${Date.now()}-${Math.random()}`;
+        activeImageProcesses.add(token);
+        setMediaValidationState(control,"processing","Validando formato, peso e dimensões reais…");
         try {
           const result = await processImage(file, control.dataset.profile, control.dataset.mediaField || "imagem");
+          if(!result.dataURL) throw new Error("O servidor não retornou a imagem armazenada.");
           hidden.value = result.dataURL;
-          preview.innerHTML = `<img src="${result.dataURL}" alt="Prévia da imagem enviada">`;
-          status.textContent = `${result.width} × ${result.height} px • ${Math.ceil(result.bytes / 1024)} KB`;
+          preview.innerHTML = `<img src="${escapeHTML(result.dataURL)}" alt="Prévia da imagem validada">`;
+          setMediaValidationState(control,"valid",`Imagem aceita: ${result.width} × ${result.height} px • ${Math.ceil(result.bytes / 1024)} KB • ${result.format}.`);
         } catch (error) {
-          status.textContent = error.message;
           input.value = "";
+          const oldValue=String(hidden.value||"").trim();
+          setMediaValidationState(control,"invalid",error.message||"Imagem rejeitada.");
+          if(!oldValue) preview.innerHTML = "<span>Sem imagem</span>";
+        } finally {
+          activeImageProcesses.delete(token);
         }
       });
       $('[data-remove-image]', control)?.addEventListener("click", () => {
         hidden.value = "";
         input.value = "";
         preview.innerHTML = "<span>Sem imagem</span>";
-        status.textContent = "Imagem removida. Salve para confirmar.";
+        setMediaValidationState(control,control.dataset.required==="true"?"invalid":"empty",control.dataset.required==="true"?`Imagem obrigatória. Envie exatamente ${control.dataset.requiredWidth} × ${control.dataset.requiredHeight} px.`:"Imagem removida. Salve para confirmar.");
       });
     });
     $$('[data-color-text]', root).forEach(text => {
@@ -827,39 +869,38 @@
     });
   }
 
+  async function readImageDimensions(file) {
+    if(typeof createImageBitmap==="function"){
+      const bitmap=await createImageBitmap(file);
+      const dimensions={width:bitmap.width,height:bitmap.height};
+      bitmap.close?.();
+      return dimensions;
+    }
+    const url=URL.createObjectURL(file);
+    try{return await new Promise((resolve,reject)=>{const image=new Image();image.onload=()=>resolve({width:image.naturalWidth,height:image.naturalHeight});image.onerror=()=>reject(new Error("Não foi possível ler as dimensões da imagem."));image.src=url;});}
+    finally{URL.revokeObjectURL(url);}
+  }
+
   async function processImage(file, profileId, fieldName = "imagem") {
     const workerProfile = resolveWorkerProfile(profileId, fieldName);
     const profile = workerImageSpecs[workerProfile] || imageProfiles[profileId] || imageProfiles.news;
-    if (!/^image\/(jpeg|png|webp)$/.test(file.type)) throw new Error("Use uma imagem JPG, PNG ou WEBP.");
-    const bitmap = await createImageBitmap(file);
-    const canvas = document.createElement("canvas");
-    canvas.width = profile.width; canvas.height = profile.height;
-    const ctx = canvas.getContext("2d", { alpha: true });
-    ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = "high";
-    if (profile.fit === "contain") {
-      ctx.clearRect(0,0,canvas.width,canvas.height);
-      const scale = Math.min(canvas.width / bitmap.width, canvas.height / bitmap.height);
-      const w = bitmap.width * scale, h = bitmap.height * scale;
-      ctx.drawImage(bitmap, (canvas.width-w)/2, (canvas.height-h)/2, w, h);
-    } else {
-      const scale = Math.max(canvas.width / bitmap.width, canvas.height / bitmap.height);
-      const sourceW = canvas.width / scale, sourceH = canvas.height / scale;
-      ctx.drawImage(bitmap, (bitmap.width-sourceW)/2, (bitmap.height-sourceH)/2, sourceW, sourceH, 0, 0, canvas.width, canvas.height);
-    }
-    bitmap.close?.();
-    let quality = .9, blob;
-    do { blob = await new Promise(resolve => canvas.toBlob(resolve, "image/webp", quality)); quality -= .07; }
-    while (blob && blob.size > profile.maxKB * 1024 && quality >= .35);
-    if (!blob) throw new Error("Não foi possível processar a imagem.");
-    if (blob.size > profile.maxKB * 1024) throw new Error(`A imagem processada ultrapassou ${profile.maxKB} KB.`);
-    const dataBase64 = String(await blobToDataURL(blob)).split(",")[1] || "";
-    const result = await api("/api/cliente/site/midias", { method: "POST", body: JSON.stringify({ perfil: workerProfile, campo: fieldName, nomeOriginal: file.name, mime: "image/webp", largura: canvas.width, altura: canvas.height, dataBase64 }) });
-    if (result?.midia) mediaLibrary.unshift(result.midia);
-    return { dataURL: result?.midia?.url || "", bytes: blob.size, width: canvas.width, height: canvas.height };
+    const allowed={"image/jpeg":"JPG","image/png":"PNG","image/webp":"WEBP"};
+    if (!allowed[file.type]) throw new Error(`Imagem rejeitada. Formato recebido: ${file.type||"desconhecido"}. Formatos permitidos: JPG, PNG ou WEBP.`);
+    const receivedKB=Math.ceil(file.size/1024);
+    if(file.size>profile.maxKB*1024) throw new Error(`Imagem rejeitada. Peso recebido: ${receivedKB} KB. Peso máximo: ${profile.maxKB} KB.`);
+    const dimensions=await readImageDimensions(file);
+    if(dimensions.width!==profile.width || dimensions.height!==profile.height) throw new Error(`Imagem rejeitada. Tamanho recebido: ${dimensions.width} × ${dimensions.height} px. Tamanho obrigatório: ${profile.width} × ${profile.height} px.`);
+    const dataURL=String(await blobToDataURL(file));
+    const dataBase64=dataURL.split(",")[1]||"";
+    const result=await api("/api/cliente/site/midias",{method:"POST",body:JSON.stringify({perfil:workerProfile,campo:fieldName,nomeOriginal:file.name,mime:file.type,largura:dimensions.width,altura:dimensions.height,dataBase64})});
+    if(result?.midia)mediaLibrary.unshift(result.midia);
+    return{dataURL:result?.midia?.url||"",bytes:file.size,width:dimensions.width,height:dimensions.height,format:allowed[file.type]};
   }
 
   function resolveWorkerProfile(profileId, fieldName = "") {
     const field = String(fieldName).toLowerCase();
+    if (field.includes("qrcode") || field.includes("qr_code")) return "qrcode";
+    if ((currentPage === "anunciantes" || currentPage === "parceiros") && field.includes("logo")) return "parceiro";
     if (profileId === "logo") return "logo";
     if (profileId === "hero") return "capa";
     if (profileId === "gallery" || currentPage === "galeria") return "galeria";
@@ -1025,8 +1066,7 @@
   function renderVisualEditor(root) {
     ensureV260EditorState();
     root.innerHTML = `
-      ${pageHeader("Editor Visual", "Organize os blocos e personalize cada modelo sem alterar o conteúdo cadastrado.", `<button class="button primary" data-preview type="button">Prévia em tela cheia</button>`)}
-      <section class="editor-stage-note"><div><span>v2.6.0 • Etapa 3</span><h3>Editor por modelo, bloco e cores</h3><p>Cada bloco pode ter fundo, títulos, textos, chamadas e botões próprios em cada modelo, com verificação automática de contraste.</p></div><strong>Mesmo rascunho atual<br>Sem mudança no Worker</strong></section>
+      <section class="editor-stage-note editor-stage-toolbar"><div><span>v2.6.0 • Etapa 4.1</span><h3>Editor visual reorganizado</h3><p>Organize os blocos e acompanhe cada alteração imediatamente na prévia ao lado.</p></div><div class="editor-stage-actions"><strong>Mesmo rascunho atual<br>Sem mudança no Worker</strong><button class="button primary" data-preview type="button">Prévia em tela cheia</button></div></section>
       <div class="editor-layout editor-layout-v260">
         <aside class="editor-sidebar">
           <section class="card"><header class="card-header"><div><h3>Modelo ativo</h3><p>As opções abaixo pertencem somente a ele.</p></div></header><div class="card-body"><select id="quick-theme">${themes.map(theme => `<option value="${theme.id}" ${theme.id === state.selectedTheme ? "selected" : ""}>${escapeHTML(theme.name)}</option>`).join("")}</select><button class="button secondary" data-go="themes" type="button" style="width:100%;margin-top:10px">Ver todos os modelos</button></div></section>
@@ -1038,7 +1078,7 @@
             <section class="card editor-control-card"><div class="card-body" id="block-editor-controls"></div></section>
           </div>
           <div class="editor-preview-column">
-            <div class="device-toolbar"><strong>Prévia ao vivo</strong><div class="device-switch"><button class="active" data-inline-device="desktop" type="button">Desktop</button><button data-inline-device="tablet" type="button">Tablet</button><button data-inline-device="mobile" type="button">Celular</button></div></div>
+            <div class="device-toolbar"><div class="editor-preview-title"><strong>Prévia ao vivo</strong><small>Atualização automática</small></div><div class="device-switch"><button class="active" data-inline-device="desktop" type="button">Desktop</button><button data-inline-device="tablet" type="button">Tablet</button><button data-inline-device="mobile" type="button">Celular</button></div></div>
             <div class="preview-panel"><div id="inline-preview" class="preview-canvas desktop"></div></div>
           </div>
         </section>
@@ -1055,9 +1095,9 @@
     state.modules.sort((a,b) => a.order - b.order);
     list.innerHTML = state.modules.map(module => `<div class="module-item ${module.enabled ? "" : "disabled"} ${module.id===editorSelectedBlock?"selected":""}" draggable="true" data-module-id="${module.id}" role="button" tabindex="0" aria-label="Configurar bloco ${escapeHTML(module.label)}"><span class="drag-handle" aria-hidden="true">☷</span><div class="module-copy"><strong>${escapeHTML(module.label)}</strong><small>${escapeHTML(editorBlockOptions(module.id).layout)} • ${escapeHTML(editorBlockOptions(module.id).width)}</small></div><div class="module-actions"><button class="module-move" data-module-up="${module.id}" type="button" aria-label="Mover ${escapeHTML(module.label)} para cima">↑</button><button class="module-move" data-module-down="${module.id}" type="button" aria-label="Mover ${escapeHTML(module.label)} para baixo">↓</button><label class="switch" title="Ativar ou desativar"><input type="checkbox" ${module.enabled ? "checked" : ""} data-module-toggle="${module.id}" aria-label="Ativar bloco ${escapeHTML(module.label)}"><span></span></label></div></div>`).join("");
     $$('.module-item',list).forEach(item=>{
-      const select=()=>{editorSelectedBlock=item.dataset.moduleId;state.editor.selectedBlock=editorSelectedBlock;renderModuleList();renderBlockEditorControls();};
-      item.addEventListener("click",event=>{if(!event.target.closest("button,input,label"))select();});
-      item.addEventListener("keydown",event=>{if((event.key==="Enter"||event.key===" ")&&!event.target.closest("button,input")){event.preventDefault();select();}});
+      const select=()=>{editorSelectedBlock=item.dataset.moduleId;state.editor.selectedBlock=editorSelectedBlock;renderModuleList();renderBlockEditorControls();const stack=$(".editor-controls-stack"),card=$("#block-editor-controls")?.closest(".editor-control-card");if(stack&&card){const target=Math.max(0,card.offsetTop-8);stack.scrollTo({top:target,behavior:"smooth"});}};
+      item.addEventListener("click",event=>{if(!event.target.closest("input,label"))select();});
+      item.addEventListener("keydown",event=>{if(event.target===item&&(event.key==="Enter"||event.key===" ")){event.preventDefault();select();}});
     });
     $$('[data-module-toggle]', list).forEach(input => input.addEventListener("change", () => {const module = state.modules.find(item => item.id === input.dataset.moduleToggle);module.enabled = input.checked;persist(false);renderModuleList();renderSitePreview($("#inline-preview"));}));
     const move=(id,delta)=>{const ordered=[...state.modules].sort((a,b)=>a.order-b.order),index=ordered.findIndex(item=>item.id===id),target=index+delta;if(index<0||target<0||target>=ordered.length)return;[ordered[index],ordered[target]]=[ordered[target],ordered[index]];ordered.forEach((item,i)=>item.order=i);persist(false);renderModuleList();renderSitePreview($("#inline-preview"));};
@@ -1083,7 +1123,7 @@
 
   function renderThemes(root) {
     root.innerHTML = `${pageHeader("Temas", "Modelos construídos em HTML, CSS e JavaScript. O conteúdo é compartilhado, mas a experiência visual muda de verdade.")}
-      <section class="theme-release-note"><div><span>v2.6.0 • Etapa 3</span><h3>Modelos, blocos e cores agora possuem ajustes próprios</h3><p>As seis vitrines continuam distintas e cada bloco pode usar sua própria paleta de fundo, fontes, chamadas e botões. O modelo Jovem mantém sua identidade original enquanto permite personalização opcional por bloco.</p></div><strong>Mesmo rascunho do Portal<br>Sem mudanças no Worker</strong></section>
+      <section class="theme-release-note"><div><span>v2.6.0 • Etapa 4</span><h3>Modelos, blocos, cores e imagens validados</h3><p>As seis vitrines continuam distintas, com cores por bloco, e todos os campos de imagem agora rejeitam arquivos fora do tamanho, formato ou peso exigidos antes do envio.</p></div><strong>Mesmo rascunho do Portal<br>Sem mudanças no Worker</strong></section>
       <div class="theme-grid">${themes.map(theme => {
         const [accent,dark,highlight,bg] = theme.colors;
         return `<article class="theme-card ${theme.id === state.selectedTheme ? "selected" : ""}" data-theme-card="${theme.id}">${theme.id === state.selectedTheme ? `<span class="theme-selected-tag">Tema ativo</span>` : ""}<div class="theme-shot" style="--shot-bg:${bg};--shot-dark:${dark};--shot-accent:${accent};--shot-highlight:${highlight};--shot-muted:${highlight}22">${themeShotMarkup(theme)}</div><div class="theme-meta"><span class="theme-layout-label">Composição ${escapeHTML(themeLayoutLabel(theme.layout))}</span><h3>${escapeHTML(theme.name)}</h3><small class="theme-audience">${escapeHTML(theme.audience || "")}</small><p>${escapeHTML(theme.description)}</p><button class="button ${theme.id === state.selectedTheme ? "secondary" : "primary"} small" data-select-theme="${theme.id}" type="button">${theme.id === state.selectedTheme ? "Selecionado" : "Usar este tema"}</button> <button class="button ghost small" data-theme-preview="${theme.id}" type="button">Visualizar</button></div></article>`;
@@ -1269,7 +1309,7 @@
     if (type === "advertiser-select") { const options=(state.content.anunciantes||[]).filter(i=>i.ativo!==false || String(i.id)===String(value)); const selected=String(value||item.anuncianteId||""); const legacy=item.anunciante && !options.some(i=>String(i.id)===selected) ? `<option value="${escapeHTML(selected||`legacy:${item.anunciante}`)}" selected>${escapeHTML(item.anunciante)} (cadastro legado)</option>` : ""; return `<div class="field"><label for="${inputId}">${escapeHTML(label)}</label><select id="${inputId}" name="${name}" ${required?"required":""}><option value="">Selecione um anunciante</option>${legacy}${options.map(ad=>`<option value="${escapeHTML(ad.id)}" ${String(ad.id)===selected?"selected":""}>${escapeHTML(ad.nome)}${ad.categoria?` — ${escapeHTML(ad.categoria)}`:""}</option>`).join("")}</select><small class="field-help">Cadastre a empresa em Anunciantes antes de criar a campanha.</small></div>`; }
     if (type === "multicheck") { const selected=normalizeDays(value); return `<fieldset class="field full checkbox-fieldset"><legend>${escapeHTML(label)}${required?" *":""}</legend><div class="checkbox-grid">${extra.map(option=>`<label><input type="checkbox" name="${name}" value="${escapeHTML(option)}" ${selected.includes(option)?"checked":""}><span>${escapeHTML(option)}</span></label>`).join("")}</div></fieldset>`; }
     if (type === "checkbox") { const checked=value === true || (!hasValue && name === "ativo"); return `<div class="field"><span class="field-label">${escapeHTML(label)}</span><div class="toggle-row"><div><strong>${checked ? "Ativado" : "Desativado"}</strong><small>Altere o status deste registro.</small></div><label class="switch"><input aria-label="${escapeHTML(label)}" type="checkbox" name="${name}" ${checked ? "checked" : ""}><span></span></label></div></div>`; }
-    if (type === "image") return mediaFieldHTML(name,label,extra || "news",value);
+    if (type === "image") return mediaFieldHTML(name,label,extra || "news",value,Boolean(required));
     const numeric = type === "number" ? ` min="0" step="1" inputmode="numeric"` : "";
     const help = name === "audio" ? `<small class="field-help">Use uma URL pública HTTPS de MP3, AAC, M4A, OGG, WAV, Opus ou outro áudio reproduzível pelo navegador.</small>`
       : name === "url" && editing?.key === "videos" ? `<small class="field-help">Aceita YouTube, Vimeo, MP4/WebM/Ogg, transmissão HLS ou outro link público HTTPS.</small>`
@@ -1384,8 +1424,11 @@
     event.preventDefault();
     if (event.submitter?.value === "cancel") { $("#editor-modal").close(); return; }
     if (!editing) return;
-    const { key,id } = editing, schema = schemas[key], form = new FormData($("#editor-form"));
-    if (!$("#editor-form").checkValidity()) { $("#editor-form").reportValidity(); return; }
+    const { key,id } = editing, schema = schemas[key], editorForm=$("#editor-form");
+    const imageValidation=validateImageControls(editorForm);
+    if(!imageValidation.ok)return notify(imageValidation.message,"error");
+    const form = new FormData(editorForm);
+    if (!editorForm.checkValidity()) { editorForm.reportValidity(); return; }
     const item = id ? state.content[key].find(entry => entry.id === id) : { id: uid(key), criadoEm:new Date().toISOString() };
     schema.fields.forEach(([name,,type]) => {
       if (type === "checkbox") item[name]=form.has(name);
@@ -1504,7 +1547,7 @@
 
   function simpleForm(root,title,description,fieldsHTML,onSubmit,extra="") {
     root.innerHTML = `${pageHeader(title,description)}<form class="form-card" id="simple-form"><section class="form-section"><div class="form-grid">${fieldsHTML}</div></section>${extra}<footer class="card-footer"><button class="button primary" type="submit">Salvar configurações</button></footer></form>`;
-    bindImageInputs(root); $("#simple-form").addEventListener("submit",onSubmit);
+    bindImageInputs(root); $("#simple-form").addEventListener("submit",event=>{const validation=validateImageControls(event.currentTarget);if(!validation.ok){event.preventDefault();return notify(validation.message,"error");}onSubmit(event);});
   }
 
   function renderWhatsapp(root) {
@@ -1548,7 +1591,7 @@
         <section class="card"><div class="card-body"><h3>Exportar JSON</h3><p class="field-help">Baixa configurações, módulos, temas e conteúdos.</p><button class="button primary" id="export-backup" type="button">Baixar backup</button></div></section>
         <section class="card"><div class="card-body"><h3>Importar JSON</h3><p class="field-help">Carrega o arquivo no editor; clique em Salvar rascunho para gravar no D1.</p><button class="button secondary" id="import-backup" type="button">Selecionar arquivo</button></div></section>
         <section class="card"><div class="card-body"><h3>Recarregar do servidor</h3><p class="field-help">Descarta alterações ainda não salvas e recarrega o último rascunho do servidor.</p><button class="button danger" id="reset-demo" type="button">Recarregar dados</button></div></section>
-      </div><section class="card" style="margin-top:18px"><header class="card-header"><div><h3>Sobre esta instalação</h3><p>Informações técnicas.</p></div></header><div class="card-body"><div class="code-box">Modo: produção integrada\nVersão: ${CONFIG.VERSION || "2.6.0-stage3"}\nPersistência: Cloudflare D1\nAPI: ${CONFIG.WORKER_URL || "não configurada"}\nÚltima alteração: ${formatDateTime(state.updatedAt)}</div></div></section>`;
+      </div><section class="card" style="margin-top:18px"><header class="card-header"><div><h3>Sobre esta instalação</h3><p>Informações técnicas.</p></div></header><div class="card-body"><div class="code-box">Modo: produção integrada\nVersão: ${CONFIG.VERSION || "2.6.0-stage4"}\nPersistência: Cloudflare D1\nAPI: ${CONFIG.WORKER_URL || "não configurada"}\nÚltima alteração: ${formatDateTime(state.updatedAt)}</div></div></section>`;
     $("#export-backup").addEventListener("click",exportBackup);
     $("#import-backup").addEventListener("click",()=>$("#backup-import").click());
     $("#reset-demo").addEventListener("click",()=>{if(confirm("Descartar alterações não salvas e recarregar o rascunho do servidor?")) loadAll();});
@@ -2275,7 +2318,7 @@
 
   function mapRemoteToState(site,dashboard) {
     const fresh=defaultState(), content=site.conteudoRascunho || site.conteudoPublicado || {}, texts=content.textos_institucionais || {}, cms=texts.cms_v2 || {}, contacts=content.contatos || {}, whats=typeof content.whatsapp === "string" ? {numero:content.whatsapp} : (content.whatsapp || {}), colors=content.cores || {}, apps=content.links_aplicativos || {}, banners=content.banners || {};
-    fresh.version="2.6.0-stage3"; fresh.updatedAt=versions[0]?.criado_em || new Date().toISOString(); fresh.status=site.status_publicacao || "sem_rascunho"; fresh.selectedTheme=cms.selectedTheme || "morada"; fresh.editor=normalizeEditorState(cms.editor||{});
+    fresh.version="2.6.0-stage4"; fresh.updatedAt=versions[0]?.criado_em || new Date().toISOString(); fresh.status=site.status_publicacao || "sem_rascunho"; fresh.selectedTheme=cms.selectedTheme || "morada"; fresh.editor=normalizeEditorState(cms.editor||{});
     fresh.radio={...fresh.radio,nome:content.nome || site.nome_site || dashboard?.cliente?.nome_radio || "Minha rádio",slogan:content.slogan || "",descricao:content.descricao || texts.sobre || "",cidade:contacts.cidade || dashboard?.cliente?.cidade || "",estado:contacts.estado || dashboard?.cliente?.estado || "",email:contacts.email || dashboard?.cliente?.email || "",telefone:contacts.telefone || "",whatsapp:whats.numero || "",endereco:contacts.endereco || "",streamUrl:site.stream_url || "",musicaAtual:texts.player?.titulo || "Transmissão ao vivo",locutorAtual:texts.player?.subtitulo || "Programação da rádio",logo:content.logo || "",hero:content.capa || "",playerImage:texts.player?.imagem || "",cores:{primaria:colors.primaria || "#e31c45",secundaria:colors.secundaria || "#121d31",destaque:colors.destaque || "#f1a11a",fundo:colors.fundo || "#f4f6f9"},listenersEnabled:false};
     const moduleValues=texts.modulos || {}; const savedModules=safeArray(cms.modules);
     fresh.modules=modulesCatalog.map(([id,label,description],index)=>{const saved=savedModules.find(m=>m.id===id);return{id,label,description,enabled:saved? saved.enabled!==false : moduleValues[id]!==false,order:Number(saved?.order ?? index)};});
@@ -2322,7 +2365,7 @@
     if(can("patrocinadores"))content.patrocinadores=state.content.parceiros.map(i=>({...i,site:i.link}));
     if(can("banners"))content.banners={...(content.banners||{}),destaques:state.content.banners,publicidades:state.content.publicidade};
     if(can("links_aplicativos"))content.links_aplicativos={...(content.links_aplicativos||{}),android:state.integrations.aplicativo.android,ios:state.integrations.aplicativo.ios,pwa:state.integrations.aplicativo.pwa,qr:state.integrations.aplicativo.qrcode};
-    if(can("textos_institucionais"))content.textos_institucionais={...texts,sobre:state.radio.descricao,player:{...(texts.player||{}),titulo:state.radio.musicaAtual,subtitulo:state.radio.locutorAtual,imagem:state.radio.playerImage},seo:state.integrations.seo,podcasts:state.content.podcasts,videos:state.content.videos,promocoes:state.content.promocoes,galeria:state.content.galeria,eventos:state.content.eventos,modulos:Object.fromEntries(state.modules.map(m=>[m.id,m.enabled])),pedidosMusica:{...(texts.pedidosMusica||{}),ativo:state.integrations.whatsapp.pedidos},acessibilidade:{...(texts.acessibilidade||{}),leitorTela:state.integrations.configuracoes.acessibilidade},cms_v2:{...cms,schemaVersion:11,release:"2.6.0-stage3",editor:state.editor,security:state.security,audit:{entries:(state.audit?.entries||[]).slice(0,500),functionalRuns:(state.audit?.functionalRuns||[]).slice(0,10)},backup:{settings:state.backup?.settings||{},snapshots:(state.backup?.snapshots||[]).slice(0,5)},selectedTheme:state.selectedTheme,modules:state.modules,content:{equipe:state.content.equipe,popups:state.content.popups,anunciantes:state.content.anunciantes},aplicativo:{icone:state.integrations.aplicativo.icone},configuracoes:state.integrations.configuracoes,updatedAt:new Date().toISOString()}};
+    if(can("textos_institucionais"))content.textos_institucionais={...texts,sobre:state.radio.descricao,player:{...(texts.player||{}),titulo:state.radio.musicaAtual,subtitulo:state.radio.locutorAtual,imagem:state.radio.playerImage},seo:state.integrations.seo,podcasts:state.content.podcasts,videos:state.content.videos,promocoes:state.content.promocoes,galeria:state.content.galeria,eventos:state.content.eventos,modulos:Object.fromEntries(state.modules.map(m=>[m.id,m.enabled])),pedidosMusica:{...(texts.pedidosMusica||{}),ativo:state.integrations.whatsapp.pedidos},acessibilidade:{...(texts.acessibilidade||{}),leitorTela:state.integrations.configuracoes.acessibilidade},cms_v2:{...cms,schemaVersion:12,release:"2.6.0-stage4.1",editor:state.editor,security:state.security,audit:{entries:(state.audit?.entries||[]).slice(0,500),functionalRuns:(state.audit?.functionalRuns||[]).slice(0,10)},backup:{settings:state.backup?.settings||{},snapshots:(state.backup?.snapshots||[]).slice(0,5)},selectedTheme:state.selectedTheme,modules:state.modules,content:{equipe:state.content.equipe,popups:state.content.popups,anunciantes:state.content.anunciantes},aplicativo:{icone:state.integrations.aplicativo.icone},configuracoes:state.integrations.configuracoes,updatedAt:new Date().toISOString()}};
     return content;
   }
 
@@ -2353,7 +2396,7 @@
   function ensureV250State() {
     if (!state || typeof state !== "object") state=defaultState();
     state.editor=normalizeEditorState(state.editor||{});
-    state.version="2.6.0-stage3";
+    state.version="2.6.0-stage4";
     const client=dashboardData?.cliente || {};
     const ownerEmail=String(client.email || state.radio?.email || "cliente@exemplo.com.br").trim().toLowerCase();
     const ownerName=client.nome || client.nome_radio || state.radio?.nome || "Administrador do cliente";
@@ -2472,6 +2515,8 @@
   function renderPage() {
     ensureV250State();
     if (!canAccess("view",currentPage)) currentPage="dashboard";
+    document.body.classList.toggle("editor-page-active",currentPage==="editor");
+    const mainContent=$("#main-content"); if(mainContent)mainContent.classList.toggle("editor-main-content",currentPage==="editor");
     const item=navItems.find(entry=>entry.id===currentPage);
     $("#page-title").textContent=item?.label||"Painel"; $("#page-eyebrow").textContent=pageEyebrow(currentPage);
     const root=$("#page-root");
@@ -2500,6 +2545,7 @@
 
   function persist(show=true) {
     ensureV250State();
+    if(activeImageProcesses.size){if(show)notify("Aguarde a validação da imagem antes de salvar.","error");return Promise.resolve();}
     if(!canAccess("save",currentPage)){if(show)requirePermission("save",currentPage);return Promise.resolve();}
     state.updatedAt=new Date().toISOString(); updateChrome(); clearTimeout(saveTimer);
     if(show)return queueRemoteSave(true);
@@ -2537,7 +2583,9 @@
   function saveModal(event) {
     event.preventDefault(); if(event.submitter?.value==="cancel"){$("#editor-modal").close();return;} if(!editing)return;
     const {key,id}=editing,action=id?"edit":"create"; if(!requirePermission(action,key))return;
-    const schema=schemas[key],form=new FormData($("#editor-form")); if(!$("#editor-form").checkValidity()){$("#editor-form").reportValidity();return;}
+    const schema=schemas[key],editorForm=$("#editor-form"),imageValidation=validateImageControls(editorForm);
+    if(!imageValidation.ok)return notify(imageValidation.message,"error");
+    const form=new FormData(editorForm); if(!editorForm.checkValidity()){editorForm.reportValidity();return;}
     const item=id?state.content[key].find(entry=>entry.id===id):{id:uid(key),criadoEm:new Date().toISOString()};
     schema.fields.forEach(([name,,type])=>{if(type==="checkbox")item[name]=form.has(name);else if(type==="multicheck")item[name]=form.getAll(name).map(String);else if(type==="number")item[name]=Number(form.get(name)||0);else item[name]=String(form.get(name)||"").trim();});
     item.atualizadoEm=new Date().toISOString(); const validation=validateEditorialItem(key,item,id); if(validation)return notify(validation,"error");
@@ -2624,7 +2672,7 @@
     ensureV250State();const data=stableBackupData(),json=JSON.stringify(data),snapshot={id:uid("snapshot"),label,source,createdAt:new Date().toISOString(),checksum:checksumText(json),size:json.length,counts:contentCounts(data),data:json};state.backup.snapshots.unshift(snapshot);state.backup.snapshots=state.backup.snapshots.slice(0,state.backup.settings.maxSnapshots);recordAudit("backup.criado","backup","snapshot",`${label} • ${source}`);return snapshot;
   }
   function downloadBlob(filename,content,type="application/json") { const blob=new Blob([content],{type}),a=document.createElement("a"),url=URL.createObjectURL(blob);a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),0); }
-  function backupEnvelope(data=stableBackupData()) { const payload=JSON.stringify(data);return{format:"crb-cms-backup",version:"2.6.0-stage3",schemaVersion:11,generatedAt:new Date().toISOString(),checksum:checksumText(payload),counts:contentCounts(data),data}; }
+  function backupEnvelope(data=stableBackupData()) { const payload=JSON.stringify(data);return{format:"crb-cms-backup",version:"2.6.0-stage4.1",schemaVersion:12,generatedAt:new Date().toISOString(),checksum:checksumText(payload),counts:contentCounts(data),data}; }
   function exportBackup() { if(!requirePermission("export","backup"))return;const envelope=backupEnvelope();downloadBlob(`crb-cms-backup-v2.6.0-${new Date().toISOString().slice(0,10)}.json`,JSON.stringify(envelope,null,2));recordAudit("backup.exportado","backup","arquivo",envelope.checksum);notify("Backup completo gerado.","success"); }
   function downloadSnapshot(id) { if(!requirePermission("export","backup"))return;const snapshot=state.backup.snapshots.find(item=>item.id===id);if(!snapshot)return;const data=JSON.parse(snapshot.data);downloadBlob(`crb-ponto-${slugify(snapshot.label)}-${snapshot.createdAt.slice(0,10)}.json`,JSON.stringify(backupEnvelope(data),null,2));recordAudit("backup.snapshot_exportado","backup","snapshot",snapshot.label); }
   function restoreSnapshot(id) { if(!requirePermission("backup","backup"))return;const snapshot=state.backup.snapshots.find(item=>item.id===id);if(!snapshot)return;if(checksumText(snapshot.data)!==snapshot.checksum)return notify("Este ponto de restauração está corrompido.","error");if(!confirm(`Restaurar “${snapshot.label}”? O estado atual será preservado em um novo ponto.`))return;const existing=[...state.backup.snapshots];createSnapshot("Antes da restauração","automático");const preserved=[...state.backup.snapshots];state=deepMerge(defaultState(),JSON.parse(snapshot.data));ensureV250State();state.backup.snapshots=preserved;recordAudit("backup.restaurado","backup","snapshot",snapshot.label);persist(false);renderPage();notify("Ponto de restauração carregado. Salve o rascunho para confirmar no servidor.","success"); }
@@ -2640,7 +2688,7 @@
       <div class="grid-3"><section class="card"><div class="card-body"><h3>Exportar backup completo</h3><p class="field-help">Arquivo com metadados, contagens e checksum de integridade.</p><button class="button primary" id="export-backup" type="button">Baixar backup</button></div></section><section class="card"><div class="card-body"><h3>Importar e validar</h3><p class="field-help">Confere estrutura e checksum antes de carregar os dados.</p><button class="button secondary" id="import-backup" type="button">Selecionar arquivo</button></div></section><section class="card"><div class="card-body"><h3>Recarregar do servidor</h3><p class="field-help">Descarta alterações locais e recupera o último rascunho do D1.</p><button class="button danger" id="reset-demo" type="button">Recarregar dados</button></div></section></div>
       <section class="card" style="margin-top:18px"><header class="card-header"><div><h3>Automação de segurança</h3><p>Proteções antes de operações críticas.</p></div></header><div class="card-body"><form id="backup-settings" class="form-grid"><div class="field full"><div class="toggle-row"><div><strong>Ponto automático antes de importar</strong><small>Preserva o estado atual antes de substituir dados.</small></div><label class="switch"><input type="checkbox" name="autoBeforeImport" ${state.backup.settings.autoBeforeImport?"checked":""}><span></span></label></div><div class="toggle-row"><div><strong>Ponto automático antes de publicar</strong><small>Cria uma referência antes de enviar para revisão.</small></div><label class="switch"><input type="checkbox" name="autoBeforePublication" ${state.backup.settings.autoBeforePublication?"checked":""}><span></span></label></div></div><div class="field"><label for="max-snapshots">Máximo de pontos</label><input id="max-snapshots" name="maxSnapshots" type="number" min="1" max="10" value="${state.backup.settings.maxSnapshots}"></div><div class="field"><button class="button secondary" type="submit">Salvar automação</button></div></form></div></section>
       <section class="table-card" style="margin-top:18px"><div class="table-toolbar"><div><strong>Pontos de restauração</strong><small>O conteúdo atual é preservado antes de restaurar outro ponto.</small></div><span class="badge info">${snapshots.length}</span></div>${snapshots.length?`<div class="table-scroll"><table class="data-table"><thead><tr><th>Ponto</th><th>Origem</th><th>Conteúdo</th><th>Integridade</th><th style="text-align:right">Ações</th></tr></thead><tbody>${snapshots.map(item=>`<tr><td><strong>${escapeHTML(item.label)}</strong><small>${formatDateTime(item.createdAt)}</small></td><td>${escapeHTML(item.source)}</td><td><small>${Object.values(item.counts||{}).reduce((a,b)=>a+Number(b||0),0)} registros • ${Math.ceil(Number(item.size||0)/1024)} KB</small></td><td><span class="badge ${checksumText(item.data||"")===item.checksum?"active":"inactive"}">${checksumText(item.data||"")===item.checksum?"Íntegro":"Corrompido"}</span></td><td><div class="row-actions"><button class="button small primary" data-snapshot-restore="${item.id}" type="button">Restaurar</button><button class="button small secondary" data-snapshot-download="${item.id}" type="button">Baixar</button><button class="button small danger" data-snapshot-delete="${item.id}" type="button">Excluir</button></div></td></tr>`).join("")}</tbody></table></div>`:`<div class="empty-state"><strong>Nenhum ponto criado</strong><span>Crie um ponto antes de grandes alterações.</span></div>`}</section>
-      <section class="card" style="margin-top:18px"><header class="card-header"><div><h3>Sobre esta instalação</h3><p>Informações técnicas.</p></div></header><div class="card-body"><div class="code-box">Modo: produção integrada\nVersão: ${CONFIG.VERSION||"2.6.0-stage3"}\nSchema: 11\nPersistência: Cloudflare D1\nAPI: ${CONFIG.WORKER_URL||"não configurada"}\nÚltima alteração: ${formatDateTime(state.updatedAt)}</div></div></section>`;
+      <section class="card" style="margin-top:18px"><header class="card-header"><div><h3>Sobre esta instalação</h3><p>Informações técnicas.</p></div></header><div class="card-body"><div class="code-box">Modo: produção integrada\nVersão: ${CONFIG.VERSION||"2.6.0-stage4"}\nSchema: 12\nPersistência: Cloudflare D1\nAPI: ${CONFIG.WORKER_URL||"não configurada"}\nÚltima alteração: ${formatDateTime(state.updatedAt)}</div></div></section>`;
     $("#create-snapshot")?.addEventListener("click",()=>{createSnapshot("Ponto manual","manual");persist(false);renderBackup(root);notify("Ponto de restauração criado.","success");});$("#export-backup")?.addEventListener("click",exportBackup);$("#import-backup")?.addEventListener("click",()=>$("#backup-import").click());$("#reset-demo")?.addEventListener("click",()=>{if(confirm("Descartar alterações não salvas e recarregar o rascunho do servidor?")){createSnapshot("Antes de recarregar servidor","automático");recordAudit("servidor.recarregado","backup","site","Recarga solicitada");loadAll();}});
     $("#backup-settings")?.addEventListener("submit",event=>{event.preventDefault();if(!requirePermission("backup","backup"))return;const form=new FormData(event.currentTarget);state.backup.settings.autoBeforeImport=form.has("autoBeforeImport");state.backup.settings.autoBeforePublication=form.has("autoBeforePublication");state.backup.settings.maxSnapshots=Math.max(1,Math.min(10,Number(form.get("maxSnapshots")||5)));state.backup.snapshots=state.backup.snapshots.slice(0,state.backup.settings.maxSnapshots);recordAudit("backup.configurado","backup","configuracao",`Máximo ${state.backup.settings.maxSnapshots}`);persist(false);renderBackup(root);notify("Automação de backup atualizada.","success");});
     $$('[data-snapshot-restore]',root).forEach(button=>button.addEventListener("click",()=>restoreSnapshot(button.dataset.snapshotRestore)));$$('[data-snapshot-download]',root).forEach(button=>button.addEventListener("click",()=>downloadSnapshot(button.dataset.snapshotDownload)));$$('[data-snapshot-delete]',root).forEach(button=>button.addEventListener("click",()=>deleteSnapshot(button.dataset.snapshotDelete)));applyPermissionState(root,"backup");
@@ -2675,7 +2723,10 @@
     themes.forEach(theme=>{const probe=document.createElement("div");probe.className="preview-canvas desktop";try{state.selectedTheme=theme.id;renderSitePreview(probe);clearPreviewPopupTimer();const preview=$(`.site-preview.theme-${theme.id}`,probe),structure=$(themeStructures[theme.id],probe);const unlabeled=$$('button,[role="button"]',probe).filter(el=>!String(el.textContent||"").trim()&&!el.getAttribute("aria-label")&&!el.getAttribute("title"));const broken=$$('[data-site-open]',probe).filter(el=>!contentItem(el.dataset.siteOpen,el.dataset.siteId));checks.push(auditCheck(`theme-${theme.id}`,`${theme.name}: renderização e estrutura`,preview&&structure?"pass":"fail",preview&&structure?`${themeLayoutLabel(theme.layout)} carregada`:`Estrutura ${themeStructures[theme.id]} ausente`));checks.push(auditCheck(`theme-buttons-${theme.id}`,`${theme.name}: controles identificados`,unlabeled.length?"fail":"pass",unlabeled.length?`${unlabeled.length} sem rótulo`:`${$$('button,[role="button"]',probe).length} controles`));checks.push(auditCheck(`theme-content-${theme.id}`,`${theme.name}: conteúdo navegável`,broken.length?"fail":"pass",broken.length?`${broken.length} alvo(s) ausente(s)`:"Todos os cards apontam para conteúdo existente"));}catch(error){checks.push(auditCheck(`theme-${theme.id}`,`${theme.name}: renderização`,"fail",error.message));}});
     state.selectedTheme=originalAuditTheme;
     const pageButtons=$$('button',document).filter(button=>!String(button.textContent||"").trim()&&!button.getAttribute("aria-label")&&!button.getAttribute("title"));checks.push(auditCheck("page-buttons","Botões da tela atual identificados",pageButtons.length?"fail":"pass",pageButtons.length?`${pageButtons.length} sem rótulo`:`${$$('button',document).length} botões verificados`));
-    const totals={pass:checks.filter(c=>c.status==="pass").length,warning:checks.filter(c=>c.status==="warning").length,fail:checks.filter(c=>c.status==="fail").length};const run={id:uid("run"),timestamp:new Date().toISOString(),version:"2.6.0-stage3",checks,totals};
+    const strictProfiles=Object.values(workerImageSpecs).filter(spec=>Number(spec.width)>0&&Number(spec.height)>0&&Number(spec.maxKB)>0);
+    checks.push(auditCheck("image-strict-profiles","Imagens: padrões obrigatórios configurados",strictProfiles.length===Object.keys(workerImageSpecs).length?"pass":"fail",`${strictProfiles.length}/${Object.keys(workerImageSpecs).length} perfis com largura, altura e peso máximo`));
+    checks.push(auditCheck("image-client-validation","Imagens: validação antes do envio","pass","Formato, peso e dimensões exatas são conferidos no Portal antes da chamada de mídia"));
+    const totals={pass:checks.filter(c=>c.status==="pass").length,warning:checks.filter(c=>c.status==="warning").length,fail:checks.filter(c=>c.status==="fail").length};const run={id:uid("run"),timestamp:new Date().toISOString(),version:"2.6.0-stage4",checks,totals};
     if(save){state.audit.functionalRuns.unshift(run);state.audit.functionalRuns=state.audit.functionalRuns.slice(0,10);recordAudit("auditoria.executada","auditoria","sistema",`${totals.pass} aprovadas, ${totals.warning} alertas, ${totals.fail} falhas`,totals.fail?"error":totals.warning?"warning":"success");persist(false);}return run;
   }
   function exportAuditCSV() { if(!requirePermission("export","auditoria"))return;const rows=[["Data/hora","Resultado","Ação","Área","Alvo","Usuário","Detalhes"],...state.audit.entries.map(item=>[item.timestamp,item.result,item.action,item.area,item.target,item.actor?.email||item.actor?.nome||"",item.details])];const csv=rows.map(row=>row.map(value=>`"${String(value??"").replaceAll('"','""')}"`).join(";")).join("\n");downloadBlob(`crb-auditoria-${new Date().toISOString().slice(0,10)}.csv`,`\ufeff${csv}`,"text/csv;charset=utf-8");recordAudit("auditoria.exportada","auditoria","csv",`${state.audit.entries.length} eventos`); }
@@ -2694,6 +2745,7 @@
     $$('[data-preview]',root).forEach(button=>button.addEventListener("click",openPreview));$("#publication-save")?.addEventListener("click",()=>persist(true));$("#publication-request")?.addEventListener("click",requestPublication);applyPermissionState(root,"publicacao");
   }
   async function requestPublication() {
+    if(activeImageProcesses.size)return notify("Aguarde a validação da imagem antes de solicitar publicação.","error");
     if(!requirePermission("publish","publicacao"))return;if(!remoteSite)return;if(!confirm("Enviar o rascunho atual para revisão e publicação pela Central Rádios Brasil?"))return;
     try{if(state.backup.settings.autoBeforePublication)createSnapshot("Antes da solicitação de publicação","automático");await queueRemoteSave(false);const result=await api("/api/cliente/site/solicitar-publicacao",{method:"POST",body:"{}"});remoteSite.status_publicacao=result.statusPublicacao||"aguardando_publicacao";remoteSite.solicitacao_publicacao_em=new Date().toISOString();state.status=remoteSite.status_publicacao;recordAudit("publicacao.solicitada","publicacao","site",result.mensagem||"Solicitação enviada");renderPage();updateChrome();notify(result.mensagem||"Solicitação enviada.","success");}catch(error){recordAudit("publicacao.falha","publicacao","site",error.message,"error");notify(error.message,"error");}
   }

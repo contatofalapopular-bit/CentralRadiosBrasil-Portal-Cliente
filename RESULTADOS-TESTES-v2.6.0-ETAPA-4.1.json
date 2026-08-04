@@ -1,0 +1,227 @@
+{
+  "version": "2.6.0-stage4.1",
+  "summary": {
+    "total": 42,
+    "pass": 42,
+    "fail": 0
+  },
+  "results": [
+    {
+      "name": "no-horizontal-overflow-1600x900",
+      "status": "pass",
+      "detail": "{'sw': 1600, 'cw': 1600}"
+    },
+    {
+      "name": "editor-mode-class-1600x900",
+      "status": "pass",
+      "detail": "body class"
+    },
+    {
+      "name": "layout-visible-1600x900",
+      "status": "pass",
+      "detail": "{'layout': {'x': 306, 'y': 196.9375, 'width': 1274, 'height': 794}, 'preview': {'x': 912, 'y': 196.9375, 'width': 668, 'height': 784}, 'controls': {'x': 550, 'y': 196.9375, 'width': 350, 'height': 794}}"
+    },
+    {
+      "name": "preview-beside-controls-1600x900",
+      "status": "pass",
+      "detail": "{'previewX': 912, 'controlsRight': 900}"
+    },
+    {
+      "name": "preview-below-topbar-1600x900",
+      "status": "pass",
+      "detail": "{'previewY': 196.9375, 'topbarH': 86}"
+    },
+    {
+      "name": "preview-fits-viewport-1600x900",
+      "status": "pass",
+      "detail": "{'right': 1580, 'viewport': 1600}"
+    },
+    {
+      "name": "live-preview-update-1600x900",
+      "status": "pass",
+      "detail": "title rendered"
+    },
+    {
+      "name": "mobile-preview-contained-1600x900",
+      "status": "pass",
+      "detail": "{'canvas': 532.140625, 'panel': 668}"
+    },
+    {
+      "name": "tablet-preview-contained-1600x900",
+      "status": "pass",
+      "detail": "{'canvas': 536.921875, 'panel': 668}"
+    },
+    {
+      "name": "independent-control-scroll-1600x900",
+      "status": "pass",
+      "detail": "{'ch': 794, 'sh': 1365, 'ph': 784, 'py': 196.9375}"
+    },
+    {
+      "name": "preview-stays-while-controls-scroll-1600x900",
+      "status": "pass",
+      "detail": "{'before': 106, 'after': 87.9375}"
+    },
+    {
+      "name": "no-horizontal-overflow-1360x768",
+      "status": "pass",
+      "detail": "{'sw': 1360, 'cw': 1360}"
+    },
+    {
+      "name": "editor-mode-class-1360x768",
+      "status": "pass",
+      "detail": "body class"
+    },
+    {
+      "name": "layout-visible-1360x768",
+      "status": "pass",
+      "detail": "{'layout': {'x': 302, 'y': 196.9375, 'width': 1042, 'height': 662}, 'preview': {'x': 861, 'y': 196.9375, 'width': 483, 'height': 652}, 'controls': {'x': 524, 'y': 196.9375, 'width': 325, 'height': 662}}"
+    },
+    {
+      "name": "preview-beside-controls-1360x768",
+      "status": "pass",
+      "detail": "{'previewX': 861, 'controlsRight': 849}"
+    },
+    {
+      "name": "preview-below-topbar-1360x768",
+      "status": "pass",
+      "detail": "{'previewY': 196.9375, 'topbarH': 86}"
+    },
+    {
+      "name": "preview-fits-viewport-1360x768",
+      "status": "pass",
+      "detail": "{'right': 1344, 'viewport': 1360}"
+    },
+    {
+      "name": "live-preview-update-1360x768",
+      "status": "pass",
+      "detail": "title rendered"
+    },
+    {
+      "name": "mobile-preview-contained-1360x768",
+      "status": "pass",
+      "detail": "{'canvas': 439.9375, 'panel': 483}"
+    },
+    {
+      "name": "tablet-preview-contained-1360x768",
+      "status": "pass",
+      "detail": "{'canvas': 434.0625, 'panel': 483}"
+    },
+    {
+      "name": "independent-control-scroll-1360x768",
+      "status": "pass",
+      "detail": "{'ch': 662, 'sh': 1393, 'ph': 652, 'py': 196.9375}"
+    },
+    {
+      "name": "preview-stays-while-controls-scroll-1360x768",
+      "status": "pass",
+      "detail": "{'before': 106, 'after': 87.9375}"
+    },
+    {
+      "name": "no-horizontal-overflow-1180x800",
+      "status": "pass",
+      "detail": "{'sw': 1180, 'cw': 1180}"
+    },
+    {
+      "name": "editor-mode-class-1180x800",
+      "status": "pass",
+      "detail": "body class"
+    },
+    {
+      "name": "layout-visible-1180x800",
+      "status": "pass",
+      "detail": "{'layout': {'x': 276, 'y': 196.9375, 'width': 888, 'height': 1013.46875}, 'preview': {'x': 628, 'y': 516.40625, 'width': 536, 'height': 684}, 'controls': {'x': 276, 'y': 516.40625, 'width': 340, 'height': 694}}"
+    },
+    {
+      "name": "preview-below-topbar-1180x800",
+      "status": "pass",
+      "detail": "{'previewY': 516.40625, 'topbarH': 86}"
+    },
+    {
+      "name": "preview-fits-viewport-1180x800",
+      "status": "pass",
+      "detail": "{'right': 1164, 'viewport': 1180}"
+    },
+    {
+      "name": "live-preview-update-1180x800",
+      "status": "pass",
+      "detail": "title rendered"
+    },
+    {
+      "name": "mobile-preview-contained-1180x800",
+      "status": "pass",
+      "detail": "{'canvas': 442.5625, 'panel': 536}"
+    },
+    {
+      "name": "tablet-preview-contained-1180x800",
+      "status": "pass",
+      "detail": "{'canvas': 445.921875, 'panel': 536}"
+    },
+    {
+      "name": "no-horizontal-overflow-1024x768",
+      "status": "pass",
+      "detail": "{'sw': 1024, 'cw': 1024}"
+    },
+    {
+      "name": "editor-mode-class-1024x768",
+      "status": "pass",
+      "detail": "body class"
+    },
+    {
+      "name": "layout-visible-1024x768",
+      "status": "pass",
+      "detail": "{'layout': {'x': 276, 'y': 212.875, 'width': 732, 'height': 981.46875}, 'preview': {'x': 628, 'y': 532.34375, 'width': 380, 'height': 652}, 'controls': {'x': 276, 'y': 532.34375, 'width': 340, 'height': 662}}"
+    },
+    {
+      "name": "preview-below-topbar-1024x768",
+      "status": "pass",
+      "detail": "{'previewY': 532.34375, 'topbarH': 86}"
+    },
+    {
+      "name": "preview-fits-viewport-1024x768",
+      "status": "pass",
+      "detail": "{'right': 1008, 'viewport': 1024}"
+    },
+    {
+      "name": "live-preview-update-1024x768",
+      "status": "pass",
+      "detail": "title rendered"
+    },
+    {
+      "name": "mobile-preview-contained-1024x768",
+      "status": "pass",
+      "detail": "{'canvas': 358, 'panel': 380}"
+    },
+    {
+      "name": "tablet-preview-contained-1024x768",
+      "status": "pass",
+      "detail": "{'canvas': 358, 'panel': 380}"
+    },
+    {
+      "name": "release-stage4-1",
+      "status": "pass",
+      "detail": "release"
+    },
+    {
+      "name": "schema-preserved",
+      "status": "pass",
+      "detail": "schema 12"
+    },
+    {
+      "name": "page-errors",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "name": "console-errors",
+      "status": "pass",
+      "detail": ""
+    }
+  ],
+  "consoleErrors": [
+    "Failed to load resource: the server responded with a status of 404 (Not Found)",
+    "Failed to load resource: the server responded with a status of 404 (Not Found)",
+    "Failed to load resource: the server responded with a status of 404 (Not Found)",
+    "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  ],
+  "pageErrors": []
+}

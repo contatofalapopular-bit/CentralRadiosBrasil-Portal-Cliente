@@ -22,7 +22,7 @@
         <button class="button primary" id="login-button" type="submit">Entrar</button>
       </form>
       <div class="global-message hidden" id="login-message" role="alert"></div>
-      <small class="login-version">Portal v2.6.0 • Cores por bloco</small>
+      <small class="login-version">Portal v2.6.0 • Editor reorganizado</small>
     </div>
   </section>
 
@@ -39,7 +39,7 @@
       </div>
       <nav class="sidebar-nav" id="sidebar-nav"></nav>
       <div class="sidebar-footer">
-        <span>Portal v2.6.0 • Etapa 3</span>
+        <span>Portal v2.6.0 • Etapa 4.1</span>
         <small>Dados reais • Worker + D1</small>
       </div>
     </aside>
@@ -66,10 +66,10 @@
   </div>
 
   <dialog class="modal" id="editor-modal">
-    <form method="dialog" class="modal-card" id="editor-form">
-      <header class="modal-header"><div><span class="overline" id="modal-eyebrow">Cadastro</span><h2 id="modal-title">Novo item</h2></div><button class="icon-button" value="cancel" aria-label="Fechar" type="submit">×</button></header>
+    <form class="modal-card" id="editor-form">
+      <header class="modal-header"><div><span class="overline" id="modal-eyebrow">Cadastro</span><h2 id="modal-title">Novo item</h2></div><button class="icon-button" value="cancel" aria-label="Fechar" type="button">×</button></header>
       <div class="modal-body" id="modal-fields"></div>
-      <footer class="modal-footer"><button class="button ghost" value="cancel" type="submit">Cancelar</button><button class="button primary" id="modal-save" value="default" type="submit">Salvar item</button></footer>
+      <footer class="modal-footer"><button class="button ghost" value="cancel" type="button">Cancelar</button><button class="button primary" id="modal-save" value="default" type="submit">Salvar item</button></footer>
     </form>
   </dialog>
 
@@ -93,10 +93,10 @@
 
 
   <dialog class="modal access-user-dialog" id="access-user-modal" aria-labelledby="access-user-title">
-    <form method="dialog" class="modal-card" id="access-user-form">
-      <header class="modal-header"><div><span class="overline">Segurança e permissões</span><h2 id="access-user-title">Novo usuário</h2></div><button class="icon-button" value="cancel" aria-label="Fechar cadastro de usuário" type="submit">×</button></header>
+    <form class="modal-card" id="access-user-form">
+      <header class="modal-header"><div><span class="overline">Segurança e permissões</span><h2 id="access-user-title">Novo usuário</h2></div><button class="icon-button" value="cancel" aria-label="Fechar cadastro de usuário" type="button">×</button></header>
       <div class="modal-body" id="access-user-fields"></div>
-      <footer class="modal-footer"><button class="button ghost" value="cancel" type="submit">Cancelar</button><button class="button primary" id="access-user-save" value="default" type="submit">Salvar usuário</button></footer>
+      <footer class="modal-footer"><button class="button ghost" value="cancel" type="button">Cancelar</button><button class="button primary" id="access-user-save" value="default" type="submit">Salvar usuário</button></footer>
     </form>
   </dialog>
 

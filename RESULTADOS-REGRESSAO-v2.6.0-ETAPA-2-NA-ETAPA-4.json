@@ -1,0 +1,244 @@
+{
+  "version": "2.6.0-stage4-regression-stage2",
+  "summary": {
+    "total": 46,
+    "pass": 46,
+    "fail": 0
+  },
+  "results": [
+    {
+      "name": "version-login",
+      "status": "pass",
+      "detail": "Portal v2.6.0 • Editor reorganizado"
+    },
+    {
+      "name": "version-sidebar",
+      "status": "pass",
+      "detail": "Portal v2.6.0 • Etapa 4.1\nDados reais • Worker + D1"
+    },
+    {
+      "name": "routes",
+      "status": "pass",
+      "detail": "30 áreas; falhas=[]"
+    },
+    {
+      "name": "editor-note",
+      "status": "pass",
+      "detail": "V2.6.0 • ETAPA 4.1\nEditor visual reorganizado\n\nOrganize os blocos e acompanhe cada alteração imediatamente na prévia ao lado.\n\nMesmo rascunho atual\nSem mudança no Worker\nPrévia em tela cheia"
+    },
+    {
+      "name": "theme-fields",
+      "status": "pass",
+      "detail": "5"
+    },
+    {
+      "name": "blocks",
+      "status": "pass",
+      "detail": "14"
+    },
+    {
+      "name": "move-buttons",
+      "status": "pass",
+      "detail": "setas por bloco"
+    },
+    {
+      "name": "news-ticker-off",
+      "status": "pass",
+      "detail": "ticker ocultado"
+    },
+    {
+      "name": "news-layout-class",
+      "status": "pass",
+      "detail": "site-preview theme-news editor-density-compacta editor-header-redacao-compacta editor-headline-layout-lista-cronologica editor-option-section-rules"
+    },
+    {
+      "name": "block-title",
+      "status": "pass",
+      "detail": "Plantão da emissora"
+    },
+    {
+      "name": "block-eyebrow",
+      "status": "pass",
+      "detail": "ATUALIZAÇÃO CONTÍNUA"
+    },
+    {
+      "name": "block-limit",
+      "status": "pass",
+      "detail": "2"
+    },
+    {
+      "name": "block-classes",
+      "status": "pass",
+      "detail": "site-section alt editor-block-lista editor-width-contido editor-bg-automatico editor-align-esquerda editor-hide-description editor-hide-action"
+    },
+    {
+      "name": "block-description-hidden",
+      "status": "pass",
+      "detail": "oculta"
+    },
+    {
+      "name": "block-action-hidden",
+      "status": "pass",
+      "detail": "oculta"
+    },
+    {
+      "name": "theme-isolation-title",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "name": "theme-isolation-limit",
+      "status": "pass",
+      "detail": "4"
+    },
+    {
+      "name": "gospel-options",
+      "status": "pass",
+      "detail": "opções gospel"
+    },
+    {
+      "name": "gospel-welcome-off",
+      "status": "pass",
+      "detail": "painel ocultado"
+    },
+    {
+      "name": "news-persist-title",
+      "status": "pass",
+      "detail": "Plantão da emissora"
+    },
+    {
+      "name": "news-persist-limit",
+      "status": "pass",
+      "detail": "2"
+    },
+    {
+      "name": "news-persist-ticker",
+      "status": "pass",
+      "detail": "desativado"
+    },
+    {
+      "name": "move-up",
+      "status": "pass",
+      "detail": "noticias->hero"
+    },
+    {
+      "name": "toggle-block",
+      "status": "pass",
+      "detail": "True->False"
+    },
+    {
+      "name": "fullscreen-title",
+      "status": "pass",
+      "detail": "Plantão da emissora"
+    },
+    {
+      "name": "fullscreen-limit",
+      "status": "pass",
+      "detail": "2"
+    },
+    {
+      "name": "device-desktop",
+      "status": "pass",
+      "detail": "preview-canvas desktop"
+    },
+    {
+      "name": "device-tablet",
+      "status": "pass",
+      "detail": "preview-canvas tablet"
+    },
+    {
+      "name": "device-mobile",
+      "status": "pass",
+      "detail": "preview-canvas mobile"
+    },
+    {
+      "name": "theme-morada",
+      "status": "pass",
+      "detail": ".theme-stage-regional"
+    },
+    {
+      "name": "theme-labels-morada",
+      "status": "pass",
+      "detail": "0"
+    },
+    {
+      "name": "theme-spotify",
+      "status": "pass",
+      "detail": ".theme-stage-music"
+    },
+    {
+      "name": "theme-labels-spotify",
+      "status": "pass",
+      "detail": "0"
+    },
+    {
+      "name": "theme-news",
+      "status": "pass",
+      "detail": ".theme-stage-news"
+    },
+    {
+      "name": "theme-labels-news",
+      "status": "pass",
+      "detail": "0"
+    },
+    {
+      "name": "theme-gospel",
+      "status": "pass",
+      "detail": ".theme-stage-community"
+    },
+    {
+      "name": "theme-labels-gospel",
+      "status": "pass",
+      "detail": "0"
+    },
+    {
+      "name": "theme-young",
+      "status": "pass",
+      "detail": ".theme-stage-young"
+    },
+    {
+      "name": "theme-labels-young",
+      "status": "pass",
+      "detail": "0"
+    },
+    {
+      "name": "theme-custom",
+      "status": "pass",
+      "detail": ".theme-stage-clean"
+    },
+    {
+      "name": "theme-labels-custom",
+      "status": "pass",
+      "detail": "0"
+    },
+    {
+      "name": "audit-editor-themes",
+      "status": "pass",
+      "detail": "check presente"
+    },
+    {
+      "name": "audit-editor-blocks",
+      "status": "pass",
+      "detail": "check presente"
+    },
+    {
+      "name": "audit-no-fail",
+      "status": "pass",
+      "detail": "[]"
+    },
+    {
+      "name": "page-errors",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "name": "console-errors",
+      "status": "pass",
+      "detail": ""
+    }
+  ],
+  "consoleErrors": [
+    "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  ],
+  "pageErrors": []
+}

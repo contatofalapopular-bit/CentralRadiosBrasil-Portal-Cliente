@@ -1,0 +1,16 @@
+{
+  "status": "pass",
+  "puts": 3,
+  "mediaPosts": 1,
+  "schema": 12,
+  "release": "2.6.0-stage4",
+  "draftEndpoint": "/api/cliente/site/rascunho",
+  "mediaEndpoint": "/api/cliente/site/midias",
+  "validatedImage": {
+    "width": 800,
+    "height": 400,
+    "mime": "image/png"
+  },
+  "themes": 6,
+  "blocksPerTheme": 14
+}

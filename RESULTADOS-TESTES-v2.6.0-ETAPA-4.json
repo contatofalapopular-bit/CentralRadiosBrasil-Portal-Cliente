@@ -1,0 +1,222 @@
+{
+  "version": "2.6.0-stage4.1",
+  "summary": {
+    "total": 39,
+    "pass": 39,
+    "fail": 0
+  },
+  "results": [
+    {
+      "name": "version-login",
+      "status": "pass",
+      "detail": "Portal v2.6.0 • Editor reorganizado"
+    },
+    {
+      "name": "version-sidebar",
+      "status": "pass",
+      "detail": "Portal v2.6.0 • Etapa 4.1\nDados reais • Worker + D1"
+    },
+    {
+      "name": "routes",
+      "status": "pass",
+      "detail": "30 áreas; falhas=[]"
+    },
+    {
+      "name": "logo-spec",
+      "status": "pass",
+      "detail": "(800, 400, 300, 'false')"
+    },
+    {
+      "name": "strict-copy",
+      "status": "pass",
+      "detail": "Sem imagem\n800 × 400 px • proporção 2:1\n\nTamanho obrigatório. JPG, PNG ou WEBP, com no máximo 300 KB. Imagens fora do padrão são rejeitadas; o Portal não recorta nem redimensiona.\n\nSelecionar imagem Remover\nAguardando uma imagem no padrão informado."
+    },
+    {
+      "name": "reject-dimensions",
+      "status": "pass",
+      "detail": "Imagem rejeitada. Tamanho recebido: 400 × 400 px. Tamanho obrigatório: 800 × 400 px."
+    },
+    {
+      "name": "reject-dimensions-no-api",
+      "status": "pass",
+      "detail": "0"
+    },
+    {
+      "name": "reject-dimensions-no-value",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "name": "reject-format",
+      "status": "pass",
+      "detail": "Imagem rejeitada. Formato recebido: image/gif. Formatos permitidos: JPG, PNG ou WEBP."
+    },
+    {
+      "name": "reject-format-no-api",
+      "status": "pass",
+      "detail": "0"
+    },
+    {
+      "name": "reject-weight",
+      "status": "pass",
+      "detail": "Imagem rejeitada. Peso recebido: 939 KB. Peso máximo: 300 KB."
+    },
+    {
+      "name": "reject-weight-no-api",
+      "status": "pass",
+      "detail": "0"
+    },
+    {
+      "name": "accept-valid",
+      "status": "pass",
+      "detail": "Imagem aceita: 800 × 400 px • 2 KB • PNG."
+    },
+    {
+      "name": "accept-valid-api",
+      "status": "pass",
+      "detail": "1"
+    },
+    {
+      "name": "accept-valid-payload",
+      "status": "pass",
+      "detail": "{'perfil': 'logo', 'campo': 'logo', 'nomeOriginal': 'valid-logo.png', 'mime': 'image/png', 'largura': 800, 'altura': 400, 'dataBase64': 'iVBORw0KGgoAAAANSUhEUgAAAyAAAAGQCAIAAADZR5NjAAAF6klEQVR42u3WMREAMAgAsVIXWEMnAtHAHWMi4aePrH4AANz5EgAAGCwAAIMFAGCwAAAwWAAABgsAwGABAGCwAAAMFgCAwQIAwGABABgsAACDBQBgsAAAMFgAAAYLAMBgAQBgsAAADBYAgMECAMBgAQAYLAAAgwUAgMECADBYAAAGCwDAYAEAYLAAAAwWAIDBAgDAYAEAGCwAAIMFAIDBAgAwWAAABgsAAIMFAGCwAAAMFgCAwQIAwGABABgsAACDBQCAwQIAMFgAAAYLAACDBQBgsAAADBYAAAYLAMBgAQAYLAAAgwUAgMECADBYAAAGCwAAgwUAYLAAAAwWAAAGCwDAYAEAGCwAAIMFAIDBAgAwWAAABgsAAIMFAGCwAAAMFgAABgsAwGABABgsAAAMFgCAwQIAMFgAAAYLAACDBQBgsAAADBYAAAYLAMBgAQAYLAAADBYAgMECADBYAAAYLAAAgwUAYLAAAAwWAAAGCwDAYAEAGCwAAAwWAIDBAgAwWAAAGCwAAIMFAGCwAAAwWAAABgsAwGABABgsAAAMFgCAwQIAMFgAABgsAACDBQBgsAAAMFgAAAYLAMBgAQAYLAAADBYAgMECADBYAAAYLAAAgwUAYLAAADBYAAAGCwDAYAEAYLAAAAwWAIDBAgAwWAAAGCwAAIMFAGCwAAAwWAAABgsAwGABAGCwAAAMFgCAwQIAwGABABgsAACDBQBgsAAAMFgAAAYLAMBgAQBgsAAADBYAgMECAMBgAQAYLAAAgwUAgMECADBYAAAGCwDAYAEAYLAAAAwWAIDBAgDAYAEAGCwAAIMFAIDBAgAwWAAABgsAwGABAGCwAAAMFgCAwQIAwGABABgsAACDBQCAwQIAMFgAAAYLAACDBQBgsAAADBYAgMECAMBgAQAYLAAAgwUAgMECADBYAAAGCwAAgwUAYLAAAAwWAAAGCwDAYAEAGCwAAIMFAIDBAgAwWAAABgsAAIMFAGCwAAAMFgAABgsAwGABABgsAAAMFgCAwQIAMFgAAAYLAACDBQBgsAAADBYAAAYLAMBgAQAYLAAADBYAgMECADBYAAAGCwAAgwUAYLAAAAwWAAAGCwDAYAEAGCwAAAwWAIDBAgAwWAAAGCwAAIMFAGCwAAAMFgAABgsAwGABABgsAAAMFgCAwQIAMFgAABgsAACDBQBgsAAAMFgAAAYLAMBgAQAYLAAADBYAgMECADBYAAAYLAAAgwUAYLAAADBYAAAGCwDAYAEAYLAAAAwWAIDBAgAwWAAAGCwAAIMFAGCwAAAwWAAABgsAwGABAGCwAAAMFgCAwQIAMFgSAAAYLAAAgwUAYLAAADBYAAAGCwDAYAEAYLAAAAwWAIDBAgDAYAEAGCwAAIMFAGCwAAAwWAAABgsAwGABAGCwAAAMFgCAwQIAwGABABgsAACDBQCAwQIAMFgAAAYLAMBgAQBgsAAADBYAgMECAMBgAQAYLAAAgwUAgMECADBYAAAGCwAAgwUAYLAAAAwWAIDBAgDAYAEAGCwAAIMFAIDBAgAwWAAABgsAAIMFAGCwAAAMFgAABgsAwGABABgsAACDBQCAwQIAMFgAAAYLAACDBQBgsAAADBYAAAYLAMBgAQAYLAAAgwUAgMECADBYAAAGCwAAgwUAYLAAAAwWAAAGCwDAYAEAGCwAAAwWAIDBAgAwWAAABgsAAIMFAGCwAAAMFgAABgsAwGABABgsAAAMFgCAwQIAMFgAABgsAACDBQBgsAAADBYAAAYLAMBgAQAYLAAADBYAgMECADBYAAAYLAAAgwUAYLAAADBYAAAGCwDAYAEAGCwAAAwWAIDBAgAwWAAAGCwAAIMFAGCwAAAwWAAABgsAwGABABgsAAAMFgCAwQIAMFgAABgsAACDBQBgsAAAMFgAAAYLAMBgAQBgsAAADBYAgMECADBYAAAYLAAAgwUAYLAAADBYAAAGCwDAYAEAYLAAAAwWAIDBAgDAYAEAGCwAAIMFAGCwAAAwWAAABgsAwGABALAx4k4ERy/zYFAAAAAASUVORK5CYII='}"
+    },
+    {
+      "name": "accept-valid-value",
+      "status": "pass",
+      "detail": "data:image/png;base64,iVBORw0K"
+    },
+    {
+      "name": "all-content-image-profiles",
+      "status": "pass",
+      "detail": "14 módulos e 17 campos conferidos"
+    },
+    {
+      "name": "seo-spec",
+      "status": "pass",
+      "detail": "(1200, 630, 300, 'false')"
+    },
+    {
+      "name": "app-icon-spec",
+      "status": "pass",
+      "detail": "(512, 512, 120, 'false')"
+    },
+    {
+      "name": "app-qr-spec",
+      "status": "pass",
+      "detail": "(512, 512, 150, 'false')"
+    },
+    {
+      "name": "required-blocks-save",
+      "status": "pass",
+      "detail": "modal continua aberto"
+    },
+    {
+      "name": "required-message",
+      "status": "pass",
+      "detail": "Imagem obrigatória. Envie exatamente 1600 × 1200 px."
+    },
+    {
+      "name": "gallery-valid",
+      "status": "pass",
+      "detail": "Imagem aceita: 1600 × 1200 px • 9 KB • PNG."
+    },
+    {
+      "name": "required-valid-saves",
+      "status": "pass",
+      "detail": "modal fechado"
+    },
+    {
+      "name": "gallery-row",
+      "status": "pass",
+      "detail": "Foto validada\nSem descrição\n\tGaleria\t\nPublicado\n\t\nVisualizar\nEditar\nDuplicar\nExcluir\n\n\nNO\nNossa equipe\nDia a dia da rádio.\n\tBastidores\t\nPublicado\n\t\nVisualizar\nEditar\nDuplicar\nExcluir\n\n\nES\nEstúdio principal\nConheça nossos espaços.\n\tEstrutura\t\nPublicado\n\t\nVisualizar\nEditar\nDuplicar\nExcluir\n\n\nAÇ\nAção externa\nRádio perto da comunidade.\n\tEventos\t\nPublicado\n\t\nVisualizar\nEditar\nDuplicar\nExcluir"
+    },
+    {
+      "name": "editor-14-blocks",
+      "status": "pass",
+      "detail": "14"
+    },
+    {
+      "name": "editor-colors",
+      "status": "pass",
+      "detail": "6"
+    },
+    {
+      "name": "six-themes",
+      "status": "pass",
+      "detail": "6"
+    },
+    {
+      "name": "audit-image-profiles",
+      "status": "pass",
+      "detail": "check presente"
+    },
+    {
+      "name": "audit-image-before-upload",
+      "status": "pass",
+      "detail": "check presente"
+    },
+    {
+      "name": "audit-no-fail",
+      "status": "pass",
+      "detail": "[]"
+    },
+    {
+      "name": "schema-12",
+      "status": "pass",
+      "detail": "schema 12"
+    },
+    {
+      "name": "release-stage4-1",
+      "status": "pass",
+      "detail": "release stage4.1"
+    },
+    {
+      "name": "no-browser-resize",
+      "status": "pass",
+      "detail": "sem recorte/redimensionamento automático"
+    },
+    {
+      "name": "same-media-endpoint",
+      "status": "pass",
+      "detail": "endpoint preservado"
+    },
+    {
+      "name": "same-draft-endpoint",
+      "status": "pass",
+      "detail": "endpoint preservado"
+    },
+    {
+      "name": "page-errors",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "name": "console-errors",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "name": "endpoint-isolation",
+      "status": "pass",
+      "detail": "{'stage3': ['/api/cliente/dashboard', '/api/cliente/login', '/api/cliente/logout', '/api/cliente/sessao', '/api/cliente/site', '/api/cliente/site/midias', '/api/cliente/site/rascunho', '/api/cliente/site/solicitar-publicacao', '/api/cliente/trocar-senha'], 'stage4': ['/api/cliente/dashboard', '/api/cliente/login', '/api/cliente/logout', '/api/cliente/sessao', '/api/cliente/site', '/api/cliente/site/midias', '/api/cliente/site/rascunho', '/api/cliente/site/solicitar-publicacao', '/api/cliente/trocar-senha']}"
+    }
+  ],
+  "mediaRequests": 2,
+  "draftRequests": 0,
+  "consoleErrors": [
+    "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  ],
+  "pageErrors": [],
+  "endpoints": [
+    "/api/cliente/dashboard",
+    "/api/cliente/login",
+    "/api/cliente/logout",
+    "/api/cliente/sessao",
+    "/api/cliente/site",
+    "/api/cliente/site/midias",
+    "/api/cliente/site/rascunho",
+    "/api/cliente/site/solicitar-publicacao",
+    "/api/cliente/trocar-senha"
+  ]
+}

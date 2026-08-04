@@ -1,0 +1,50 @@
+{
+  "release": "2.6.0-stage4",
+  "baterias": [
+    {
+      "arquivo": "RESULTADOS-TESTES-v2.6.0-ETAPA-4.json",
+      "total": 39,
+      "pass": 39,
+      "fail": 0
+    },
+    {
+      "arquivo": "RESULTADOS-REGRESSAO-v2.6.0-ETAPA-1-NA-ETAPA-4.json",
+      "total": 48,
+      "pass": 48,
+      "fail": 0
+    },
+    {
+      "arquivo": "RESULTADOS-REGRESSAO-v2.6.0-ETAPA-2-NA-ETAPA-4.json",
+      "total": 46,
+      "pass": 46,
+      "fail": 0
+    },
+    {
+      "arquivo": "RESULTADOS-REGRESSAO-v2.6.0-ETAPA-3-NA-ETAPA-4.json",
+      "total": 56,
+      "pass": 56,
+      "fail": 0
+    }
+  ],
+  "total": 189,
+  "pass": 189,
+  "fail": 0,
+  "persistence": {
+    "status": "pass",
+    "puts": 3,
+    "mediaPosts": 1,
+    "schema": 12,
+    "release": "2.6.0-stage4",
+    "draftEndpoint": "/api/cliente/site/rascunho",
+    "mediaEndpoint": "/api/cliente/site/midias",
+    "validatedImage": {
+      "width": 800,
+      "height": 400,
+      "mime": "image/png"
+    },
+    "themes": 6,
+    "blocksPerTheme": 14
+  },
+  "exceptionsJavaScript": 0,
+  "relevantConsoleErrors": 0
+}

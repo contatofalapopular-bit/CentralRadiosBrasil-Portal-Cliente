@@ -1,0 +1,30 @@
+{
+  "version": "2.6.0-stage4.1",
+  "before": [
+    "/api/cliente/dashboard",
+    "/api/cliente/login",
+    "/api/cliente/logout",
+    "/api/cliente/sessao",
+    "/api/cliente/site",
+    "/api/cliente/site/midias",
+    "/api/cliente/site/rascunho",
+    "/api/cliente/site/solicitar-publicacao",
+    "/api/cliente/trocar-senha"
+  ],
+  "after": [
+    "/api/cliente/dashboard",
+    "/api/cliente/login",
+    "/api/cliente/logout",
+    "/api/cliente/sessao",
+    "/api/cliente/site",
+    "/api/cliente/site/midias",
+    "/api/cliente/site/rascunho",
+    "/api/cliente/site/solicitar-publicacao",
+    "/api/cliente/trocar-senha"
+  ],
+  "added": [],
+  "removed": [],
+  "same": true,
+  "configJsUnchanged": true,
+  "manifestUnchanged": true
+}

@@ -1,0 +1,254 @@
+{
+  "version": "2.6.0-stage4-regression-stage1",
+  "summary": {
+    "total": 48,
+    "pass": 48,
+    "fail": 0
+  },
+  "results": [
+    {
+      "name": "login-view",
+      "status": "pass",
+      "detail": "Portal v2.6.0 • Editor reorganizado"
+    },
+    {
+      "name": "login",
+      "status": "pass",
+      "detail": "Aplicação aberta"
+    },
+    {
+      "name": "sidebar-version",
+      "status": "pass",
+      "detail": "Portal v2.6.0 • Etapa 4.1\nDados reais • Worker + D1"
+    },
+    {
+      "name": "nav-count",
+      "status": "pass",
+      "detail": "30 áreas visíveis"
+    },
+    {
+      "name": "all-routes",
+      "status": "pass",
+      "detail": "30 áreas abertas"
+    },
+    {
+      "name": "theme-names",
+      "status": "pass",
+      "detail": "Portal Regional & TV | Rádio Popular & Musical | News 24h | Gospel Inspira | Rádio Jovem | Estúdio Personalizado"
+    },
+    {
+      "name": "theme-release-note",
+      "status": "pass",
+      "detail": "V2.6.0 • ETAPA 4\nModelos, blocos, cores e imagens validados\n\nAs seis vitrines continuam distintas, com cores por bloco, e todos os campos de imagem agora rejeitam arquivos fora do tamanho, formato ou peso exigidos antes do envio.\n\nMesmo rascunho do Portal\nSem mudanças no Worker"
+    },
+    {
+      "name": "theme-morada-structure",
+      "status": "pass",
+      "detail": ".theme-stage-regional"
+    },
+    {
+      "name": "theme-morada-labels",
+      "status": "pass",
+      "detail": "44 controles; 0 sem rótulo"
+    },
+    {
+      "name": "theme-morada-desktop",
+      "status": "pass",
+      "detail": "preview-canvas desktop"
+    },
+    {
+      "name": "theme-morada-tablet",
+      "status": "pass",
+      "detail": "preview-canvas tablet"
+    },
+    {
+      "name": "theme-morada-mobile",
+      "status": "pass",
+      "detail": "preview-canvas mobile"
+    },
+    {
+      "name": "theme-spotify-structure",
+      "status": "pass",
+      "detail": ".theme-music-actions"
+    },
+    {
+      "name": "theme-spotify-labels",
+      "status": "pass",
+      "detail": "45 controles; 0 sem rótulo"
+    },
+    {
+      "name": "theme-spotify-desktop",
+      "status": "pass",
+      "detail": "preview-canvas desktop"
+    },
+    {
+      "name": "theme-spotify-tablet",
+      "status": "pass",
+      "detail": "preview-canvas tablet"
+    },
+    {
+      "name": "theme-spotify-mobile",
+      "status": "pass",
+      "detail": "preview-canvas mobile"
+    },
+    {
+      "name": "theme-news-structure",
+      "status": "pass",
+      "detail": ".theme-news-ticker"
+    },
+    {
+      "name": "theme-news-labels",
+      "status": "pass",
+      "detail": "44 controles; 0 sem rótulo"
+    },
+    {
+      "name": "theme-news-desktop",
+      "status": "pass",
+      "detail": "preview-canvas desktop"
+    },
+    {
+      "name": "theme-news-tablet",
+      "status": "pass",
+      "detail": "preview-canvas tablet"
+    },
+    {
+      "name": "theme-news-mobile",
+      "status": "pass",
+      "detail": "preview-canvas mobile"
+    },
+    {
+      "name": "theme-gospel-structure",
+      "status": "pass",
+      "detail": ".theme-gospel-welcome"
+    },
+    {
+      "name": "theme-gospel-labels",
+      "status": "pass",
+      "detail": "43 controles; 0 sem rótulo"
+    },
+    {
+      "name": "theme-gospel-desktop",
+      "status": "pass",
+      "detail": "preview-canvas desktop"
+    },
+    {
+      "name": "theme-gospel-tablet",
+      "status": "pass",
+      "detail": "preview-canvas tablet"
+    },
+    {
+      "name": "theme-gospel-mobile",
+      "status": "pass",
+      "detail": "preview-canvas mobile"
+    },
+    {
+      "name": "theme-young-structure",
+      "status": "pass",
+      "detail": ".theme-stage-young"
+    },
+    {
+      "name": "theme-young-labels",
+      "status": "pass",
+      "detail": "41 controles; 0 sem rótulo"
+    },
+    {
+      "name": "theme-young-desktop",
+      "status": "pass",
+      "detail": "preview-canvas desktop"
+    },
+    {
+      "name": "theme-young-tablet",
+      "status": "pass",
+      "detail": "preview-canvas tablet"
+    },
+    {
+      "name": "theme-young-mobile",
+      "status": "pass",
+      "detail": "preview-canvas mobile"
+    },
+    {
+      "name": "theme-custom-structure",
+      "status": "pass",
+      "detail": ".theme-stage-clean"
+    },
+    {
+      "name": "theme-custom-labels",
+      "status": "pass",
+      "detail": "41 controles; 0 sem rótulo"
+    },
+    {
+      "name": "theme-custom-desktop",
+      "status": "pass",
+      "detail": "preview-canvas desktop"
+    },
+    {
+      "name": "theme-custom-tablet",
+      "status": "pass",
+      "detail": "preview-canvas tablet"
+    },
+    {
+      "name": "theme-custom-mobile",
+      "status": "pass",
+      "detail": "preview-canvas mobile"
+    },
+    {
+      "name": "distinct-palettes",
+      "status": "pass",
+      "detail": "{\"morada\": \"#1457d9\", \"spotify\": \"#ff4d2e\", \"news\": \"#0047ab\", \"gospel\": \"#0f766e\", \"young\": \"#ff3d8d\", \"custom\": \"#e31c45\"}"
+    },
+    {
+      "name": "news-card-present",
+      "status": "pass",
+      "detail": "Notícia encontrada"
+    },
+    {
+      "name": "news-opens",
+      "status": "pass",
+      "detail": "Portal Cidade RV amplia cobertura de notícias locais"
+    },
+    {
+      "name": "program-opens",
+      "status": "pass",
+      "detail": "Tarde Sertaneja"
+    },
+    {
+      "name": "theme-select",
+      "status": "pass",
+      "detail": "News selecionado"
+    },
+    {
+      "name": "editor-live-preview",
+      "status": "pass",
+      "detail": "Prévia News no editor"
+    },
+    {
+      "name": "editor-mobile",
+      "status": "pass",
+      "detail": "preview-canvas mobile"
+    },
+    {
+      "name": "internal-audit-no-fail",
+      "status": "pass",
+      "detail": "0 falhas"
+    },
+    {
+      "name": "internal-audit-themes",
+      "status": "pass",
+      "detail": "6 temas auditados"
+    },
+    {
+      "name": "page-errors",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "name": "console-errors",
+      "status": "pass",
+      "detail": ""
+    }
+  ],
+  "consoleErrors": [
+    "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  ],
+  "pageErrors": []
+}

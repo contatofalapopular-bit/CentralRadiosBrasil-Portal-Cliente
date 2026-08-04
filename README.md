@@ -1,18 +1,30 @@
 # Portal do Cliente — Central Rádios Brasil
 
-## v2.4.0 — Etapa 1: Publicidade e Banners
+## v2.4.0 — Etapa 2: Parceiros e Popups
 
-Base: v2.3.0 Final Consolidada.
+Base: v2.4.0 Etapa 1 — Publicidade e Banners.
 
-### Incluído
-- Cadastro reutilizável de anunciantes e contatos comerciais.
-- Campanhas vinculadas a anunciantes, com posição, formato, período, prioridade e situação automática.
-- Peças responsivas separadas para desktop e celular.
-- Banners editoriais, comerciais e institucionais com período, prioridade e posições na prévia.
-- Filtros, ordenação, duplicação segura, validações e visualização completa.
-- Métricas somente quando recebidas de fonte real; a prévia não incrementa impressões ou cliques.
-- Compatibilidade com registros antigos de publicidade e banners.
-- Persistência no Worker/D1 atual, sem migração SQL.
+### Parceiros
+- Cadastro com nome, categoria, descrição pública, logomarca e ordem de exibição.
+- Site, WhatsApp, Instagram, Facebook e YouTube.
+- Destaque, ativação, filtros, ordenação, visualização, edição, duplicação e exclusão.
+- Cards responsivos na prévia e abertura do conteúdo completo salvo.
+- Compatibilidade automática com registros antigos.
+
+### Popups
+- Título, mensagem, imagem e botão de ação opcional.
+- Período com data e hora, prioridade e situação automática.
+- Exibição em desktop, celular ou ambos.
+- Frequência configurável: uma vez, por sessão, diariamente ou sempre.
+- Atraso de abertura, pausa e cancelamento.
+- Fechamento por botão, clique externo e tecla Esc, com foco de teclado.
+- A prévia não registra exibição real nem altera frequência ou métricas.
+
+### Integração
+- Persistência no Worker/D1 atual.
+- Schema interno 7.
+- Nenhuma migração SQL necessária.
+- Publicidade e banners da Etapa 1 preservados.
 
 ### Instalação
-Publique os arquivos sobre a v2.3.0 Final Consolidada, preservando um backup anterior. Depois use Ctrl + F5.
+Publique os arquivos sobre a v2.4.0 Etapa 1, preservando um backup. Depois use Ctrl + F5.

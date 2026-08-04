@@ -10,6 +10,8 @@
   let versions = [];
   let mediaLibrary = [];
   let saveTimer = null;
+  let previewPopupTimer = null;
+  let previewPopupReturnFocus = null;
   let saveQueue = Promise.resolve();
   let isLoading = false;
 
@@ -218,9 +220,15 @@
       summary: item => `${advertiserName(item)} • ${item.posicao || "Posição"} • ${campaignStatusLabel(item)}`
     },
     parceiros: {
-      title: "Parceiros", singular: "parceiro", imageProfile: "logo", description: "Logos de patrocinadores e parceiros institucionais.",
-      fields: [["nome","Nome da marca","text",true],["categoria","Categoria","text"],["link","Site ou rede social","url"],["logo","Logomarca","image",false,"logo"],["ordem","Ordem","number"],["ativo","Exibir no site","checkbox"]],
-      summary: item => item.categoria || "Parceiro"
+      title: "Parceiros", singular: "parceiro", imageProfile: "logo", description: "Cadastre marcas parceiras, organize destaques e publique contatos e redes sociais com segurança.",
+      fields: [
+        ["nome","Nome da marca","text",true], ["categoria","Categoria","select",true,["Patrocinador","Apoio","Parceiro institucional","Fornecedor","Mídia parceira","Outro"]],
+        ["descricao","Descrição pública","textarea"], ["link","Site principal","url"], ["whatsapp","WhatsApp","text"],
+        ["instagram","Instagram","url"], ["facebook","Facebook","url"], ["youtube","YouTube","url"],
+        ["logo","Logomarca","image",true,"logo"], ["ordem","Ordem de exibição","number"],
+        ["destaque","Parceiro em destaque","checkbox"], ["ativo","Exibir no site","checkbox"]
+      ],
+      summary: item => `${item.categoria || "Parceiro"}${item.destaque ? " • Destaque" : ""}${item.ordem ? ` • Ordem ${item.ordem}` : ""}`
     },
     banners: {
       title: "Banners", singular: "banner", imageProfile: "banner", description: "Banners editoriais ou comerciais com peças responsivas, posição, período e prioridade.",
@@ -236,9 +244,18 @@
       summary: item => `${item.tipo || "Banner"} • ${item.posicao || "Posição"} • ${bannerStatusLabel(item)}`
     },
     popups: {
-      title: "Popups", singular: "popup", imageProfile: "popup", description: "Avisos promocionais exibidos com frequência controlada.",
-      fields: [["titulo","Título interno","text",true],["inicio","Início","date"],["fim","Fim","date"],["frequencia","Frequência","select",true,["Uma vez por sessão","Uma vez por dia","Sempre"]],["link","Link","url"],["imagem","Imagem do popup","image",true,"popup"],["ativo","Ativo","checkbox"]],
-      summary: item => item.frequencia || "Popup"
+      title: "Popups", singular: "popup", imageProfile: "popup", description: "Crie avisos com período, prioridade, dispositivo, atraso e frequência controlada.",
+      fields: [
+        ["titulo","Título interno","text",true], ["mensagem","Mensagem pública","textarea",true],
+        ["inicio","Data inicial","date"], ["horaInicio","Horário inicial","time"], ["fim","Data final","date"], ["horaFim","Horário final","time"],
+        ["situacao","Controle da situação","select",true,["Automático pelo período","Pausado","Cancelado"]],
+        ["dispositivo","Exibir em","select",true,["Desktop e celular","Somente desktop","Somente celular"]],
+        ["frequencia","Frequência","select",true,["Uma única vez","Uma vez por sessão","Uma vez por dia","Sempre"]],
+        ["atrasoSegundos","Atraso para abrir (segundos)","number"], ["prioridade","Prioridade","number"],
+        ["textoBotao","Texto do botão","text"], ["link","Link do botão","url"],
+        ["imagem","Imagem do popup","image",false,"popup"], ["ativo","Publicado","checkbox"]
+      ],
+      summary: item => `${popupStatusLabel(item)} • ${item.dispositivo || "Todos os dispositivos"} • ${item.frequencia || "Frequência"}`
     },
     usuarios: {
       title: "Usuários", singular: "usuário", description: "Controle quem pode editar o site e quais áreas cada perfil acessa.",
@@ -254,7 +271,7 @@
   function defaultState() {
     const today = new Date().toISOString().slice(0, 10);
     return {
-      version: "2.4.0-etapa-1",
+      version: "2.4.0-etapa-2",
       updatedAt: new Date().toISOString(),
       status: "rascunho",
       selectedTheme: "morada",
@@ -505,7 +522,7 @@
         <article class="kpi-card"><span>Imagens armazenadas</span><strong>${mediaCount}</strong><small>arquivos vinculados ao site</small></article>
         <article class="kpi-card"><span>Faturas em aberto</span><strong>${openInvoices.length}</strong><small>${contract ? `Contrato ${escapeHTML(contract.numero || "ativo")}` : "Nenhum contrato"}</small></article>
       </div>
-      <section class="card" style="margin-bottom:18px"><header class="card-header"><div><h3>Comercial v2.4.0 — Etapa 1</h3><p>Anunciantes, campanhas e banners responsivos integrados ao rascunho e à prévia.</p></div><span class="badge active">Publicidade e banners</span></header><div class="card-body"><div class="module-health">${[["anunciantes","Anunciantes",state.content.anunciantes.length],["publicidade","Campanhas",state.content.publicidade.length],["banners","Banners",state.content.banners.length]].map(([id,label,total])=>`<div class="health-row"><div><strong><span class="health-dot"></span>${label}</strong><span>${total} registro${total===1?"":"s"} no rascunho</span></div><button class="button small secondary" data-go="${id}" type="button">Revisar</button></div>`).join("")}</div><div class="notice" style="margin-top:14px">Impressões e cliques só aparecem quando recebidos de uma fonte real do site/Worker. A prévia do CMS não gera métricas.</div></div></section>
+      <section class="card" style="margin-bottom:18px"><header class="card-header"><div><h3>Comercial v2.4.0 — Etapa 2</h3><p>Publicidade, banners, parceiros e popups integrados ao rascunho e à prévia responsiva.</p></div><span class="badge active">Parceiros e popups</span></header><div class="card-body"><div class="module-health">${[["anunciantes","Anunciantes",state.content.anunciantes.length],["publicidade","Campanhas",state.content.publicidade.length],["banners","Banners",state.content.banners.length],["parceiros","Parceiros",state.content.parceiros.length],["popups","Popups",state.content.popups.length]].map(([id,label,total])=>`<div class="health-row"><div><strong><span class="health-dot"></span>${label}</strong><span>${total} registro${total===1?"":"s"} no rascunho</span></div><button class="button small secondary" data-go="${id}" type="button">Revisar</button></div>`).join("")}</div><div class="notice" style="margin-top:14px">A prévia demonstra parceiros e popups sem registrar impressão, clique ou frequência real. A frequência pública deve ser aplicada pelo Portal Público/Worker.</div></div></section>
       <div class="grid-2">
         <section class="card"><header class="card-header"><div><h3>Estrutura do site</h3><p>Módulos ativados no editor visual.</p></div><button class="button small secondary" data-go="editor" type="button">Organizar</button></header><div class="card-body"><div class="module-health">${activeModules().slice(0,10).map(module => `<div class="health-row"><div><strong><span class="health-dot"></span>${escapeHTML(module.label)}</strong><span>${escapeHTML(module.description)}</span></div><span class="badge active">Ativo</span></div>`).join("") || `<div class="empty-state"><strong>Nenhum módulo ativo</strong></div>`}</div></div></section>
         <section class="card"><header class="card-header"><div><h3>Publicação e versões</h3><p>Situação real do site no Worker.</p></div><button class="button small secondary" data-go="publicacao" type="button">Gerenciar</button></header><div class="card-body"><div class="activity-list">
@@ -516,7 +533,7 @@
       </div>
       <div class="grid-2 equal" style="margin-top:18px">
         <section class="card"><header class="card-header"><div><h3>Dados reais, sem números inventados</h3><p>Audiência e ouvintes.</p></div></header><div class="card-body"><div class="notice">O painel não exibe audiência fictícia. O número de ouvintes só será mostrado quando existir uma fonte técnica confiável do streaming.</div></div></section>
-        <section class="card"><header class="card-header"><div><h3>Integração ativa</h3><p>Ambiente utilizado nesta instalação.</p></div></header><div class="card-body"><div class="code-box">Portal: ${escapeHTML(CONFIG.VERSION || "2.4.0-etapa-1")}\nWorker: ${escapeHTML(CONFIG.WORKER_URL || "—")}\nPersistência: Cloudflare D1\nMídias: API do site\nPublicação: supervisionada pela Central</div></div></section>
+        <section class="card"><header class="card-header"><div><h3>Integração ativa</h3><p>Ambiente utilizado nesta instalação.</p></div></header><div class="card-body"><div class="code-box">Portal: ${escapeHTML(CONFIG.VERSION || "2.4.0-etapa-2")}\nWorker: ${escapeHTML(CONFIG.WORKER_URL || "—")}\nPersistência: Cloudflare D1\nMídias: API do site\nPublicação: supervisionada pela Central</div></div></section>
       </div>`;
     bindGoButtons(root);
   }
@@ -775,6 +792,8 @@
     if (key === "anunciantes") return [["Anunciantes",items.length],["Ativos",active],["Com campanhas",new Set(state.content.publicidade.map(i=>i.anuncianteId).filter(Boolean)).size],["Com contato",items.filter(i=>i.email||i.telefone||i.whatsapp).length]];
     if (key === "publicidade") return [["Campanhas",items.length],["Ativas",items.filter(i=>i.ativo!==false&&campaignStatusValue(i)==="ativa").length],["Agendadas",items.filter(i=>i.ativo!==false&&campaignStatusValue(i)==="agendada").length],["Encerradas",items.filter(i=>campaignStatusValue(i)==="encerrada").length]];
     if (key === "banners") return [["Banners",items.length],["Ativos",items.filter(i=>i.ativo!==false&&bannerStatusValue(i)==="ativo").length],["Agendados",items.filter(i=>i.ativo!==false&&bannerStatusValue(i)==="agendado").length],["Encerrados",items.filter(i=>bannerStatusValue(i)==="encerrado").length]];
+    if (key === "parceiros") return [["Parceiros",items.length],["Ativos",active],["Destaques",items.filter(i=>i.destaque&&i.ativo!==false).length],["Categorias",new Set(items.map(i=>i.categoria).filter(Boolean)).size]];
+    if (key === "popups") return [["Popups",items.length],["Ativos",items.filter(i=>i.ativo!==false&&popupStatusValue(i)==="ativo").length],["Agendados",items.filter(i=>i.ativo!==false&&popupStatusValue(i)==="agendado").length],["Encerrados",items.filter(i=>popupStatusValue(i)==="encerrado").length]];
     return [];
   }
 
@@ -790,6 +809,8 @@
       : key === "noticias" ? [["padrao","Destaques e recentes"],["recentes","Mais recentes"],["titulo","Título A–Z"],["antigos","Mais antigas"]]
       : key === "publicidade" ? [["padrao","Prioridade e período"],["prioridade","Maior prioridade"],["inicio","Início próximo"],["titulo","Título A–Z"],["antigos","Mais antigas"]]
       : key === "banners" ? [["padrao","Prioridade e período"],["prioridade","Maior prioridade"],["inicio","Início próximo"],["titulo","Título A–Z"],["antigos","Mais antigos"]]
+      : key === "parceiros" ? [["padrao","Destaque e ordem"],["ordem","Ordem de exibição"],["destaques","Destaques primeiro"],["titulo","Nome A–Z"]]
+      : key === "popups" ? [["padrao","Prioridade e período"],["prioridade","Maior prioridade"],["inicio","Início próximo"],["titulo","Título A–Z"],["antigos","Mais antigos"]]
       : key === "anunciantes" ? [["titulo","Nome A–Z"],["recentes","Mais recentes"],["antigos","Mais antigos"]]
       : [];
     return options.length ? `<select id="collection-sort" aria-label="Ordenar conteúdos">${options.map(([value,label])=>`<option value="${value}" ${collectionSort===value?"selected":""}>${label}</option>`).join("")}</select>` : "";
@@ -805,6 +826,8 @@
     if (key === "eventos") return `<select id="collection-filter" aria-label="Filtrar situação do evento"><option value="todos" ${collectionFilter === "todos" ? "selected" : ""}>Todas as situações</option>${[["futuro","Próximos"],["hoje","Hoje"],["encerrado","Encerrados"],["adiado","Adiados"],["cancelado","Cancelados"]].map(([value,label])=>`<option value="evento:${value}" ${collectionFilter === `evento:${value}` ? "selected" : ""}>${label}</option>`).join("")}</select><select id="collection-context-filter" aria-label="Filtrar categoria"><option value="todos" ${collectionContextFilter === "todos" ? "selected" : ""}>Todas as categorias</option>${selectOptions(allItems.map(i=>i.categoria||i.tipo),"categoria")}</select>${sortOptions(key)}`;
     if (key === "publicidade") return `<select id="collection-filter" aria-label="Filtrar situação da campanha"><option value="todos" ${collectionFilter === "todos" ? "selected" : ""}>Todas as situações</option>${[["ativa","Ativas"],["agendada","Agendadas"],["encerrada","Encerradas"],["pausada","Pausadas"],["cancelada","Canceladas"]].map(([value,label])=>`<option value="campanha:${value}" ${collectionFilter === `campanha:${value}` ? "selected" : ""}>${label}</option>`).join("")}</select><select id="collection-context-filter" aria-label="Filtrar posição"><option value="todos" ${collectionContextFilter === "todos" ? "selected" : ""}>Todas as posições</option>${selectOptions(allItems.map(i=>i.posicao),"posicao")}</select>${sortOptions(key)}`;
     if (key === "banners") return `<select id="collection-filter" aria-label="Filtrar situação do banner"><option value="todos" ${collectionFilter === "todos" ? "selected" : ""}>Todas as situações</option>${[["ativo","Ativos"],["agendado","Agendados"],["encerrado","Encerrados"],["pausado","Pausados"],["cancelado","Cancelados"]].map(([value,label])=>`<option value="banner:${value}" ${collectionFilter === `banner:${value}` ? "selected" : ""}>${label}</option>`).join("")}</select><select id="collection-context-filter" aria-label="Filtrar posição"><option value="todos" ${collectionContextFilter === "todos" ? "selected" : ""}>Todas as posições</option>${selectOptions(allItems.map(i=>i.posicao),"posicao")}</select>${sortOptions(key)}`;
+    if (key === "parceiros") return `${base}<select id="collection-context-filter" aria-label="Filtrar categoria"><option value="todos" ${collectionContextFilter === "todos" ? "selected" : ""}>Todas as categorias</option>${selectOptions(allItems.map(i=>i.categoria),"categoria")}</select>${sortOptions(key)}`;
+    if (key === "popups") return `<select id="collection-filter" aria-label="Filtrar situação do popup"><option value="todos" ${collectionFilter === "todos" ? "selected" : ""}>Todas as situações</option>${[["ativo","Ativos"],["agendado","Agendados"],["encerrado","Encerrados"],["pausado","Pausados"],["cancelado","Cancelados"]].map(([value,label])=>`<option value="popup:${value}" ${collectionFilter === `popup:${value}` ? "selected" : ""}>${label}</option>`).join("")}</select><select id="collection-context-filter" aria-label="Filtrar dispositivo"><option value="todos" ${collectionContextFilter === "todos" ? "selected" : ""}>Todos os dispositivos</option>${selectOptions(allItems.map(i=>i.dispositivo),"dispositivo")}</select>${sortOptions(key)}`;
     if (key === "anunciantes") return `${base}${sortOptions(key)}`;
     return base;
   }
@@ -824,10 +847,12 @@
     else if (collectionFilter.startsWith("evento:")) items = items.filter(item => eventStatusValue(item) === collectionFilter.slice(7));
     else if (collectionFilter.startsWith("campanha:")) items = items.filter(item => campaignStatusValue(item) === collectionFilter.slice(9));
     else if (collectionFilter.startsWith("banner:")) items = items.filter(item => bannerStatusValue(item) === collectionFilter.slice(7));
+    else if (collectionFilter.startsWith("popup:")) items = items.filter(item => popupStatusValue(item) === collectionFilter.slice(6));
     if (collectionContextFilter.startsWith("dia:")) items = items.filter(item => normalizeDays(item.dias || item.dia).includes(collectionContextFilter.slice(4)));
     else if (collectionContextFilter.startsWith("programa:")) items = items.filter(item => String(item.programa||"") === collectionContextFilter.slice(9));
     else if (collectionContextFilter.startsWith("categoria:")) items = items.filter(item => String(item.categoria||item.tipo||"") === collectionContextFilter.slice(10));
     else if (collectionContextFilter.startsWith("posicao:")) items = items.filter(item => String(item.posicao||"") === collectionContextFilter.slice(8));
+    else if (collectionContextFilter.startsWith("dispositivo:")) items = items.filter(item => String(item.dispositivo||"") === collectionContextFilter.slice(12));
     items = [...items];
     if (key === "programacao") items.sort((a,b)=>Math.min(...normalizeDays(a.dias||a.dia).map(d=>weekOrder.indexOf(d)).filter(i=>i>=0),99)-Math.min(...normalizeDays(b.dias||b.dia).map(d=>weekOrder.indexOf(d)).filter(i=>i>=0),99) || compareTime(a.inicio,b.inicio));
     else if (key === "locutores") items.sort((a,b)=>Number(a.ordem||999)-Number(b.ordem||999) || String(a.nome||"").localeCompare(String(b.nome||"")));
@@ -839,8 +864,11 @@
     else if (collectionSort === "inicio") items.sort((a,b)=>dateKey(a.inicio).localeCompare(dateKey(b.inicio)));
     else if (collectionSort === "fim") items.sort((a,b)=>(dateKey(a.fim)||"9999-12-31").localeCompare(dateKey(b.fim)||"9999-12-31"));
     else if (collectionSort === "prioridade") items.sort((a,b)=>Number(b.prioridade||0)-Number(a.prioridade||0) || contentTimestamp(b)-contentTimestamp(a));
+    else if (collectionSort === "ordem") items.sort((a,b)=>Number(a.ordem||999)-Number(b.ordem||999) || String(a.nome||"").localeCompare(String(b.nome||""),"pt-BR"));
     else if (key === "publicidade") items=sortCampaignItems(items);
     else if (key === "banners") items=sortBannerItems(items);
+    else if (key === "parceiros") items=sortPartnerItems(items);
+    else if (key === "popups") items=sortPopupItems(items);
     else if (key === "anunciantes") items.sort((a,b)=>String(a.nome||"").localeCompare(String(b.nome||""),"pt-BR"));
     else if (key === "promocoes") items=sortPromotionItems(items);
     else if (key === "eventos") items=sortEventItems(items);
@@ -877,7 +905,7 @@
       const status = newsStatusValue(item);
       return `<span class="badge status-${status}">${escapeHTML(statusNewsLabel(item))}</span>`;
     }
-    const automatic = key === "promocoes" ? `<span class="badge status-promo-${promotionStatusValue(item)}">${escapeHTML(promotionStatusLabel(item))}</span>` : key === "eventos" ? `<span class="badge status-evento-${eventStatusValue(item)}">${escapeHTML(eventStatusLabel(item))}</span>` : key === "publicidade" ? `<span class="badge status-campaign-${campaignStatusValue(item)}">${escapeHTML(campaignStatusLabel(item))}</span>` : key === "banners" ? `<span class="badge status-banner-${bannerStatusValue(item)}">${escapeHTML(bannerStatusLabel(item))}</span>` : "";
+    const automatic = key === "promocoes" ? `<span class="badge status-promo-${promotionStatusValue(item)}">${escapeHTML(promotionStatusLabel(item))}</span>` : key === "eventos" ? `<span class="badge status-evento-${eventStatusValue(item)}">${escapeHTML(eventStatusLabel(item))}</span>` : key === "publicidade" ? `<span class="badge status-campaign-${campaignStatusValue(item)}">${escapeHTML(campaignStatusLabel(item))}</span>` : key === "banners" ? `<span class="badge status-banner-${bannerStatusValue(item)}">${escapeHTML(bannerStatusLabel(item))}</span>` : key === "popups" ? `<span class="badge status-popup-${popupStatusValue(item)}">${escapeHTML(popupStatusLabel(item))}</span>` : "";
     const metrics=key === "publicidade" ? `<span class="badge metric-real" title="Somente dados recebidos do site/Worker">${escapeHTML(campaignMetricsLabel(item))}</span>` : "";
     return `<div class="collection-status-stack"><button class="badge ${item.ativo === false ? "inactive" : "active"}" data-toggle-item="${item.id}" type="button">${item.ativo === false ? "Não publicado" : "Publicado"}</button>${automatic}${metrics}${item.destaque ? `<span class="badge featured">Destaque</span>` : ""}</div>`;
   }
@@ -899,6 +927,8 @@
       : key === "eventos" ? { ativo:true, destaque:false, data:today, dataFim:"", situacao:"Automático pela data", tipo:"Evento da rádio" }
       : key === "publicidade" ? { ativo:true, inicio:today, fim:"", horaInicio:"", horaFim:"", situacao:"Automático pelo período", posicao:"Entre seções", formato:"Banner horizontal", prioridade:10, textoBotao:"Saiba mais", metricas:{impressoes:0,cliques:0,fonte:""} }
       : key === "banners" ? { ativo:true, inicio:today, fim:"", horaInicio:"", horaFim:"", situacao:"Automático pelo período", tipo:"Editorial", posicao:"Após o cabeçalho", prioridade:10, textoBotao:"Saiba mais" }
+      : key === "parceiros" ? { ativo:true, categoria:"Patrocinador", ordem:10, destaque:false }
+      : key === "popups" ? { ativo:true, inicio:today, fim:"", horaInicio:"", horaFim:"", situacao:"Automático pelo período", dispositivo:"Desktop e celular", frequencia:"Uma vez por sessão", atrasoSegundos:3, prioridade:10, textoBotao:"" }
       : { ativo:true };
     const item = id ? state.content[key].find(entry => entry.id === id) : base;
     editing = { key, id };
@@ -923,7 +953,8 @@
     if (type === "image") return mediaFieldHTML(name,label,extra || "news",value);
     const numeric = type === "number" ? ` min="0" step="1" inputmode="numeric"` : "";
     const help = name === "audio" ? `<small class="field-help">Use uma URL pública HTTPS de MP3, AAC, M4A, OGG, WAV, Opus ou outro áudio reproduzível pelo navegador.</small>`
-      : name === "url" ? `<small class="field-help">Aceita YouTube, Vimeo, MP4/WebM/Ogg, transmissão HLS ou outro link público HTTPS.</small>` : "";
+      : name === "url" && editing?.key === "videos" ? `<small class="field-help">Aceita YouTube, Vimeo, MP4/WebM/Ogg, transmissão HLS ou outro link público HTTPS.</small>`
+      : name === "link" ? `<small class="field-help">Use um endereço público começando com https:// ou http://.</small>` : "";
     return `<div class="field"><label for="${inputId}">${escapeHTML(label)}</label><input id="${inputId}" name="${name}" type="${type}" value="${escapeHTML(value)}" ${required ? "required" : ""}${numeric}>${help}</div>`;
   }
 
@@ -1003,6 +1034,28 @@
         item.metricas=item.metricas && typeof item.metricas === "object" ? item.metricas : {impressoes:0,cliques:0,fonte:""};
       }
     }
+    if (key === "parceiros") {
+      item.ordem=Math.max(0,Math.min(999,Math.trunc(Number(item.ordem||0))));
+      for (const [field,label] of [["link","site"],["instagram","Instagram"],["facebook","Facebook"],["youtube","YouTube"]]) if (item[field] && !absoluteHttpURL(item[field])) return `O link de ${label} deve começar com https:// ou http://.`;
+      const comparable=normalizeComparableURL(item.link);
+      const duplicate=(state.content.parceiros||[]).find(other=>other.id!==id && (String(other.nome||"").trim().toLowerCase()===String(item.nome||"").trim().toLowerCase() || (comparable && normalizeComparableURL(other.link)===comparable)));
+      if (duplicate) return "Já existe um parceiro com o mesmo nome ou site principal.";
+      if (!item.logo) return "Adicione a logomarca do parceiro.";
+    }
+    if (key === "popups") {
+      item.prioridade=Math.max(0,Math.min(999,Math.trunc(Number(item.prioridade||0))));
+      item.atrasoSegundos=Math.max(0,Math.min(120,Math.trunc(Number(item.atrasoSegundos||0))));
+      item.situacao=item.situacao||"Automático pelo período";
+      item.dispositivo=item.dispositivo||"Desktop e celular";
+      item.frequencia=item.frequencia||"Uma vez por sessão";
+      item.textoBotao=item.textoBotao||"";
+      if (item.fim && item.inicio && item.fim < item.inicio) return "A data final não pode ser anterior à data inicial.";
+      if (item.fim === item.inicio && item.horaInicio && item.horaFim && item.horaFim <= item.horaInicio) return "O horário final deve ser posterior ao horário inicial quando termina no mesmo dia.";
+      if (item.link && !absoluteHttpURL(item.link)) return "O link do botão deve começar com https:// ou http://.";
+      if (item.textoBotao && !item.link) return "Informe o link do botão ou deixe o texto do botão vazio.";
+      const duplicate=(state.content.popups||[]).find(other=>other.id!==id && String(other.titulo||"").trim().toLowerCase()===String(item.titulo||"").trim().toLowerCase() && String(other.inicio||"")===String(item.inicio||"") && String(other.dispositivo||"")===String(item.dispositivo||""));
+      if (duplicate) return "Já existe um popup com o mesmo título, início e dispositivo.";
+    }
     if (key === "locutores") item.ordem=Number(item.ordem||0);
     return "";
   }
@@ -1036,9 +1089,10 @@
     if (clone.nome) clone.nome=`${clone.nome} — cópia`;
     if (key === "noticias") { clone.slug=slugify(`${clone.slug||clone.titulo}-copia`); clone.status="Rascunho"; clone.destaque=false; }
     if (key === "programacao") { clone.ativo=false; }
-    if (["podcasts","videos","promocoes","eventos","publicidade","banners"].includes(key)) { clone.ativo=false; clone.destaque=false; }
+    if (["podcasts","videos","promocoes","eventos","publicidade","banners","parceiros","popups"].includes(key)) { clone.ativo=false; clone.destaque=false; }
     if (key === "publicidade") { clone.situacao="Pausada"; clone.metricas={impressoes:0,cliques:0,fonte:"",atualizadoEm:""}; }
     if (key === "banners") clone.situacao="Pausado";
+    if (key === "popups") clone.situacao="Pausado";
     if (key === "promocoes") clone.situacao="Automático pelas datas";
     if (key === "eventos") clone.situacao="Automático pela data";
     state.content[key].unshift(clone); persist(false); renderPage(); notify("Cópia criada para revisão.","success");
@@ -1169,7 +1223,7 @@
         <section class="card"><div class="card-body"><h3>Exportar JSON</h3><p class="field-help">Baixa configurações, módulos, temas e conteúdos.</p><button class="button primary" id="export-backup" type="button">Baixar backup</button></div></section>
         <section class="card"><div class="card-body"><h3>Importar JSON</h3><p class="field-help">Carrega o arquivo no editor; clique em Salvar rascunho para gravar no D1.</p><button class="button secondary" id="import-backup" type="button">Selecionar arquivo</button></div></section>
         <section class="card"><div class="card-body"><h3>Recarregar do servidor</h3><p class="field-help">Descarta alterações ainda não salvas e recarrega o último rascunho do servidor.</p><button class="button danger" id="reset-demo" type="button">Recarregar dados</button></div></section>
-      </div><section class="card" style="margin-top:18px"><header class="card-header"><div><h3>Sobre esta instalação</h3><p>Informações técnicas.</p></div></header><div class="card-body"><div class="code-box">Modo: produção integrada\nVersão: ${CONFIG.VERSION || "2.4.0-etapa-1"}\nPersistência: Cloudflare D1\nAPI: ${CONFIG.WORKER_URL || "não configurada"}\nÚltima alteração: ${formatDateTime(state.updatedAt)}</div></div></section>`;
+      </div><section class="card" style="margin-top:18px"><header class="card-header"><div><h3>Sobre esta instalação</h3><p>Informações técnicas.</p></div></header><div class="card-body"><div class="code-box">Modo: produção integrada\nVersão: ${CONFIG.VERSION || "2.4.0-etapa-2"}\nPersistência: Cloudflare D1\nAPI: ${CONFIG.WORKER_URL || "não configurada"}\nÚltima alteração: ${formatDateTime(state.updatedAt)}</div></div></section>`;
     $("#export-backup").addEventListener("click",exportBackup);
     $("#import-backup").addEventListener("click",()=>$("#backup-import").click());
     $("#reset-demo").addEventListener("click",()=>{if(confirm("Descartar alterações não salvas e recarregar o rascunho do servidor?")) loadAll();});
@@ -1255,7 +1309,59 @@
     if (betweenBanner) body+=betweenBanner;
     container.innerHTML = `<div class="site-preview theme-${state.selectedTheme}" data-site-section="inicio" style="${customStyle}${r.hero ? `--hero-image:url('${escapeHTML(r.hero)}')` : ""}">${body}${footerBanner}${siteFooter(r)}</div>`;
     bindSitePreviewInteractions(container);
+    schedulePreviewPopup(container);
     syncAudioButtons();
+  }
+
+  function partnerSocialLinks(item) {
+    return [["link","Site"],["instagram","Instagram"],["facebook","Facebook"],["youtube","YouTube"]].map(([field,label])=>[safeExternalURL(item?.[field]),label]).filter(([url])=>url);
+  }
+  function partnerWhatsappURL(item) {
+    const digits=String(item?.whatsapp||"").replace(/\D/g,"");
+    return digits.length>=10?`https://wa.me/${digits}`:"";
+  }
+  function previewDeviceKind(container) {
+    return container?.classList.contains("mobile") ? "mobile" : "desktop";
+  }
+  function popupMatchesDevice(item,device) {
+    const target=String(item?.dispositivo||"Desktop e celular");
+    return target === "Desktop e celular" || (target === "Somente celular" && device === "mobile") || (target === "Somente desktop" && device !== "mobile");
+  }
+  function eligiblePreviewPopups(container) {
+    const device=previewDeviceKind(container);
+    return sortPopupItems((state.content.popups||[]).filter(item=>item.ativo!==false && popupStatusValue(item)==="ativo" && popupMatchesDevice(item,device)));
+  }
+  function clearPreviewPopupTimer() {
+    if (previewPopupTimer) { clearTimeout(previewPopupTimer); previewPopupTimer=null; }
+  }
+  function closePreviewPopup(container,{restoreFocus=true}={}) {
+    clearPreviewPopupTimer();
+    const layer=$(".site-popup-layer",container); if(layer)layer.remove();
+    if (restoreFocus && previewPopupReturnFocus && document.contains(previewPopupReturnFocus)) previewPopupReturnFocus.focus();
+    previewPopupReturnFocus=null;
+  }
+  function showPreviewPopup(container,item) {
+    if (!container || !item || !$(".site-preview",container)) return;
+    closePreviewPopup(container,{restoreFocus:false});
+    const link=safeExternalURL(item.link);
+    const layer=document.createElement("div");
+    layer.className="site-popup-layer";
+    layer.dataset.popupId=String(item.id||"");
+    layer.setAttribute("role","presentation");
+    layer.innerHTML=`<section class="site-popup-card" role="dialog" aria-modal="true" aria-labelledby="site-popup-title"><button class="site-popup-close" type="button" aria-label="Fechar popup">×</button>${item.imagem?`<img class="site-popup-image" src="${escapeHTML(item.imagem)}" alt="">`:""}<div class="site-popup-copy"><span>Mensagem da rádio</span><h2 id="site-popup-title">${escapeHTML(item.titulo||"Aviso")}</h2><p>${escapeHTML(item.mensagem||"")}</p><small>Prévia: ${escapeHTML(item.frequencia||"Frequência não definida")} • não registra exibição real</small>${link&&item.textoBotao?`<a class="site-popup-action" href="${escapeHTML(link)}" target="_blank" rel="noopener noreferrer">${escapeHTML(item.textoBotao)}</a>`:""}</div></section>`;
+    $(".site-preview",container).appendChild(layer);
+    previewPopupReturnFocus=document.activeElement;
+    const close=$(".site-popup-close",layer); close?.focus();
+    close?.addEventListener("click",()=>closePreviewPopup(container));
+    layer.addEventListener("click",event=>{if(event.target===layer)closePreviewPopup(container);});
+  }
+  function schedulePreviewPopup(container) {
+    clearPreviewPopupTimer();
+    closePreviewPopup(container,{restoreFocus:false});
+    const item=eligiblePreviewPopups(container)[0]; if(!item)return;
+    const delay=Math.max(0,Math.min(120,Number(item.atrasoSegundos||0)))*1000;
+    if(!delay)return showPreviewPopup(container,item);
+    previewPopupTimer=setTimeout(()=>showPreviewPopup(container,item),delay);
   }
 
   function socialEntries() {
@@ -1319,7 +1425,7 @@
     if (!items.length) return "";
     return `<section class="site-banner-slot position-${slugify(position)}" data-site-section="banners" data-banner-position="${escapeHTML(position)}">${items.map(item=>{const link=safeExternalURL(item.link),tag=link?"a":"button",attrs=link?`href="${escapeHTML(link)}" target="_blank" rel="noopener noreferrer"`:`data-site-open="banners" data-site-id="${escapeHTML(item.id)}" type="button"`;return `<${tag} class="site-responsive-commercial site-banner-link" ${attrs} aria-label="Abrir banner ${escapeHTML(item.titulo||"")}">${responsiveCommercialImage(item,item.titulo||"Banner")}${item.textoBotao?`<span class="site-commercial-cta">${escapeHTML(item.textoBotao)}</span>`:""}</${tag}>`;}).join("")}</section>`;
   }
-  function sitePartners() { const items=state.content.parceiros.filter(i=>i.ativo!==false).slice(0,6); if(!items.length)return ""; return `<section class="site-section alt" data-site-section="parceiros"><div class="site-section-head"><div><span>Apoio</span><h2>Patrocinadores</h2></div></div><div class="site-sponsor-grid">${items.map(i=>{const link=safeExternalURL(i.link);return `<${link?"a":"button"} class="site-sponsor" ${link?`href="${escapeHTML(link)}" target="_blank" rel="noopener noreferrer"`:`data-site-open="parceiros" data-site-id="${escapeHTML(i.id)}" type="button"`} aria-label="Abrir parceiro ${escapeHTML(i.nome)}">${i.logo?`<img src="${escapeHTML(i.logo)}" alt="${escapeHTML(i.nome)}">`:escapeHTML(i.nome)}</${link?"a":"button"}>`;}).join("")}</div></section>`; }
+  function sitePartners() { const items=sortPartnerItems(state.content.parceiros.filter(i=>i.ativo!==false)).slice(0,8); if(!items.length)return ""; return `<section class="site-section alt" data-site-section="parceiros"><div class="site-section-head"><div><span>Apoio</span><h2>Parceiros e patrocinadores</h2><p>Marcas que apoiam a rádio e seus projetos.</p></div><button class="site-section-link" data-site-list="parceiros" type="button">Ver todos →</button></div><div class="site-partner-grid">${items.map(i=>`<button class="site-partner-card ${i.destaque?"featured":""}" data-site-open="parceiros" data-site-id="${escapeHTML(i.id)}" type="button" aria-label="Abrir parceiro ${escapeHTML(i.nome)}"><span class="site-partner-logo">${i.logo?`<img src="${escapeHTML(i.logo)}" alt="Logomarca de ${escapeHTML(i.nome)}">`:`${escapeHTML(initials(i.nome))}`}</span><strong>${escapeHTML(i.nome)}</strong><small>${escapeHTML(i.categoria||"Parceiro")}</small>${i.destaque?`<em>Destaque</em>`:""}</button>`).join("")}</div></section>`; }
   function siteApp() { return `<section class="site-section dark" data-site-section="aplicativo"><div class="site-section-head"><div><span>Leve a rádio com você</span><h2>Baixe nosso aplicativo</h2><p>Ouça a programação no celular e receba novidades.</p></div><button class="site-live-button" data-site-action="app" type="button">Baixar aplicativo</button></div></section>`; }
   function siteContact() { return `<section class="site-section" data-site-section="contato"><div class="site-section-head"><div><span>Fale com a rádio</span><h2>Contato e participação</h2><p>WhatsApp, pedidos de música, comercial e jornalismo.</p></div><button class="site-wa-button" data-site-action="whatsapp" type="button">Abrir WhatsApp</button></div></section>`; }
   function siteFooter(r) { const links=[["inicio","Início"],["noticias","Notícias"],["programacao","Programação"],["promocoes","Promoções"]].filter(([id])=>id === "inicio" || previewSectionAvailable(id)); return `<footer class="site-footer"><div class="site-footer-grid"><div><h3>${escapeHTML(r.nome)}</h3><p>${escapeHTML(r.descricao)}</p></div><div><h3>Navegação</h3><p>${links.map(([id,label])=>`<a href="#" data-site-scroll="${id}">${label}</a>`).join("<br>")}</p></div><div><h3>Contato</h3><p>${escapeHTML(r.email)}<br>${escapeHTML(r.telefone)}<br>${escapeHTML(r.endereco)}</p></div><div><h3>Anuncie</h3><p>Apresente sua marca aos ouvintes da rádio.</p><button class="site-footer-action" data-site-action="whatsapp" type="button">Falar com o comercial</button></div></div><div class="site-footer-bottom"><span>© ${new Date().getFullYear()} ${escapeHTML(r.nome)}</span><span>Site administrado pela Central Rádios Brasil</span></div></footer>`; }
@@ -1453,6 +1559,11 @@
   function bannerRank(item) { return ({ativo:0,agendado:1,pausado:2,encerrado:3,cancelado:4})[bannerStatusValue(item)] ?? 9; }
   function sortCampaignItems(items) { return [...items].sort((a,b)=>campaignRank(a)-campaignRank(b) || Number(b.prioridade||0)-Number(a.prioridade||0) || dateKey(a.inicio).localeCompare(dateKey(b.inicio)) || String(a.titulo||"").localeCompare(String(b.titulo||""),"pt-BR")); }
   function sortBannerItems(items) { return [...items].sort((a,b)=>bannerRank(a)-bannerRank(b) || Number(b.prioridade||0)-Number(a.prioridade||0) || dateKey(a.inicio).localeCompare(dateKey(b.inicio)) || String(a.titulo||"").localeCompare(String(b.titulo||""),"pt-BR")); }
+  function popupStatusValue(item) { return periodStatus(item,{scheduled:"agendado",active:"ativo",ended:"encerrado",paused:"pausado",cancelled:"cancelado"}); }
+  function popupStatusLabel(item) { return ({ativo:"Ativo",agendado:"Agendado",encerrado:"Encerrado",pausado:"Pausado",cancelado:"Cancelado"})[popupStatusValue(item)] || "Popup"; }
+  function popupRank(item) { return ({ativo:0,agendado:1,pausado:2,encerrado:3,cancelado:4})[popupStatusValue(item)] ?? 9; }
+  function sortPopupItems(items) { return [...items].sort((a,b)=>popupRank(a)-popupRank(b) || Number(b.prioridade||0)-Number(a.prioridade||0) || dateKey(a.inicio).localeCompare(dateKey(b.inicio)) || String(a.titulo||"").localeCompare(String(b.titulo||""),"pt-BR")); }
+  function sortPartnerItems(items) { return [...items].sort((a,b)=>Number(Boolean(b.destaque))-Number(Boolean(a.destaque)) || Number(a.ordem||999)-Number(b.ordem||999) || String(a.nome||"").localeCompare(String(b.nome||""),"pt-BR")); }
 
   function promotionStatusValue(item) {
     if (/cancelad/i.test(String(item?.situacao||""))) return "cancelada";
@@ -1566,7 +1677,8 @@
     if (key === "eventos") { const map=absoluteHttpURL(item.linkMapa), info=absoluteHttpURL(item.linkInformacoes); return `${detailImage(item)}${detailMeta([eventStatusLabel(item),item.tipo,item.categoria,formatEventPeriod(item),item.local,item.cidade,item.destaque?"Destaque":""])}${item.endereco?`<div class="site-event-address"><strong>Endereço</strong><span>${escapeHTML(item.endereco)}</span></div>`:""}<div class="site-detail-text">${multilineHTML(item.descricao)}</div><div class="site-detail-actions">${map?`<a class="button secondary site-detail-external" href="${escapeHTML(map)}" target="_blank" rel="noopener noreferrer">Abrir no mapa</a>`:""}${info?`<a class="button primary site-detail-external" href="${escapeHTML(info)}" target="_blank" rel="noopener noreferrer">Informações ou ingressos</a>`:""}</div>`; }
     if (key === "galeria") return `${detailImage(item)}${detailMeta([item.album,item.data?formatDate(item.data):""])}<div class="site-detail-text">${multilineHTML(item.descricao)}</div>`;
     if (["locutores","equipe"].includes(key)) return `${detailImage(item,"foto")}${detailMeta([item.cargo,item.email,item.telefone])}<div class="site-detail-text">${multilineHTML(item.bio || item.descricao)}</div>`;
-    if (key === "parceiros") { const url=safeExternalURL(item.link); return `${detailImage(item,"logo")}${detailMeta([item.categoria])}${url?`<a class="button primary site-detail-external" href="${escapeHTML(url)}" target="_blank" rel="noopener noreferrer">Abrir site do parceiro</a>`:"<div class=\"site-detail-notice\">Parceiro sem link cadastrado.</div>"}`; }
+    if (key === "parceiros") { const links=partnerSocialLinks(item),wa=partnerWhatsappURL(item); return `${detailImage(item,"logo")}${detailMeta([item.categoria,item.destaque?"Parceiro em destaque":"",item.ordem?`Ordem ${item.ordem}`:""])}<div class="site-detail-text">${multilineHTML(item.descricao)}</div><div class="site-detail-actions">${links.map(([url,label])=>`<a class="button secondary site-detail-external" href="${escapeHTML(url)}" target="_blank" rel="noopener noreferrer">${escapeHTML(label)}</a>`).join("")}${wa?`<a class="button primary site-detail-external" href="${escapeHTML(wa)}" target="_blank" rel="noopener noreferrer">WhatsApp</a>`:""}</div>${!links.length&&!wa?`<div class="site-detail-notice">Parceiro sem contato público cadastrado.</div>`:""}`; }
+    if (key === "popups") { const url=safeExternalURL(item.link); return `${detailImage(item)}${detailMeta([popupStatusLabel(item),item.dispositivo,item.frequencia,`Atraso ${Number(item.atrasoSegundos||0)}s`,`Prioridade ${Number(item.prioridade||0)}`,item.inicio?`Início: ${formatDate(item.inicio)}${item.horaInicio?` ${item.horaInicio}`:""}`:"",item.fim?`Fim: ${formatDate(item.fim)}${item.horaFim?` ${item.horaFim}`:""}`:"Sem data final"])}<div class="site-detail-text">${multilineHTML(item.mensagem)}</div>${url&&item.textoBotao?`<a class="button primary site-detail-external" href="${escapeHTML(url)}" target="_blank" rel="noopener noreferrer">${escapeHTML(item.textoBotao)}</a>`:""}<div class="site-detail-notice">A visualização do CMS não registra frequência ou impressão real.</div>`; }
     if (key === "anunciantes") { const url=safeExternalURL(item.site); return `${detailImage(item,"logo")}${detailMeta([item.razaoSocial,item.categoria,item.documento,item.responsavel,item.email,item.telefone,item.whatsapp])}<div class="site-detail-text">${multilineHTML(item.observacoes)}</div>${url?`<a class="button primary site-detail-external" href="${escapeHTML(url)}" target="_blank" rel="noopener noreferrer">Abrir site do anunciante</a>`:""}`; }
     if (key === "publicidade") { const url=safeExternalURL(item.link),m=campaignMetrics(item); return `${responsiveCommercialImage(item,item.titulo||"Campanha")} ${detailMeta([advertiserName(item),item.posicao,item.formato,campaignStatusLabel(item),item.inicio?`Início: ${formatDate(item.inicio)}${item.horaInicio?` ${item.horaInicio}`:""}`:"",item.fim?`Fim: ${formatDate(item.fim)}${item.horaFim?` ${item.horaFim}`:""}`:"Sem data final",`Prioridade ${item.prioridade||0}`])}<div class="real-metrics-panel"><div><span>Impressões reais</span><strong>${m.impressoes}</strong></div><div><span>Cliques reais</span><strong>${m.cliques}</strong></div><div><span>CTR</span><strong>${m.ctr.toFixed(2)}%</strong></div><small>${m.fonte?`Fonte: ${escapeHTML(m.fonte)}${m.atualizadoEm?` • atualizado em ${escapeHTML(formatDateTime(m.atualizadoEm))}`:""}`:"Aguardando dados reais do site/Worker. A prévia não gera contagem."}</small></div><div class="site-detail-text">${multilineHTML(item.descricao)}</div>${url?`<a class="button primary site-detail-external" href="${escapeHTML(url)}" target="_blank" rel="noopener noreferrer">Abrir destino da campanha</a>`:""}`; }
     if (key === "banners") { const url=safeExternalURL(item.link); return `${responsiveCommercialImage(item,item.titulo||"Banner")}${detailMeta([item.tipo,item.posicao,bannerStatusLabel(item),item.inicio?`Início: ${formatDate(item.inicio)}`:"",item.fim?`Fim: ${formatDate(item.fim)}`:"",`Prioridade ${item.prioridade||0}`])}<div class="site-detail-text">${multilineHTML(item.descricao)}</div>${url?`<a class="button primary site-detail-external" href="${escapeHTML(url)}" target="_blank" rel="noopener noreferrer">Abrir destino do banner</a>`:""}`; }
@@ -1592,6 +1704,8 @@
     if (key === "eventos") return sortEventItems((state.content.eventos||[]).filter(i=>i.ativo!==false));
     if (key === "publicidade") return sortCampaignItems((state.content.publicidade||[]).filter(i=>i.ativo!==false));
     if (key === "banners") return sortBannerItems((state.content.banners||[]).filter(i=>i.ativo!==false));
+    if (key === "parceiros") return sortPartnerItems((state.content.parceiros||[]).filter(i=>i.ativo!==false));
+    if (key === "popups") return sortPopupItems((state.content.popups||[]).filter(i=>i.ativo!==false));
     return (state.content[key] || []).filter(i=>i.ativo!==false);
   }
 
@@ -1710,7 +1824,7 @@
 
   function mapRemoteToState(site,dashboard) {
     const fresh=defaultState(), content=site.conteudoRascunho || site.conteudoPublicado || {}, texts=content.textos_institucionais || {}, cms=texts.cms_v2 || {}, contacts=content.contatos || {}, whats=typeof content.whatsapp === "string" ? {numero:content.whatsapp} : (content.whatsapp || {}), colors=content.cores || {}, apps=content.links_aplicativos || {}, banners=content.banners || {};
-    fresh.version="2.4.0-etapa-1"; fresh.updatedAt=versions[0]?.criado_em || new Date().toISOString(); fresh.status=site.status_publicacao || "sem_rascunho"; fresh.selectedTheme=cms.selectedTheme || "morada";
+    fresh.version="2.4.0-etapa-2"; fresh.updatedAt=versions[0]?.criado_em || new Date().toISOString(); fresh.status=site.status_publicacao || "sem_rascunho"; fresh.selectedTheme=cms.selectedTheme || "morada";
     fresh.radio={...fresh.radio,nome:content.nome || site.nome_site || dashboard?.cliente?.nome_radio || "Minha rádio",slogan:content.slogan || "",descricao:content.descricao || texts.sobre || "",cidade:contacts.cidade || dashboard?.cliente?.cidade || "",estado:contacts.estado || dashboard?.cliente?.estado || "",email:contacts.email || dashboard?.cliente?.email || "",telefone:contacts.telefone || "",whatsapp:whats.numero || "",endereco:contacts.endereco || "",streamUrl:site.stream_url || "",musicaAtual:texts.player?.titulo || "Transmissão ao vivo",locutorAtual:texts.player?.subtitulo || "Programação da rádio",logo:content.logo || "",hero:content.capa || "",playerImage:texts.player?.imagem || "",cores:{primaria:colors.primaria || "#e31c45",secundaria:colors.secundaria || "#121d31",destaque:colors.destaque || "#f1a11a",fundo:colors.fundo || "#f4f6f9"},listenersEnabled:false};
     const moduleValues=texts.modulos || {}; const savedModules=safeArray(cms.modules);
     fresh.modules=modulesCatalog.map(([id,label,description],index)=>{const saved=savedModules.find(m=>m.id===id);return{id,label,description,enabled:saved? saved.enabled!==false : moduleValues[id]!==false,order:Number(saved?.order ?? index)};});
@@ -1726,8 +1840,9 @@
       equipe:ensureIds(cms.content?.equipe,"team"),
       anunciantes:ensureIds(safeArray(cms.content?.anunciantes).map(i=>({...i,site:i.site||i.link||"",ativo:i.ativo!==false})),"adv"),
       publicidade:ensureIds(safeArray(banners.publicidades).map(i=>({...i,anuncianteId:i.anuncianteId||"",anunciante:i.anunciante||"",posicao:i.posicao||"Entre seções",formato:i.formato||"Banner horizontal",inicio:i.inicio||"",horaInicio:i.horaInicio||"",fim:i.fim||"",horaFim:i.horaFim||"",situacao:i.situacao||"Automático pelo período",prioridade:Number(i.prioridade||0),imagemDesktop:i.imagemDesktop||i.imagem||"",imagemMobile:i.imagemMobile||"",textoBotao:i.textoBotao||"Saiba mais",metricas:i.metricas&&typeof i.metricas==="object"?i.metricas:{impressoes:Number(i.impressoes||0),cliques:Number(i.cliques||0),fonte:i.fonteMetricas||"",atualizadoEm:i.metricasAtualizadoEm||""},ativo:i.ativo!==false})),"ad"),
-      parceiros:ensureIds(safeArray(content.patrocinadores).map(i=>({...i,link:i.link||i.site||"",ativo:i.ativo!==false})),"part"),
-      banners:ensureIds(safeArray(banners.destaques).map(i=>({...i,tipo:i.tipo||"Editorial",posicao:normalizedBannerPosition(i.posicao),inicio:i.inicio||"",horaInicio:i.horaInicio||"",fim:i.fim||"",horaFim:i.horaFim||"",situacao:i.situacao||"Automático pelo período",prioridade:Number(i.prioridade||0),imagemDesktop:i.imagemDesktop||i.imagem||"",imagemMobile:i.imagemMobile||"",textoBotao:i.textoBotao||"Saiba mais",ativo:i.ativo!==false})),"banner"), popups:ensureIds(cms.content?.popups,"popup"), usuarios:[]
+      parceiros:ensureIds(safeArray(content.patrocinadores).map((i,index)=>({...i,categoria:i.categoria||"Patrocinador",descricao:i.descricao||"",link:i.link||i.site||"",whatsapp:i.whatsapp||"",instagram:i.instagram||"",facebook:i.facebook||"",youtube:i.youtube||"",ordem:Number(i.ordem||index+1),destaque:Boolean(i.destaque),ativo:i.ativo!==false})),"part"),
+      banners:ensureIds(safeArray(banners.destaques).map(i=>({...i,tipo:i.tipo||"Editorial",posicao:normalizedBannerPosition(i.posicao),inicio:i.inicio||"",horaInicio:i.horaInicio||"",fim:i.fim||"",horaFim:i.horaFim||"",situacao:i.situacao||"Automático pelo período",prioridade:Number(i.prioridade||0),imagemDesktop:i.imagemDesktop||i.imagem||"",imagemMobile:i.imagemMobile||"",textoBotao:i.textoBotao||"Saiba mais",ativo:i.ativo!==false})),"banner"),
+      popups:ensureIds(safeArray(cms.content?.popups).map(i=>({...i,mensagem:i.mensagem||i.descricao||"",inicio:i.inicio||"",horaInicio:i.horaInicio||"",fim:i.fim||"",horaFim:i.horaFim||"",situacao:i.situacao||"Automático pelo período",dispositivo:i.dispositivo||"Desktop e celular",frequencia:i.frequencia||"Uma vez por sessão",atrasoSegundos:Number(i.atrasoSegundos||0),prioridade:Number(i.prioridade||0),textoBotao:i.textoBotao||"",ativo:i.ativo!==false})),"popup"), usuarios:[]
     };
     fresh.integrations={
       whatsapp:{numero:whats.numero||"",mensagem:whats.mensagem||"Olá! Vim pelo site da rádio.",flutuante:whats.flutuante!==false,pedidos:texts.pedidosMusica?.ativo!==false},
@@ -1753,7 +1868,7 @@
     if(can("patrocinadores"))content.patrocinadores=state.content.parceiros.map(i=>({...i,site:i.link}));
     if(can("banners"))content.banners={...(content.banners||{}),destaques:state.content.banners,publicidades:state.content.publicidade};
     if(can("links_aplicativos"))content.links_aplicativos={...(content.links_aplicativos||{}),android:state.integrations.aplicativo.android,ios:state.integrations.aplicativo.ios,pwa:state.integrations.aplicativo.pwa,qr:state.integrations.aplicativo.qrcode};
-    if(can("textos_institucionais"))content.textos_institucionais={...texts,sobre:state.radio.descricao,player:{...(texts.player||{}),titulo:state.radio.musicaAtual,subtitulo:state.radio.locutorAtual,imagem:state.radio.playerImage},seo:state.integrations.seo,podcasts:state.content.podcasts,videos:state.content.videos,promocoes:state.content.promocoes,galeria:state.content.galeria,eventos:state.content.eventos,modulos:Object.fromEntries(state.modules.map(m=>[m.id,m.enabled])),pedidosMusica:{...(texts.pedidosMusica||{}),ativo:state.integrations.whatsapp.pedidos},acessibilidade:{...(texts.acessibilidade||{}),leitorTela:state.integrations.configuracoes.acessibilidade},cms_v2:{...cms,schemaVersion:6,selectedTheme:state.selectedTheme,modules:state.modules,content:{equipe:state.content.equipe,popups:state.content.popups,anunciantes:state.content.anunciantes},aplicativo:{icone:state.integrations.aplicativo.icone},configuracoes:state.integrations.configuracoes,updatedAt:new Date().toISOString()}};
+    if(can("textos_institucionais"))content.textos_institucionais={...texts,sobre:state.radio.descricao,player:{...(texts.player||{}),titulo:state.radio.musicaAtual,subtitulo:state.radio.locutorAtual,imagem:state.radio.playerImage},seo:state.integrations.seo,podcasts:state.content.podcasts,videos:state.content.videos,promocoes:state.content.promocoes,galeria:state.content.galeria,eventos:state.content.eventos,modulos:Object.fromEntries(state.modules.map(m=>[m.id,m.enabled])),pedidosMusica:{...(texts.pedidosMusica||{}),ativo:state.integrations.whatsapp.pedidos},acessibilidade:{...(texts.acessibilidade||{}),leitorTela:state.integrations.configuracoes.acessibilidade},cms_v2:{...cms,schemaVersion:7,selectedTheme:state.selectedTheme,modules:state.modules,content:{equipe:state.content.equipe,popups:state.content.popups,anunciantes:state.content.anunciantes},aplicativo:{icone:state.integrations.aplicativo.icone},configuracoes:state.integrations.configuracoes,updatedAt:new Date().toISOString()}};
     return content;
   }
 
@@ -1762,17 +1877,17 @@
     $("#logout-button").addEventListener("click",logout);
     $("#save-button").addEventListener("click",()=>persist(true));
     $("#preview-top-button").addEventListener("click",openPreview);
-    $("#preview-close").addEventListener("click",()=>{previewThemeOverride=null;$("#preview-dialog").close();});
+    $("#preview-close").addEventListener("click",()=>{clearPreviewPopupTimer();closePreviewPopup($("#preview-canvas"),{restoreFocus:false});previewThemeOverride=null;$("#preview-dialog").close();});
     $("#site-content-close").addEventListener("click",()=>$("#site-content-dialog").close());
     $("#site-content-dialog").addEventListener("click",event=>{if(event.target===$("#site-content-dialog"))$("#site-content-dialog").close();});
     $("#site-content-body").addEventListener("click",event=>{const open=event.target.closest("[data-site-open]");if(open)return openSiteDetail(open.dataset.siteOpen,open.dataset.siteId);const action=event.target.closest("[data-site-action]");if(action)return runSiteAction(action.dataset.siteAction);});
     $("#preview-refresh").addEventListener("click",renderPreviewDialog);
-    $$('[data-preview-device]').forEach(button=>button.addEventListener("click",()=>{ $$('[data-preview-device]').forEach(i=>i.classList.remove("active"));button.classList.add("active");$("#preview-canvas").className=`preview-canvas ${button.dataset.previewDevice}`;}));
+    $$('[data-preview-device]').forEach(button=>button.addEventListener("click",()=>{ $$('[data-preview-device]').forEach(i=>i.classList.remove("active"));button.classList.add("active");$("#preview-canvas").className=`preview-canvas ${button.dataset.previewDevice}`;renderPreviewDialog();}));
     $("#menu-toggle").addEventListener("click",()=>{const sidebar=$("#sidebar");sidebar.classList.toggle("open");$("#menu-toggle").setAttribute("aria-expanded",String(sidebar.classList.contains("open")));});
     $("#editor-form").addEventListener("submit",saveModal);
     $$('#editor-modal [value="cancel"]').forEach(button=>button.addEventListener("click",event=>{event.preventDefault();editing=null;$("#editor-modal").close();}));
     $("#backup-import").addEventListener("change",event=>{const file=event.target.files?.[0];if(file)importBackup(file);event.target.value="";});
-    document.addEventListener("keydown",event=>{if(event.key!=="Escape")return;if($("#site-content-dialog").open)$("#site-content-dialog").close();else if($("#preview-dialog").open){previewThemeOverride=null;$("#preview-dialog").close();}});
+    document.addEventListener("keydown",event=>{if(event.key!=="Escape")return;const previewCanvas=$("#preview-canvas");if($(".site-popup-layer",previewCanvas)){event.preventDefault();return closePreviewPopup(previewCanvas);}if($("#site-content-dialog").open)$("#site-content-dialog").close();else if($("#preview-dialog").open){clearPreviewPopupTimer();previewThemeOverride=null;$("#preview-dialog").close();}});
     resumeSession();
   }
 

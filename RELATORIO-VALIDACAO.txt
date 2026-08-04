@@ -1,21 +1,16 @@
 CENTRAL RÁDIOS BRASIL — PORTAL DO CLIENTE
-VERSÃO: 2.4.0 — ETAPA 1: PUBLICIDADE E BANNERS
+v2.4.0 — ETAPA 2: PARCEIROS E POPUPS
 
-VALIDAÇÃO ESTÁTICA
-- JavaScript validado com node --check: APROVADO
-- Estrutura do pacote: APROVADA
-- Versionamento interno: 2.4.0-etapa-1
-- Schema interno CMS: 6
-- Migração SQL: NÃO NECESSÁRIA
-
-VALIDAÇÃO EM NAVEGADOR CHROMIUM
-- Regressão integrada: 64/64
-- Publicidade e banners: 38/38
-- Total: 102/102
+VALIDAÇÕES CONCLUÍDAS
+- Sintaxe JavaScript: aprovada
+- Auditoria integrada Chromium: 77/77
+- Áreas do menu: 29/29
+- Temas: 6/6
+- Prévia responsiva: desktop, tablet e celular
+- Botões sem rótulo: 0
 - Exceções JavaScript: 0
 - Erros de console: 0
-
-SEGURANÇA DOS DADOS
-- API simulada durante os testes
-- Nenhum dado de produção alterado
-- A prévia não fabrica impressões ou cliques
+- Versionamento interno: 2.4.0-etapa-2
+- Schema interno: 7
+- Migração SQL: não necessária
+- API de testes: simulada; produção não alterada

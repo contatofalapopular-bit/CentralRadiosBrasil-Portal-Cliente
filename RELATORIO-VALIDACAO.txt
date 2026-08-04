@@ -1,15 +1,16 @@
 CENTRAL RÁDIOS BRASIL — PORTAL DO CLIENTE
-VERSÃO: 2.3.0 — ETAPA 1: PODCASTS E VÍDEOS
-DATA: 03/08/2026
+VERSÃO: 2.3.0 — ETAPA 2: PROMOÇÕES E EVENTOS
+BASE: v2.3.0 Etapa 1 — Podcasts e Vídeos
 
-VALIDAÇÕES:
-- Sintaxe JavaScript: APROVADA
-- Regressão funcional: 72/72 APROVADAS
-- Testes específicos da etapa: 19/19 APROVADOS
-- Total em navegador: 91/91 APROVADOS
+VALIDAÇÃO AUTOMATIZADA EM CHROMIUM
+- Regressão v2.2.1: 72/72
+- Etapa 1: 19/19
+- Etapa 2: 29/29
+- TOTAL: 120/120 APROVADOS
 - Exceções JavaScript: 0
-- Migração SQL: NÃO NECESSÁRIA
-- API de produção alterada durante testes: NÃO
+- API: simulada durante os testes
+- Produção: nenhum dado alterado
+- Migração SQL: não necessária
 
-BASE PRESERVADA: v2.2.1 — Auditoria Funcional
-PRÓXIMA ETAPA: v2.3.0 Etapa 2 — Promoções e Eventos
+PRÓXIMO PASSO RECOMENDADO:
+v2.3.0 — consolidação final e auditoria integrada dos quatro módulos.

@@ -533,3 +533,21 @@ button.site-sponsor{font:inherit}.site-footer-action{border:1px solid rgba(255,2
 .site-media-corner{position:absolute;left:7px;top:7px;padding:4px 6px;border-radius:999px;background:var(--site-accent);color:#111827;font-size:6px;text-transform:uppercase;letter-spacing:.05em;box-shadow:0 3px 10px rgba(0,0,0,.2)}
 .site-audio-box{display:grid;grid-template-columns:110px minmax(0,1fr);gap:16px;align-items:center;padding:15px;border:1px solid #dce3ec;border-radius:14px;background:#f8fafc;margin-bottom:18px}.site-audio-box>img{width:110px;height:110px;object-fit:cover;border-radius:11px;background:#e5e7eb}.site-audio-box strong{display:block;color:#111827;font-size:1rem}.site-audio-box span{display:block;color:#64748b;font-size:.76rem;margin:4px 0 10px}.site-audio-box a{display:inline-block;color:#315b9b;font-size:.72rem;font-weight:800;text-decoration:none}.site-audio-box a:hover{text-decoration:underline}.site-audio-box .site-audio-player{margin:0 0 7px}
 @media(max-width:640px){.site-audio-box{grid-template-columns:1fr}.site-audio-box>img{width:100%;height:auto;aspect-ratio:1;max-height:280px}}
+
+
+/* v2.3.0 — Etapa 2: promoções e eventos */
+.badge.status-promo-ativa,.status-promo-ativa{background:#dcfce7!important;color:#166534!important;border-color:#86efac!important}
+.badge.status-promo-agendada,.status-promo-agendada{background:#dbeafe!important;color:#1d4ed8!important;border-color:#93c5fd!important}
+.badge.status-promo-encerrada,.status-promo-encerrada{background:#e5e7eb!important;color:#374151!important;border-color:#cbd5e1!important}
+.badge.status-promo-cancelada,.status-promo-cancelada{background:#fee2e2!important;color:#991b1b!important;border-color:#fca5a5!important}
+.badge.status-evento-futuro,.status-evento-futuro{background:#dbeafe!important;color:#1d4ed8!important;border-color:#93c5fd!important}
+.badge.status-evento-hoje,.status-evento-hoje{background:#dcfce7!important;color:#166534!important;border-color:#86efac!important}
+.badge.status-evento-encerrado,.status-evento-encerrado{background:#e5e7eb!important;color:#374151!important;border-color:#cbd5e1!important}
+.badge.status-evento-adiado,.status-evento-adiado{background:#fef3c7!important;color:#92400e!important;border-color:#fcd34d!important}
+.badge.status-evento-cancelado,.status-evento-cancelado{background:#fee2e2!important;color:#991b1b!important;border-color:#fca5a5!important}
+.site-promo-card.media-featured{box-shadow:0 0 0 2px var(--site-accent),0 12px 28px rgba(15,23,42,.18)}
+.site-promo-card .site-content-status{align-self:flex-start;display:inline-flex;width:max-content;margin-bottom:8px;padding:4px 7px;border-radius:999px;border:1px solid transparent;font-size:6px!important;font-weight:950;letter-spacing:.05em;text-transform:uppercase}
+.site-promo-card em{display:block;margin-top:7px;font-size:7px;font-style:normal;color:#dbe5ef;font-weight:800}
+.site-event-address{display:grid;gap:4px;padding:13px 15px;margin-bottom:16px;border-left:4px solid var(--site-primary,#e31c45);border-radius:10px;background:#f8fafc;color:#334155}
+.site-event-address strong{font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:#64748b}.site-event-address span{font-size:.9rem}
+.site-detail-actions{display:flex;flex-wrap:wrap;gap:9px;align-items:center}.site-detail-actions .site-detail-external{margin-bottom:0}

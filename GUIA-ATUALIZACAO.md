@@ -1,21 +1,17 @@
-# Guia de atualização — v2.3.0 Etapa 1
+# Guia de atualização — v2.3.0 Etapa 2
 
-Base anterior: **v2.2.1 — Auditoria Funcional**  
-Nova entrega: **v2.3.0 — Etapa 1: Podcasts e Vídeos**
+Base anterior: **v2.3.0 — Etapa 1: Podcasts e Vídeos**  
+Nova entrega: **v2.3.0 — Etapa 2: Promoções e Eventos**
 
-## Procedimento
+1. Faça uma cópia da instalação atual.
+2. Substitua os arquivos do Portal pelos arquivos deste pacote.
+3. Não altere `WORKER_URL` em `config.js`.
+4. Publique normalmente no mesmo repositório/serviço.
+5. Abra o Portal e pressione `Ctrl + F5`.
+6. Teste Promoções e Eventos antes de publicar o rascunho real.
 
-1. Guarde uma cópia da instalação v2.2.1.
-2. Descompacte este pacote.
-3. Substitua no repositório do Portal do Cliente os arquivos `index.html`, `app.js`, `styles.css`, `config.js` e `manifest.webmanifest`.
-4. Publique normalmente no GitHub/Cloudflare usado pelo projeto.
-5. Abra o portal e pressione `Ctrl+F5` para limpar o cache da versão anterior.
-6. Teste a abertura de um podcast e de um vídeo já cadastrados antes de criar novos registros.
+## Banco e integração
 
-## Banco de dados
+Não existe migração SQL. Os novos campos continuam dentro de `textos_institucionais.promocoes` e `textos_institucionais.eventos`, no mesmo rascunho persistido pelo Worker/D1.
 
-Não há migração SQL. Os novos campos continuam sendo salvos no conteúdo do site já utilizado pelo Worker/D1.
-
-## Compatibilidade
-
-Os podcasts e vídeos antigos permanecem carregáveis. Ao editar um registro antigo, o CMS passa a oferecer os novos campos de organização e validação.
+Registros antigos são normalizados automaticamente. Campos não existentes recebem valores seguros sem apagar dados.

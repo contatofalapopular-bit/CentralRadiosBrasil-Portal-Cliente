@@ -6,6 +6,8 @@
   const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
   let authToken = sessionStorage.getItem(CONFIG.TOKEN_KEY) || "";
   let dashboardData = null;
+  let currentSessionUser = null;
+  let serverUsers = [];
   let remoteSite = null;
   let versions = [];
   let mediaLibrary = [];
@@ -422,7 +424,7 @@
   function defaultState() {
     const today = new Date().toISOString().slice(0, 10);
     return {
-      version: "3.0.0-stage1",
+      version: "3.0.0-stage2",
       updatedAt: new Date().toISOString(),
       status: "rascunho",
       selectedTheme: "morada",
@@ -706,7 +708,7 @@
         <article class="kpi-card"><span>Imagens armazenadas</span><strong>${mediaCount}</strong><small>arquivos vinculados ao site</small></article>
         <article class="kpi-card"><span>Faturas em aberto</span><strong>${openInvoices.length}</strong><small>${contract ? `Contrato ${escapeHTML(contract.numero || "ativo")}` : "Nenhum contrato"}</small></article>
       </div>
-      <section class="card" style="margin-bottom:18px"><header class="card-header"><div><h3>Sistema v2.5.0 — Segurança e rastreabilidade</h3><p>Usuários, permissões, auditoria integrada e recuperação com pontos de restauração.</p></div><span class="badge active">Consolidada</span></header><div class="card-body"><div class="module-health"><div class="health-row"><div><strong><span class="health-dot"></span>Usuários e permissões</strong><span>${state.security?.users?.length||1} acesso(s) configurado(s)</span></div><button class="button small secondary" data-go="usuarios" type="button">Gerenciar</button></div><div class="health-row"><div><strong><span class="health-dot"></span>Auditoria integrada</strong><span>${state.audit?.entries?.length||0} evento(s) registrado(s)</span></div><button class="button small secondary" data-go="auditoria" type="button">Auditar</button></div><div class="health-row"><div><strong><span class="health-dot"></span>Backup e recuperação</strong><span>${state.backup?.snapshots?.length||0} ponto(s) disponível(is)</span></div><button class="button small secondary" data-go="backup" type="button">Proteger</button></div></div></div></section>
+      <section class="card" style="margin-bottom:18px"><header class="card-header"><div><h3>Sistema v3.0.0 — Usuários reais e permissões no servidor</h3><p>Usuários, permissões, auditoria integrada e recuperação com pontos de restauração.</p></div><span class="badge active">Consolidada</span></header><div class="card-body"><div class="module-health"><div class="health-row"><div><strong><span class="health-dot"></span>Usuários e permissões</strong><span>${state.security?.users?.length||1} acesso(s) configurado(s)</span></div><button class="button small secondary" data-go="usuarios" type="button">Gerenciar</button></div><div class="health-row"><div><strong><span class="health-dot"></span>Auditoria integrada</strong><span>${state.audit?.entries?.length||0} evento(s) registrado(s)</span></div><button class="button small secondary" data-go="auditoria" type="button">Auditar</button></div><div class="health-row"><div><strong><span class="health-dot"></span>Backup e recuperação</strong><span>${state.backup?.snapshots?.length||0} ponto(s) disponível(is)</span></div><button class="button small secondary" data-go="backup" type="button">Proteger</button></div></div></div></section>
       <section class="card" style="margin-bottom:18px"><header class="card-header"><div><h3>Comercial v2.4.0 — Final Consolidada</h3><p>Publicidade, banners, parceiros e popups integrados, com posições reais, prioridades e auditoria de conflitos.</p></div><span class="badge active">Consolidada</span></header><div class="card-body"><div class="module-health">${[["anunciantes","Anunciantes",state.content.anunciantes.length],["publicidade","Campanhas",state.content.publicidade.length],["banners","Banners",state.content.banners.length],["parceiros","Parceiros",state.content.parceiros.length],["popups","Popups",state.content.popups.length]].map(([id,label,total])=>`<div class="health-row"><div><strong><span class="health-dot"></span>${label}</strong><span>${total} registro${total===1?"":"s"} no rascunho</span></div><button class="button small secondary" data-go="${id}" type="button">Revisar</button></div>`).join("")}</div>${commercialAuditHTML()}<div class="notice" style="margin-top:14px">A prévia respeita posições e prioridades, mas não registra impressão, clique ou frequência real. A coleta e a frequência pública permanecem sob responsabilidade do Portal Público/Worker.</div></div></section>
       <div class="grid-2">
         <section class="card"><header class="card-header"><div><h3>Estrutura do site</h3><p>Módulos ativados no editor visual.</p></div><button class="button small secondary" data-go="editor" type="button">Organizar</button></header><div class="card-body"><div class="module-health">${activeModules().slice(0,10).map(module => `<div class="health-row"><div><strong><span class="health-dot"></span>${escapeHTML(module.label)}</strong><span>${escapeHTML(module.description)}</span></div><span class="badge active">Ativo</span></div>`).join("") || `<div class="empty-state"><strong>Nenhum módulo ativo</strong></div>`}</div></div></section>
@@ -718,7 +720,7 @@
       </div>
       <div class="grid-2 equal" style="margin-top:18px">
         <section class="card"><header class="card-header"><div><h3>Dados reais, sem números inventados</h3><p>Audiência e ouvintes.</p></div></header><div class="card-body"><div class="notice">O painel não exibe audiência fictícia. O número de ouvintes só será mostrado quando existir uma fonte técnica confiável do streaming.</div></div></section>
-        <section class="card"><header class="card-header"><div><h3>Integração ativa</h3><p>Ambiente utilizado nesta instalação.</p></div></header><div class="card-body"><div class="code-box">Portal: ${escapeHTML(CONFIG.VERSION || "3.0.0-stage1")}\nWorker: ${escapeHTML(CONFIG.WORKER_URL || "—")}\nPersistência: Cloudflare D1\nMídias: API do site\nPublicação: supervisionada pela Central</div></div></section>
+        <section class="card"><header class="card-header"><div><h3>Integração ativa</h3><p>Ambiente utilizado nesta instalação.</p></div></header><div class="card-body"><div class="code-box">Portal: ${escapeHTML(CONFIG.VERSION || "3.0.0-stage2")}\nWorker: ${escapeHTML(CONFIG.WORKER_URL || "—")}\nPersistência: Cloudflare D1\nMídias: API do site\nPublicação: supervisionada pela Central</div></div></section>
       </div>`;
     bindGoButtons(root);
   }
@@ -1593,7 +1595,7 @@
         <section class="card"><div class="card-body"><h3>Exportar JSON</h3><p class="field-help">Baixa configurações, módulos, temas e conteúdos.</p><button class="button primary" id="export-backup" type="button">Baixar backup</button></div></section>
         <section class="card"><div class="card-body"><h3>Importar JSON</h3><p class="field-help">Carrega o arquivo no editor; clique em Salvar rascunho para gravar no D1.</p><button class="button secondary" id="import-backup" type="button">Selecionar arquivo</button></div></section>
         <section class="card"><div class="card-body"><h3>Recarregar do servidor</h3><p class="field-help">Descarta alterações ainda não salvas e recarrega o último rascunho do servidor.</p><button class="button danger" id="reset-demo" type="button">Recarregar dados</button></div></section>
-      </div><section class="card" style="margin-top:18px"><header class="card-header"><div><h3>Sobre esta instalação</h3><p>Informações técnicas.</p></div></header><div class="card-body"><div class="code-box">Modo: produção integrada\nVersão: ${CONFIG.VERSION || "3.0.0-stage1"}\nPersistência: Cloudflare D1\nAPI: ${CONFIG.WORKER_URL || "não configurada"}\nÚltima alteração: ${formatDateTime(state.updatedAt)}</div></div></section>`;
+      </div><section class="card" style="margin-top:18px"><header class="card-header"><div><h3>Sobre esta instalação</h3><p>Informações técnicas.</p></div></header><div class="card-body"><div class="code-box">Modo: produção integrada\nVersão: ${CONFIG.VERSION || "3.0.0-stage2"}\nPersistência: Cloudflare D1\nAPI: ${CONFIG.WORKER_URL || "não configurada"}\nÚltima alteração: ${formatDateTime(state.updatedAt)}</div></div></section>`;
     $("#export-backup").addEventListener("click",exportBackup);
     $("#import-backup").addEventListener("click",()=>$("#backup-import").click());
     $("#reset-demo").addEventListener("click",()=>{if(confirm("Descartar alterações não salvas e recarregar o rascunho do servidor?")) loadAll();});
@@ -2300,32 +2302,64 @@
 
   async function login(event) {
     event.preventDefault(); const button=$("#login-button"); button.disabled=true; button.textContent="Entrando…"; showLoginMessage("");
-    try { const result=await api("/api/cliente/login",{method:"POST",body:JSON.stringify({email:$("#login-email").value.trim(),senha:$("#login-password").value})}); authToken=result.token; sessionStorage.setItem(CONFIG.TOKEN_KEY,authToken); await loadAll(); showApp(); }
+    try { const result=await api("/api/cliente/login",{method:"POST",body:JSON.stringify({email:$("#login-email").value.trim(),senha:$("#login-password").value})}); authToken=result.token; currentSessionUser=result.usuario||null; sessionStorage.setItem(CONFIG.TOKEN_KEY,authToken); await loadAll(); showApp(); }
     catch(error){showLoginMessage(error.message,"error");}
     finally{button.disabled=false;button.textContent="Entrar";}
   }
 
   async function resumeSession() {
     if (!authToken) return showLogin();
-    try { await api("/api/cliente/sessao"); await loadAll(); showApp(); }
+    try { const session=await api("/api/cliente/sessao"); currentSessionUser=session.usuario||null; await loadAll(); showApp(); }
     catch { showLogin(); }
   }
 
-  async function logout() { try { await api("/api/cliente/logout",{method:"POST"}); } catch {} resetAudio(); authToken=""; sessionStorage.removeItem(CONFIG.TOKEN_KEY); showLogin(); }
+  async function logout() { try { await api("/api/cliente/logout",{method:"POST"}); } catch {} resetAudio(); authToken=""; currentSessionUser=null; serverUsers=[]; sessionStorage.removeItem(CONFIG.TOKEN_KEY); showLogin(); }
   function showLogin(message="") { $("#app-shell").classList.add("hidden"); $("#login-view").classList.remove("hidden"); if(message)showLoginMessage(message,"error"); }
   function showApp() { $("#login-view").classList.add("hidden"); $("#app-shell").classList.remove("hidden"); updateConnectionStatus();renderNav(); updateChrome(); renderPage(); }
   function showLoginMessage(message,type="") { const box=$("#login-message"); box.textContent=message; box.className=`global-message ${type} ${message?"":"hidden"}`; }
+
+  function normalizeServerUser(user) {
+    if(!user)return null;
+    return {
+      id:user.id||uid("user"),nome:user.nome||user.email||"Usuário",email:String(user.email||"").toLowerCase(),
+      perfil:V250_ROLE_PROFILES[user.perfil]?user.perfil:"Somente leitura",
+      areas:Array.isArray(user.areas)?user.areas:[],status:user.status==="suspenso"?"Suspenso":"Ativo",
+      ativo:user.ativo!==false&&user.status!=="suspenso",owner:Boolean(user.owner),
+      forcarTrocaSenha:Boolean(user.forcarTrocaSenha),ultimoAcesso:user.ultimoAcessoEm||user.ultimoAcesso||"",
+      criadoEm:user.criadoEm||"",atualizadoEm:user.atualizadoEm||"",acoes:Array.isArray(user.acoes)?user.acoes:[]
+    };
+  }
+
+  function sessionCan(action) {
+    const user=normalizeServerUser(currentSessionUser);
+    return Boolean(user&&(user.owner||user.perfil==="Administrador"||(user.acoes||[]).includes(action)));
+  }
+
+  async function loadServerUsers() {
+    const current=normalizeServerUser(currentSessionUser||dashboardData?.usuario);
+    if(!current){serverUsers=[];return;}
+    if(!sessionCan("manage_users")){serverUsers=[current];return;}
+    try{const result=await api("/api/cliente/usuarios");serverUsers=(result.usuarios||[]).map(normalizeServerUser).filter(Boolean);}
+    catch(error){if(error.status===403)serverUsers=[current];else throw error;}
+  }
+
+  function syncServerUsersToState() {
+    if(!state?.security)return;
+    const current=normalizeServerUser(currentSessionUser||dashboardData?.usuario);
+    state.security.users=(serverUsers.length?serverUsers:(current?[current]:[])).map(user=>({...user}));
+  }
 
   async function loadAll() {
     if (isLoading) return; isLoading=true;
     resetAudio();
     try {
       const [dash, siteResult] = await Promise.all([api("/api/cliente/dashboard"), api("/api/cliente/site").catch(error => error.status===404 ? null : Promise.reject(error))]);
-      dashboardData=dash; remoteSite=siteResult?.site || null; versions=siteResult?.versoes || [];
+      dashboardData=dash; currentSessionUser=dash?.usuario||currentSessionUser; remoteSite=siteResult?.site || null; versions=siteResult?.versoes || [];
       if (remoteSite) {
         const media = await api("/api/cliente/site/midias").catch(()=>({midias:[]})); mediaLibrary=media.midias || [];
         state=mapRemoteToState(remoteSite,dashboardData); ensureV250State();
       } else { state=defaultState(); state.radio.nome=dash?.cliente?.nome_radio || dash?.cliente?.nome || "Minha rádio"; ensureV250State(); }
+      await loadServerUsers(); syncServerUsersToState();
       currentPage="dashboard"; searchTerm="";
       updateAccount();
       if (!$("#app-shell").classList.contains("hidden")) { renderNav(); updateChrome(); renderPage(); }
@@ -2333,13 +2367,14 @@
   }
 
   function updateAccount() {
-    const client=dashboardData?.cliente || {}; const name=client.nome_radio || client.nome || "Cliente";
-    $("#account-name").textContent=name; $("#account-avatar").textContent=initials(name); $("#account-role").textContent="Cliente autorizado";
+    const client=dashboardData?.cliente||{},user=normalizeServerUser(currentSessionUser||dashboardData?.usuario);
+    const name=user?.nome||client.nome_radio||client.nome||"Cliente";
+    $("#account-name").textContent=name; $("#account-avatar").textContent=initials(name); $("#account-role").textContent=user?.perfil||"Cliente autorizado";
   }
 
   function mapRemoteToState(site,dashboard) {
     const fresh=defaultState(), content=site.conteudoRascunho || site.conteudoPublicado || {}, texts=content.textos_institucionais || {}, cms=texts.cms_v2 || {}, contacts=content.contatos || {}, whats=typeof content.whatsapp === "string" ? {numero:content.whatsapp} : (content.whatsapp || {}), colors=content.cores || {}, apps=content.links_aplicativos || {}, banners=content.banners || {};
-    fresh.version="3.0.0-stage1"; fresh.updatedAt=versions[0]?.criado_em || new Date().toISOString(); fresh.status=site.status_publicacao || "sem_rascunho"; fresh.selectedTheme=cms.selectedTheme || "morada"; fresh.editor=normalizeEditorState(cms.editor||{});
+    fresh.version="3.0.0-stage2"; fresh.updatedAt=versions[0]?.criado_em || new Date().toISOString(); fresh.status=site.status_publicacao || "sem_rascunho"; fresh.selectedTheme=cms.selectedTheme || "morada"; fresh.editor=normalizeEditorState(cms.editor||{});
     fresh.radio={...fresh.radio,nome:content.nome || site.nome_site || dashboard?.cliente?.nome_radio || "Minha rádio",slogan:content.slogan || "",descricao:content.descricao || texts.sobre || "",cidade:contacts.cidade || dashboard?.cliente?.cidade || "",estado:contacts.estado || dashboard?.cliente?.estado || "",email:contacts.email || dashboard?.cliente?.email || "",telefone:contacts.telefone || "",whatsapp:whats.numero || "",endereco:contacts.endereco || "",streamUrl:site.stream_url || "",musicaAtual:texts.player?.titulo || "Transmissão ao vivo",locutorAtual:texts.player?.subtitulo || "Programação da rádio",logo:content.logo || "",hero:content.capa || "",playerImage:texts.player?.imagem || "",cores:{primaria:colors.primaria || "#e31c45",secundaria:colors.secundaria || "#121d31",destaque:colors.destaque || "#f1a11a",fundo:colors.fundo || "#f4f6f9"},listenersEnabled:false};
     const moduleValues=texts.modulos || {}; const savedModules=safeArray(cms.modules);
     fresh.modules=modulesCatalog.map(([id,label,description],index)=>{const saved=savedModules.find(m=>m.id===id);return{id,label,description,enabled:saved? saved.enabled!==false : moduleValues[id]!==false,order:Number(saved?.order ?? index)};});
@@ -2387,7 +2422,7 @@
     if(can("patrocinadores"))content.patrocinadores=state.content.parceiros.map(i=>({...i,site:i.link}));
     if(can("banners"))content.banners={...(content.banners||{}),destaques:state.content.banners,publicidades:state.content.publicidade};
     if(can("links_aplicativos"))content.links_aplicativos={...(content.links_aplicativos||{}),android:state.integrations.aplicativo.android,ios:state.integrations.aplicativo.ios,pwa:state.integrations.aplicativo.pwa,qr:state.integrations.aplicativo.qrcode};
-    if(can("textos_institucionais"))content.textos_institucionais={...texts,sobre:state.radio.descricao,player:{...(texts.player||{}),titulo:state.radio.musicaAtual,subtitulo:state.radio.locutorAtual,imagem:state.radio.playerImage},seo:state.integrations.seo,podcasts:state.content.podcasts,videos:state.content.videos,promocoes:state.content.promocoes,galeria:state.content.galeria,eventos:state.content.eventos,modulos:Object.fromEntries(state.modules.map(m=>[m.id,m.enabled])),pedidosMusica:{...(texts.pedidosMusica||{}),ativo:state.integrations.whatsapp.pedidos},acessibilidade:{...(texts.acessibilidade||{}),leitorTela:state.integrations.configuracoes.acessibilidade},cms_v2:{...cms,schemaVersion:13,release:"3.0.0-stage1",editor:state.editor,security:state.security,production:state.production,audit:{entries:(state.audit?.entries||[]).slice(0,500),functionalRuns:(state.audit?.functionalRuns||[]).slice(0,10)},backup:{settings:state.backup?.settings||{},snapshots:(state.backup?.snapshots||[]).slice(0,5)},selectedTheme:state.selectedTheme,modules:state.modules,content:{equipe:state.content.equipe,popups:state.content.popups,anunciantes:state.content.anunciantes},aplicativo:{icone:state.integrations.aplicativo.icone},configuracoes:state.integrations.configuracoes,updatedAt:new Date().toISOString()}};
+    if(can("textos_institucionais"))content.textos_institucionais={...texts,sobre:state.radio.descricao,player:{...(texts.player||{}),titulo:state.radio.musicaAtual,subtitulo:state.radio.locutorAtual,imagem:state.radio.playerImage},seo:state.integrations.seo,podcasts:state.content.podcasts,videos:state.content.videos,promocoes:state.content.promocoes,galeria:state.content.galeria,eventos:state.content.eventos,modulos:Object.fromEntries(state.modules.map(m=>[m.id,m.enabled])),pedidosMusica:{...(texts.pedidosMusica||{}),ativo:state.integrations.whatsapp.pedidos},acessibilidade:{...(texts.acessibilidade||{}),leitorTela:state.integrations.configuracoes.acessibilidade},cms_v2:{...cms,schemaVersion:14,release:"3.0.0-stage2",editor:state.editor,security:{...state.security,users:[]},production:state.production,audit:{entries:(state.audit?.entries||[]).slice(0,500),functionalRuns:(state.audit?.functionalRuns||[]).slice(0,10)},backup:{settings:state.backup?.settings||{},snapshots:(state.backup?.snapshots||[]).slice(0,5)},selectedTheme:state.selectedTheme,modules:state.modules,content:{equipe:state.content.equipe,popups:state.content.popups,anunciantes:state.content.anunciantes},aplicativo:{icone:state.integrations.aplicativo.icone},configuracoes:state.integrations.configuracoes,updatedAt:new Date().toISOString()}};
     return content;
   }
 
@@ -2418,7 +2453,7 @@
   function ensureV250State() {
     if (!state || typeof state !== "object") state=defaultState();
     state.editor=normalizeEditorState(state.editor||{});
-    state.version="3.0.0-stage1";
+    state.version="3.0.0-stage2";
     const client=dashboardData?.cliente || {};
     const ownerEmail=String(client.email || state.radio?.email || "cliente@exemplo.com.br").trim().toLowerCase();
     const ownerName=client.nome || client.nome_radio || state.radio?.nome || "Administrador do cliente";
@@ -2461,9 +2496,10 @@
   }
 
   function currentAccessUser() {
-    ensureV250State();
-    const email=String(dashboardData?.cliente?.email || "").trim().toLowerCase();
-    return state.security.users.find(user=>email && user.email===email) || state.security.users.find(user=>user.owner) || state.security.users[0];
+    const current=normalizeServerUser(currentSessionUser||dashboardData?.usuario);
+    if(current)return current;
+    const email=String(dashboardData?.cliente?.email||"").trim().toLowerCase();
+    return state.security.users.find(user=>email&&user.email===email)||state.security.users.find(user=>user.owner)||state.security.users[0];
   }
 
   function pageArea(page=currentPage) { return V250_PAGE_AREAS[page] || "sistema"; }
@@ -2650,41 +2686,62 @@
     $$('[data-view-item]',root).forEach(button=>button.addEventListener("click",()=>openSiteDetail(key,button.dataset.viewItem)));$$('[data-edit-item]',root).forEach(button=>button.addEventListener("click",()=>openItemModal(key,button.dataset.editItem)));$$('[data-duplicate-item]',root).forEach(button=>button.addEventListener("click",()=>duplicateItem(key,button.dataset.duplicateItem)));$$('[data-delete-item]',root).forEach(button=>button.addEventListener("click",()=>deleteItem(key,button.dataset.deleteItem)));$$('[data-toggle-item]',root).forEach(button=>button.addEventListener("click",()=>toggleItem(key,button.dataset.toggleItem)));applyPermissionState(root,key);
   }
 
-  function roleOptions(selected) { return Object.keys(V250_ROLE_PROFILES).map(role=>`<option value="${escapeHTML(role)}" ${role===selected?"selected":""}>${escapeHTML(role)}</option>`).join(""); }
+  function roleOptions(selected,{allowAdministrator=true}={}) { return Object.keys(V250_ROLE_PROFILES).filter(role=>allowAdministrator||role!=="Administrador").map(role=>`<option value="${escapeHTML(role)}" ${role===selected?"selected":""}>${escapeHTML(role)}</option>`).join(""); }
   function securityAreaOptions(selected=[]) {
     const areas=[["site","Site e temas"],["conteudo","Conteúdo editorial"],["comercial","Comercial"],["integracoes","Integrações"],["publicacao","Publicação"],["financeiro","Faturas e contrato"],["auditoria","Auditoria"],["backup","Backup"],["usuarios","Usuários"]];
     return `<fieldset class="field full checkbox-fieldset"><legend>Áreas permitidas</legend><div class="checkbox-grid permission-area-grid">${areas.map(([id,label])=>`<label><input type="checkbox" name="areas" value="${id}" ${selected.includes("*")||selected.includes(id)?"checked":""}><span>${label}</span></label>`).join("")}</div></fieldset>`;
   }
   function openAccessUserModal(id=null) {
-    if(!requirePermission("manage_users","usuarios"))return;ensureV250State();const user=id?state.security.users.find(entry=>entry.id===id):{perfil:"Editor",areas:[],status:"Convite pendente",ativo:true,exigir2FA:false};if(!user)return;
+    if(!requirePermission("manage_users","usuarios"))return;ensureV250State();const current=currentAccessUser(),user=id?state.security.users.find(entry=>entry.id===id):{perfil:"Editor",areas:[],status:"Convite pendente",ativo:true,exigir2FA:false};if(!user)return;
+    if(user.owner&&!current.owner)return notify("Somente o administrador principal pode alterar a conta protegida.","error");
     accessEditingId=id;$("#access-user-title").textContent=id?"Editar usuário":"Novo usuário";
-    $("#access-user-fields").innerHTML=`<div class="form-grid"><div class="field"><label for="access-name">Nome</label><input id="access-name" name="nome" value="${escapeHTML(user.nome||"")}" required></div><div class="field"><label for="access-email">E-mail</label><input id="access-email" name="email" type="email" value="${escapeHTML(user.email||"")}" required ${user.owner?"readonly":""}></div><div class="field"><label for="access-role">Perfil</label><select id="access-role" name="perfil" ${user.owner?"disabled":""}>${roleOptions(user.perfil)}</select></div><div class="field"><label for="access-status">Situação</label><select id="access-status" name="status" ${user.owner?"disabled":""}><option ${user.status==="Ativo"?"selected":""}>Ativo</option><option ${user.status==="Convite pendente"?"selected":""}>Convite pendente</option><option ${user.status==="Suspenso"?"selected":""}>Suspenso</option></select></div>${securityAreaOptions(user.areas||[])}<div class="field full"><div class="toggle-row"><div><strong>Exigir autenticação em duas etapas</strong><small>Recomendado para administradores e publicação.</small></div><label class="switch"><input type="checkbox" name="exigir2FA" ${user.exigir2FA?"checked":""}><span></span></label></div></div></div>`;
+    $("#access-user-fields").innerHTML=`<div class="form-grid"><div class="field"><label for="access-name">Nome</label><input id="access-name" name="nome" value="${escapeHTML(user.nome||"")}" required></div><div class="field"><label for="access-email">E-mail</label><input id="access-email" name="email" type="email" value="${escapeHTML(user.email||"")}" required ${user.owner?"readonly":""}></div><div class="field"><label for="access-role">Perfil</label><select id="access-role" name="perfil" ${user.owner?"disabled":""}>${roleOptions(user.perfil,{allowAdministrator:Boolean(current.owner)||user.perfil==="Administrador"})}</select></div><div class="field"><label for="access-status">Situação</label><select id="access-status" name="status" ${user.owner?"disabled":""}><option ${user.status==="Ativo"?"selected":""}>Ativo</option><option ${user.status==="Suspenso"?"selected":""}>Suspenso</option></select></div>${securityAreaOptions(user.areas||[])}<div class="field full"><div class="notice">A conta terá login individual. Perfis, áreas e cada alteração do rascunho são validados também pelo Worker.</div></div></div>`;
     $("#access-user-modal").showModal();
   }
-  function saveAccessUser(event) {
+  async function refreshServerUsers() {
+    await loadServerUsers();syncServerUsersToState();
+  }
+
+  async function saveAccessUser(event) {
     event.preventDefault();if(event.submitter?.value==="cancel"){$("#access-user-modal").close();return;}if(!requirePermission("manage_users","usuarios"))return;
-    const form=new FormData(event.currentTarget),email=String(form.get("email")||"").trim().toLowerCase(),nome=String(form.get("nome")||"").trim();if(!nome||!email)return notify("Informe nome e e-mail válidos.","error");
-    const duplicate=state.security.users.find(user=>user.id!==accessEditingId&&user.email===email);if(duplicate)return notify("Já existe um usuário com este e-mail.","error");
-    const existing=accessEditingId?state.security.users.find(user=>user.id===accessEditingId):null;const perfil=existing?.owner?"Administrador":String(form.get("perfil")||"Somente leitura"),status=existing?.owner?"Ativo":String(form.get("status")||"Convite pendente");
-    const user=existing||{id:uid("user"),criadoEm:new Date().toISOString(),owner:false};user.nome=nome;user.email=email;user.perfil=perfil;user.status=status;user.ativo=status!=="Suspenso";user.areas=existing?.owner?["*"]:form.getAll("areas").map(String);user.exigir2FA=form.has("exigir2FA");user.atualizadoEm=new Date().toISOString();
-    if(!existing)state.security.users.push(user);recordAudit(existing?"usuario.editado":"usuario.criado","usuarios","usuario",`${nome} • ${perfil}`);persist(false);$("#access-user-modal").close();accessEditingId=null;renderUsers($("#page-root"));notify(existing?"Usuário atualizado.":"Usuário configurado.","success");
+    const form=new FormData(event.currentTarget),nome=String(form.get("nome")||"").trim(),email=String(form.get("email")||"").trim().toLowerCase();
+    if(!nome||!/^\S+@\S+\.\S+$/.test(email))return notify("Informe nome e e-mail válidos.","error");
+    const existing=accessEditingId?state.security.users.find(user=>user.id===accessEditingId):null;
+    const payload={nome,email,perfil:existing?.owner?"Administrador":String(form.get("perfil")||"Somente leitura"),status:existing?.owner?"ativo":String(form.get("status")||"Ativo").toLowerCase(),areas:existing?.owner?["*"]:form.getAll("areas").map(String)};
+    try{
+      const result=await api(accessEditingId?`/api/cliente/usuarios/${encodeURIComponent(accessEditingId)}`:"/api/cliente/usuarios",{method:accessEditingId?"PATCH":"POST",body:JSON.stringify(payload)});
+      await refreshServerUsers();recordAudit(accessEditingId?"usuario.editado":"usuario.criado","usuarios","usuario",`${nome} • ${payload.perfil}`);
+      $("#access-user-modal").close();accessEditingId=null;renderUsers($("#page-root"));
+      if(result.senhaTemporaria)alert(`NOVO ACESSO\n\nPortal: ${result.portalUrl||location.origin}\nE-mail: ${email}\nSenha temporária: ${result.senhaTemporaria}\n\nCopie agora. A senha não será exibida novamente.`);
+      notify(result.mensagem||(existing?"Usuário atualizado.":"Usuário criado."),"success");
+    }catch(error){notify(error.message,"error");}
   }
-  function toggleAccessUser(id) {
-    if(!requirePermission("manage_users","usuarios"))return;const user=state.security.users.find(entry=>entry.id===id);if(!user||user.owner)return notify("O administrador principal não pode ser suspenso.","error");user.ativo=user.ativo===false;user.status=user.ativo?"Ativo":"Suspenso";user.atualizadoEm=new Date().toISOString();recordAudit("usuario.status","usuarios","usuario",`${user.email}: ${user.status}`);persist(false);renderUsers($("#page-root"));
+
+  async function toggleAccessUser(id) {
+    if(!requirePermission("manage_users","usuarios"))return;const user=state.security.users.find(entry=>entry.id===id);if(!user||user.owner)return notify("O administrador principal não pode ser suspenso.","error");
+    const status=user.ativo!==false?"suspenso":"ativo";
+    try{await api(`/api/cliente/usuarios/${encodeURIComponent(id)}`,{method:"PATCH",body:JSON.stringify({status})});await refreshServerUsers();recordAudit("usuario.status","usuarios","usuario",`${user.email}: ${status}`);renderUsers($("#page-root"));notify(status==="ativo"?"Usuário ativado.":"Usuário suspenso.","success");}catch(error){notify(error.message,"error");}
   }
-  function deleteAccessUser(id) {
-    if(!requirePermission("manage_users","usuarios"))return;const user=state.security.users.find(entry=>entry.id===id);if(!user||user.owner)return notify("O administrador principal não pode ser excluído.","error");if(!confirm(`Excluir o acesso de “${user.nome}”?`))return;state.security.users=state.security.users.filter(entry=>entry.id!==id);recordAudit("usuario.excluido","usuarios","usuario",user.email);persist(false);renderUsers($("#page-root"));notify("Usuário removido.","success");
+
+  async function deleteAccessUser(id) {
+    if(!requirePermission("manage_users","usuarios"))return;const user=state.security.users.find(entry=>entry.id===id);if(!user||user.owner)return notify("O administrador principal não pode ser excluído.","error");if(!confirm(`Excluir o acesso de “${user.nome}”?`))return;
+    try{await api(`/api/cliente/usuarios/${encodeURIComponent(id)}`,{method:"DELETE"});await refreshServerUsers();recordAudit("usuario.excluido","usuarios","usuario",user.email);renderUsers($("#page-root"));notify("Usuário removido.","success");}catch(error){notify(error.message,"error");}
+  }
+
+  async function resetAccessUserPassword(id) {
+    if(!requirePermission("manage_users","usuarios"))return;const current=currentAccessUser(),user=state.security.users.find(entry=>entry.id===id);if(!user)return;if(user.owner&&!current.owner)return notify("Somente o administrador principal pode redefinir a senha da conta protegida.","error");if(!confirm(`Gerar uma nova senha temporária para ${user.nome}?`))return;
+    try{const result=await api(`/api/cliente/usuarios/${encodeURIComponent(id)}/redefinir-senha`,{method:"POST",body:"{}"});await refreshServerUsers();renderUsers($("#page-root"));alert(`SENHA TEMPORÁRIA\n\nPortal: ${result.portalUrl||location.origin}\nE-mail: ${user.email}\nSenha: ${result.senhaTemporaria}\n\nCopie agora. A senha não será exibida novamente.`);notify("Senha temporária gerada.","success");}catch(error){notify(error.message,"error");}
   }
 
   function renderUsers(root) {
     ensureV250State();const client=dashboardData?.cliente||{},current=currentAccessUser(),canManage=canAccess("manage_users","usuarios"),users=state.security.users;
     root.innerHTML=`${pageHeader("Usuários e permissões","Controle perfis, áreas, situação, autenticação em duas etapas e acesso ao CMS.",canManage?`<button class="button primary" id="new-access-user" type="button">+ Novo usuário</button>`:"")}
-      <div class="editorial-kpis"><article><span>Usuários configurados</span><strong>${users.length}</strong></article><article><span>Acessos ativos</span><strong>${users.filter(user=>user.ativo!==false).length}</strong></article><article><span>Administradores</span><strong>${users.filter(user=>user.perfil==="Administrador"&&user.ativo!==false).length}</strong></article><article><span>2FA exigida</span><strong>${users.filter(user=>user.exigir2FA).length}</strong></article></div>
-      <div class="grid-2"><section class="card"><header class="card-header"><div><h3>Acesso atual</h3><p>Permissões aplicadas nesta sessão.</p></div><span class="badge active">${escapeHTML(current.perfil)}</span></header><div class="card-body"><div class="status-list"><div class="health-row"><div><strong>${escapeHTML(current.nome||client.nome||"Cliente")}</strong><span>${escapeHTML(current.email||client.email||"")}</span></div><span class="badge active">${escapeHTML(current.status||"Ativo")}</span></div><div class="notice">O administrador principal permanece protegido contra suspensão e exclusão. Contas adicionais são salvas no CMS para integração segura com o Worker.</div></div></div></section>
+      <div class="editorial-kpis"><article><span>Usuários configurados</span><strong>${users.length}</strong></article><article><span>Acessos ativos</span><strong>${users.filter(user=>user.ativo!==false).length}</strong></article><article><span>Administradores</span><strong>${users.filter(user=>user.perfil==="Administrador"&&user.ativo!==false).length}</strong></article><article><span>Troca de senha pendente</span><strong>${users.filter(user=>user.forcarTrocaSenha).length}</strong></article></div>
+      <div class="grid-2"><section class="card"><header class="card-header"><div><h3>Acesso atual</h3><p>Permissões aplicadas nesta sessão.</p></div><span class="badge active">${escapeHTML(current.perfil)}</span></header><div class="card-body"><div class="status-list"><div class="health-row"><div><strong>${escapeHTML(current.nome||client.nome||"Cliente")}</strong><span>${escapeHTML(current.email||client.email||"")}</span></div><span class="badge active">${escapeHTML(current.status||"Ativo")}</span></div><div class="notice">O administrador principal permanece protegido. Contas adicionais possuem login individual e permissões aplicadas pelo Worker.</div></div></div></section>
       <form class="card" id="password-form"><header class="card-header"><div><h3>Alterar minha senha</h3><p>Use ao menos 8 caracteres.</p></div></header><div class="card-body"><div class="form-grid">${fieldHTML("senhaAtual","Senha atual","password","",true)}${fieldHTML("novaSenha","Nova senha","password","",true)}${fieldHTML("confirmacao","Confirmar nova senha","password","",true)}</div></div><footer class="card-footer"><button class="button primary" type="submit">Atualizar senha</button></footer></form></div>
-      <section class="table-card" style="margin-top:18px"><div class="table-toolbar"><div><strong>Equipe com acesso</strong><small>Perfis e áreas são aplicados ao menu e às ações do painel.</small></div><span class="badge info">${users.length} usuário${users.length===1?"":"s"}</span></div><div class="table-scroll"><table class="data-table"><thead><tr><th>Usuário</th><th>Perfil e áreas</th><th>Segurança</th><th>Situação</th><th style="text-align:right">Ações</th></tr></thead><tbody>${users.map(user=>`<tr><td><div class="row-main"><span class="row-thumb row-thumb-placeholder">${escapeHTML(initials(user.nome))}</span><div><strong>${escapeHTML(user.nome)}</strong><small>${escapeHTML(user.email)}</small></div></div></td><td><strong>${escapeHTML(user.perfil)}</strong><small>${escapeHTML((user.areas||[]).includes("*")?"Todas as áreas":(user.areas||[]).map(area=>statusLabel(area)).join(", ")||"Áreas do perfil")}</small></td><td><span class="badge ${user.exigir2FA?"active":"info"}">${user.exigir2FA?"2FA exigida":"2FA opcional"}</span><small>${user.ultimoAcesso?`Último acesso: ${formatDateTime(user.ultimoAcesso)}`:"Sem acesso registrado"}</small></td><td><span class="badge ${user.ativo!==false?"active":"inactive"}">${escapeHTML(user.status||"Ativo")}</span>${user.owner?`<small>Administrador principal</small>`:""}</td><td><div class="row-actions"><button class="button small secondary" data-access-edit="${user.id}" type="button">Editar</button>${user.owner?"":`<button class="button small ghost" data-access-toggle="${user.id}" type="button">${user.ativo!==false?"Suspender":"Ativar"}</button><button class="button small danger" data-access-delete="${user.id}" type="button">Excluir</button>`}</div></td></tr>`).join("")}</tbody></table></div></section>
+      <section class="table-card" style="margin-top:18px"><div class="table-toolbar"><div><strong>Equipe com acesso</strong><small>Perfis e áreas são aplicados ao menu e às ações do painel.</small></div><span class="badge info">${users.length} usuário${users.length===1?"":"s"}</span></div><div class="table-scroll"><table class="data-table"><thead><tr><th>Usuário</th><th>Perfil e áreas</th><th>Segurança</th><th>Situação</th><th style="text-align:right">Ações</th></tr></thead><tbody>${users.map(user=>`<tr><td><div class="row-main"><span class="row-thumb row-thumb-placeholder">${escapeHTML(initials(user.nome))}</span><div><strong>${escapeHTML(user.nome)}</strong><small>${escapeHTML(user.email)}</small></div></div></td><td><strong>${escapeHTML(user.perfil)}</strong><small>${escapeHTML((user.areas||[]).includes("*")?"Todas as áreas":(user.areas||[]).map(area=>statusLabel(area)).join(", ")||"Áreas do perfil")}</small></td><td><span class="badge ${user.forcarTrocaSenha?"info":"active"}">${user.forcarTrocaSenha?"Senha temporária":"Senha definida"}</span><small>${user.ultimoAcesso?`Último acesso: ${formatDateTime(user.ultimoAcesso)}`:"Sem acesso registrado"}</small></td><td><span class="badge ${user.ativo!==false?"active":"inactive"}">${escapeHTML(user.status||"Ativo")}</span>${user.owner?`<small>Administrador principal</small>`:""}</td><td><div class="row-actions">${user.owner&&!current.owner?`<span class="badge info">Protegido</span>`:`<button class="button small secondary" data-access-edit="${user.id}" type="button">Editar</button><button class="button small ghost" data-access-reset="${user.id}" type="button">Nova senha</button>`}${user.owner?"":`<button class="button small ghost" data-access-toggle="${user.id}" type="button">${user.ativo!==false?"Suspender":"Ativar"}</button><button class="button small danger" data-access-delete="${user.id}" type="button">Excluir</button>`}</div></td></tr>`).join("")}</tbody></table></div></section>
       <section class="card" style="margin-top:18px"><header class="card-header"><div><h3>Matriz de perfis</h3><p>Permissões padrão aplicadas a cada função.</p></div></header><div class="card-body"><div class="permission-profile-grid">${Object.values(V250_ROLE_PROFILES).map(profile=>`<article class="permission-profile-card"><strong>${escapeHTML(profile.label)}</strong><p>${escapeHTML(profile.description)}</p><div>${profile.actions.map(action=>`<span>${escapeHTML(action)}</span>`).join("")}</div></article>`).join("")}</div></div></section>`;
-    $("#new-access-user")?.addEventListener("click",()=>openAccessUserModal());$("#password-form")?.addEventListener("submit",changePassword);$$('[data-access-edit]',root).forEach(button=>button.addEventListener("click",()=>openAccessUserModal(button.dataset.accessEdit)));$$('[data-access-toggle]',root).forEach(button=>button.addEventListener("click",()=>toggleAccessUser(button.dataset.accessToggle)));$$('[data-access-delete]',root).forEach(button=>button.addEventListener("click",()=>deleteAccessUser(button.dataset.accessDelete)));applyPermissionState(root,"usuarios");
+    $("#new-access-user")?.addEventListener("click",()=>openAccessUserModal());$("#password-form")?.addEventListener("submit",changePassword);$$('[data-access-edit]',root).forEach(button=>button.addEventListener("click",()=>openAccessUserModal(button.dataset.accessEdit)));$$('[data-access-reset]',root).forEach(button=>button.addEventListener("click",()=>resetAccessUserPassword(button.dataset.accessReset)));$$('[data-access-toggle]',root).forEach(button=>button.addEventListener("click",()=>toggleAccessUser(button.dataset.accessToggle)));$$('[data-access-delete]',root).forEach(button=>button.addEventListener("click",()=>deleteAccessUser(button.dataset.accessDelete)));applyPermissionState(root,"usuarios");
   }
 
   async function changePassword(event) {
@@ -2701,7 +2758,7 @@
     ensureV250State();const data=stableBackupData(),json=JSON.stringify(data),snapshot={id:uid("snapshot"),label,source,createdAt:new Date().toISOString(),checksum:checksumText(json),size:json.length,counts:contentCounts(data),data:json};state.backup.snapshots.unshift(snapshot);state.backup.snapshots=state.backup.snapshots.slice(0,state.backup.settings.maxSnapshots);recordAudit("backup.criado","backup","snapshot",`${label} • ${source}`);return snapshot;
   }
   function downloadBlob(filename,content,type="application/json") { const blob=new Blob([content],{type}),a=document.createElement("a"),url=URL.createObjectURL(blob);a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),0); }
-  function backupEnvelope(data=stableBackupData()) { const payload=JSON.stringify(data);return{format:"crb-cms-backup",version:"3.0.0-stage1",schemaVersion:13,generatedAt:new Date().toISOString(),checksum:checksumText(payload),counts:contentCounts(data),data}; }
+  function backupEnvelope(data=stableBackupData()) { const payload=JSON.stringify(data);return{format:"crb-cms-backup",version:"3.0.0-stage2",schemaVersion:14,generatedAt:new Date().toISOString(),checksum:checksumText(payload),counts:contentCounts(data),data}; }
   function exportBackup() { if(!requirePermission("export","backup"))return;const envelope=backupEnvelope();downloadBlob(`crb-cms-backup-v3.0.0-${new Date().toISOString().slice(0,10)}.json`,JSON.stringify(envelope,null,2));recordAudit("backup.exportado","backup","arquivo",envelope.checksum);notify("Backup completo gerado.","success"); }
   function downloadSnapshot(id) { if(!requirePermission("export","backup"))return;const snapshot=state.backup.snapshots.find(item=>item.id===id);if(!snapshot)return;const data=JSON.parse(snapshot.data);downloadBlob(`crb-ponto-${slugify(snapshot.label)}-${snapshot.createdAt.slice(0,10)}.json`,JSON.stringify(backupEnvelope(data),null,2));recordAudit("backup.snapshot_exportado","backup","snapshot",snapshot.label); }
   function restoreSnapshot(id) { if(!requirePermission("backup","backup"))return;const snapshot=state.backup.snapshots.find(item=>item.id===id);if(!snapshot)return;if(checksumText(snapshot.data)!==snapshot.checksum)return notify("Este ponto de restauração está corrompido.","error");if(!confirm(`Restaurar “${snapshot.label}”? O estado atual será preservado em um novo ponto.`))return;const existing=[...state.backup.snapshots];createSnapshot("Antes da restauração","automático");const preserved=[...state.backup.snapshots];state=deepMerge(defaultState(),JSON.parse(snapshot.data));ensureV250State();state.backup.snapshots=preserved;recordAudit("backup.restaurado","backup","snapshot",snapshot.label);persist(false);renderPage();notify("Ponto de restauração carregado. Salve o rascunho para confirmar no servidor.","success"); }
@@ -2717,7 +2774,7 @@
       <div class="grid-3"><section class="card"><div class="card-body"><h3>Exportar backup completo</h3><p class="field-help">Arquivo com metadados, contagens e checksum de integridade.</p><button class="button primary" id="export-backup" type="button">Baixar backup</button></div></section><section class="card"><div class="card-body"><h3>Importar e validar</h3><p class="field-help">Confere estrutura e checksum antes de carregar os dados.</p><button class="button secondary" id="import-backup" type="button">Selecionar arquivo</button></div></section><section class="card"><div class="card-body"><h3>Recarregar do servidor</h3><p class="field-help">Descarta alterações locais e recupera o último rascunho do D1.</p><button class="button danger" id="reset-demo" type="button">Recarregar dados</button></div></section></div>
       <section class="card" style="margin-top:18px"><header class="card-header"><div><h3>Automação de segurança</h3><p>Proteções antes de operações críticas.</p></div></header><div class="card-body"><form id="backup-settings" class="form-grid"><div class="field full"><div class="toggle-row"><div><strong>Ponto automático antes de importar</strong><small>Preserva o estado atual antes de substituir dados.</small></div><label class="switch"><input type="checkbox" name="autoBeforeImport" ${state.backup.settings.autoBeforeImport?"checked":""}><span></span></label></div><div class="toggle-row"><div><strong>Ponto automático antes de publicar</strong><small>Cria uma referência antes de enviar para revisão.</small></div><label class="switch"><input type="checkbox" name="autoBeforePublication" ${state.backup.settings.autoBeforePublication?"checked":""}><span></span></label></div></div><div class="field"><label for="max-snapshots">Máximo de pontos</label><input id="max-snapshots" name="maxSnapshots" type="number" min="1" max="10" value="${state.backup.settings.maxSnapshots}"></div><div class="field"><button class="button secondary" type="submit">Salvar automação</button></div></form></div></section>
       <section class="table-card" style="margin-top:18px"><div class="table-toolbar"><div><strong>Pontos de restauração</strong><small>O conteúdo atual é preservado antes de restaurar outro ponto.</small></div><span class="badge info">${snapshots.length}</span></div>${snapshots.length?`<div class="table-scroll"><table class="data-table"><thead><tr><th>Ponto</th><th>Origem</th><th>Conteúdo</th><th>Integridade</th><th style="text-align:right">Ações</th></tr></thead><tbody>${snapshots.map(item=>`<tr><td><strong>${escapeHTML(item.label)}</strong><small>${formatDateTime(item.createdAt)}</small></td><td>${escapeHTML(item.source)}</td><td><small>${Object.values(item.counts||{}).reduce((a,b)=>a+Number(b||0),0)} registros • ${Math.ceil(Number(item.size||0)/1024)} KB</small></td><td><span class="badge ${checksumText(item.data||"")===item.checksum?"active":"inactive"}">${checksumText(item.data||"")===item.checksum?"Íntegro":"Corrompido"}</span></td><td><div class="row-actions"><button class="button small primary" data-snapshot-restore="${item.id}" type="button">Restaurar</button><button class="button small secondary" data-snapshot-download="${item.id}" type="button">Baixar</button><button class="button small danger" data-snapshot-delete="${item.id}" type="button">Excluir</button></div></td></tr>`).join("")}</tbody></table></div>`:`<div class="empty-state"><strong>Nenhum ponto criado</strong><span>Crie um ponto antes de grandes alterações.</span></div>`}</section>
-      <section class="card" style="margin-top:18px"><header class="card-header"><div><h3>Sobre esta instalação</h3><p>Informações técnicas.</p></div></header><div class="card-body"><div class="code-box">Modo: produção integrada\nVersão: ${CONFIG.VERSION||"3.0.0-stage1"}\nSchema: 13\nPersistência: Cloudflare D1\nAPI: ${CONFIG.WORKER_URL||"não configurada"}\nÚltima alteração: ${formatDateTime(state.updatedAt)}</div></div></section>`;
+      <section class="card" style="margin-top:18px"><header class="card-header"><div><h3>Sobre esta instalação</h3><p>Informações técnicas.</p></div></header><div class="card-body"><div class="code-box">Modo: produção integrada\nVersão: ${CONFIG.VERSION||"3.0.0-stage2"}\nSchema: 14\nPersistência: Cloudflare D1\nAPI: ${CONFIG.WORKER_URL||"não configurada"}\nÚltima alteração: ${formatDateTime(state.updatedAt)}</div></div></section>`;
     $("#create-snapshot")?.addEventListener("click",()=>{createSnapshot("Ponto manual","manual");persist(false);renderBackup(root);notify("Ponto de restauração criado.","success");});$("#export-backup")?.addEventListener("click",exportBackup);$("#import-backup")?.addEventListener("click",()=>$("#backup-import").click());$("#reset-demo")?.addEventListener("click",()=>{if(confirm("Descartar alterações não salvas e recarregar o rascunho do servidor?")){createSnapshot("Antes de recarregar servidor","automático");recordAudit("servidor.recarregado","backup","site","Recarga solicitada");loadAll();}});
     $("#backup-settings")?.addEventListener("submit",event=>{event.preventDefault();if(!requirePermission("backup","backup"))return;const form=new FormData(event.currentTarget);state.backup.settings.autoBeforeImport=form.has("autoBeforeImport");state.backup.settings.autoBeforePublication=form.has("autoBeforePublication");state.backup.settings.maxSnapshots=Math.max(1,Math.min(10,Number(form.get("maxSnapshots")||5)));state.backup.snapshots=state.backup.snapshots.slice(0,state.backup.settings.maxSnapshots);recordAudit("backup.configurado","backup","configuracao",`Máximo ${state.backup.settings.maxSnapshots}`);persist(false);renderBackup(root);notify("Automação de backup atualizada.","success");});
     $$('[data-snapshot-restore]',root).forEach(button=>button.addEventListener("click",()=>restoreSnapshot(button.dataset.snapshotRestore)));$$('[data-snapshot-download]',root).forEach(button=>button.addEventListener("click",()=>downloadSnapshot(button.dataset.snapshotDownload)));$$('[data-snapshot-delete]',root).forEach(button=>button.addEventListener("click",()=>deleteSnapshot(button.dataset.snapshotDelete)));applyPermissionState(root,"backup");
@@ -2755,7 +2812,7 @@
     const strictProfiles=Object.values(workerImageSpecs).filter(spec=>Number(spec.width)>0&&Number(spec.height)>0&&Number(spec.maxKB)>0);
     checks.push(auditCheck("image-strict-profiles","Imagens: padrões obrigatórios configurados",strictProfiles.length===Object.keys(workerImageSpecs).length?"pass":"fail",`${strictProfiles.length}/${Object.keys(workerImageSpecs).length} perfis com largura, altura e peso máximo`));
     checks.push(auditCheck("image-client-validation","Imagens: validação antes do envio","pass","Formato, peso e dimensões exatas são conferidos no Portal antes da chamada de mídia"));
-    const totals={pass:checks.filter(c=>c.status==="pass").length,warning:checks.filter(c=>c.status==="warning").length,fail:checks.filter(c=>c.status==="fail").length};const run={id:uid("run"),timestamp:new Date().toISOString(),version:"3.0.0-stage1",checks,totals};
+    const totals={pass:checks.filter(c=>c.status==="pass").length,warning:checks.filter(c=>c.status==="warning").length,fail:checks.filter(c=>c.status==="fail").length};const run={id:uid("run"),timestamp:new Date().toISOString(),version:"3.0.0-stage2",checks,totals};
     if(save){state.audit.functionalRuns.unshift(run);state.audit.functionalRuns=state.audit.functionalRuns.slice(0,10);recordAudit("auditoria.executada","auditoria","sistema",`${totals.pass} aprovadas, ${totals.warning} alertas, ${totals.fail} falhas`,totals.fail?"error":totals.warning?"warning":"success");persist(false);}return run;
   }
   function exportAuditCSV() { if(!requirePermission("export","auditoria"))return;const rows=[["Data/hora","Resultado","Ação","Área","Alvo","Usuário","Detalhes"],...state.audit.entries.map(item=>[item.timestamp,item.result,item.action,item.area,item.target,item.actor?.email||item.actor?.nome||"",item.details])];const csv=rows.map(row=>row.map(value=>`"${String(value??"").replaceAll('"','""')}"`).join(";")).join("\n");downloadBlob(`crb-auditoria-${new Date().toISOString().slice(0,10)}.csv`,`\ufeff${csv}`,"text/csv;charset=utf-8");recordAudit("auditoria.exportada","auditoria","csv",`${state.audit.entries.length} eventos`); }
@@ -2816,11 +2873,11 @@
     checks.push(productionCheck("owner","Administrador principal protegido",owner&&owner.ativo&&owner.perfil==="Administrador"?"pass":"fail",owner?`${owner.nome} • ${owner.email}`:"Administrador principal não encontrado.","qualidade",true));
     checks.push(productionCheck("client-errors","Erros capturados nesta sessão",state.production.clientErrors.length?"warning":"pass",state.production.clientErrors.length?`${state.production.clientErrors.length} ocorrência(s) registrada(s).`:"Nenhum erro de cliente registrado.","qualidade",false));
 
-    checks.push(productionCheck("server-permissions","Permissões validadas pelo servidor","pending","A interface restringe ações, mas cada endpoint precisa confirmar a permissão no Worker.","servidor",true));
+    checks.push(productionCheck("server-permissions","Permissões validadas pelo servidor",Array.isArray(currentSessionUser?.acoes)?"pass":"warning",Array.isArray(currentSessionUser?.acoes)?"Perfil, áreas e operações do rascunho são confirmados pelo Worker 1.17.0.":"A sessão ainda não informou a matriz de ações do servidor.","servidor",true));
     checks.push(productionCheck("tenant-isolation","Isolamento entre emissoras","pending","É necessário auditar consultas e gravações por cliente/site no Worker e D1.","servidor",true));
-    checks.push(productionCheck("server-media","Validação de mídias no servidor","pending","A validação atual é preventiva no navegador e pode ser contornada fora da interface.","servidor",true));
-    checks.push(productionCheck("session-policy","Sessões, expiração e revogação","pending","Confirmar duração real, revogação, troca de senha e invalidação de tokens no servidor.","servidor",true));
-    checks.push(productionCheck("rate-limit","Proteção contra abuso e tentativas de login","pending","Confirmar rate limiting, bloqueios temporários e registros de tentativas no Worker.","servidor",true));
+    checks.push(productionCheck("server-media","Validação de mídias no servidor","pass","O Worker valida assinatura, estrutura, formato, peso e dimensões reais dos arquivos.","servidor",true));
+    checks.push(productionCheck("session-policy","Sessões, expiração e revogação","pass","Sessões individuais possuem expiração, navegador vinculado, revogação e versão de permissões.","servidor",true));
+    checks.push(productionCheck("rate-limit","Proteção contra abuso e tentativas de login","pass","O Worker aplica janela e bloqueio temporário após tentativas incorretas.","servidor",true));
     checks.push(productionCheck("cors","CORS restrito aos domínios autorizados","pending","Revisar origens permitidas antes de liberar múltiplos clientes.","servidor",true));
     checks.push(productionCheck("server-backup","Backup e restauração em ambiente real","pending","Validar recuperação do D1 e das mídias fora do backup local do CMS.","servidor",true));
 
@@ -2832,7 +2889,7 @@
     };
     const localBlockers=checks.filter(item=>item.group!=="servidor"&&item.blocking&&item.status==="fail");
     const launchBlockers=checks.filter(item=>item.blocking&&["fail","pending"].includes(item.status));
-    return {id:uid("production-run"),timestamp:new Date().toISOString(),version:"3.0.0-stage1",schemaVersion:13,checks,totals,portalReady:localBlockers.length===0,productionReady:launchBlockers.length===0,localBlockers:localBlockers.map(item=>item.id),launchBlockers:launchBlockers.map(item=>item.id)};
+    return {id:uid("production-run"),timestamp:new Date().toISOString(),version:"3.0.0-stage2",schemaVersion:14,checks,totals,portalReady:localBlockers.length===0,productionReady:launchBlockers.length===0,localBlockers:localBlockers.map(item=>item.id),launchBlockers:launchBlockers.map(item=>item.id)};
   }
 
   function runProductionAnalysis({save=true,silent=false}={}) {
@@ -2896,7 +2953,7 @@
 
   async function loadAll() {
     if(isLoading)return;isLoading=true;resetAudio();
-    try{const[dash,siteResult]=await Promise.all([api("/api/cliente/dashboard"),api("/api/cliente/site").catch(error=>error.status===404?null:Promise.reject(error))]);dashboardData=dash;remoteSite=siteResult?.site||null;versions=siteResult?.versoes||[];if(remoteSite){const media=await api("/api/cliente/site/midias").catch(()=>({midias:[]}));mediaLibrary=media.midias||[];state=mapRemoteToState(remoteSite,dashboardData);}else{state=defaultState();state.radio.nome=dash?.cliente?.nome_radio||dash?.cliente?.nome||"Minha rádio";}ensureV250State();currentPage="dashboard";searchTerm="";updateAccount();if(!$("#app-shell").classList.contains("hidden")){renderNav();updateChrome();renderPage();}}finally{isLoading=false;}
+    try{const[dash,siteResult]=await Promise.all([api("/api/cliente/dashboard"),api("/api/cliente/site").catch(error=>error.status===404?null:Promise.reject(error))]);dashboardData=dash;currentSessionUser=dash?.usuario||currentSessionUser;remoteSite=siteResult?.site||null;versions=siteResult?.versoes||[];if(remoteSite){const media=await api("/api/cliente/site/midias").catch(()=>({midias:[]}));mediaLibrary=media.midias||[];state=mapRemoteToState(remoteSite,dashboardData);}else{state=defaultState();state.radio.nome=dash?.cliente?.nome_radio||dash?.cliente?.nome||"Minha rádio";}ensureV250State();await loadServerUsers();syncServerUsersToState();currentPage="dashboard";searchTerm="";updateAccount();if(!$("#app-shell").classList.contains("hidden")){renderNav();updateChrome();renderPage();}}finally{isLoading=false;}
   }
 
   function setupV250() {

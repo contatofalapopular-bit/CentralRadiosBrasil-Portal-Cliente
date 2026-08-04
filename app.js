@@ -271,7 +271,7 @@
   function defaultState() {
     const today = new Date().toISOString().slice(0, 10);
     return {
-      version: "2.4.0-etapa-2",
+      version: "2.4.0-final",
       updatedAt: new Date().toISOString(),
       status: "rascunho",
       selectedTheme: "morada",
@@ -498,11 +498,42 @@
     if (id === "podcasts" || id === "videos" || id === "galeria") return (state.content[id] || []).some(item => item.ativo !== false);
     if (id === "eventos") return state.content.eventos.some(item => item.ativo !== false && ["hoje","futuro","adiado"].includes(eventStatusValue(item)));
     if (id === "equipe") return [...state.content.locutores,...state.content.equipe].some(item => item.ativo !== false);
-    if (id === "publicidade") return (state.content.publicidade || []).some(item => item.ativo !== false && campaignStatusValue(item) === "ativa");
+    if (id === "publicidade") return (state.content.publicidade || []).some(item => item.ativo !== false && campaignStatusValue(item) === "ativa") || (state.content.banners || []).some(item => item.ativo !== false && bannerStatusValue(item) === "ativo");
     if (id === "parceiros") return (state.content.parceiros || []).some(item => item.ativo !== false);
     return true;
   }
   function countContent() { return Object.values(state.content).reduce((total, list) => total + (Array.isArray(list) ? list.length : 0), 0); }
+
+  function commercialAuditIssues() {
+    const issues=[];
+    const activeCampaigns=(state.content.publicidade||[]).filter(item=>item.ativo!==false && campaignStatusValue(item)==="ativa");
+    activeCampaigns.forEach(item=>{
+      const advertiser=(state.content.anunciantes||[]).find(ad=>String(ad.id)===String(item.anuncianteId));
+      if (!advertiser && !String(item.anuncianteId||"").startsWith("legacy:")) issues.push(`A campanha “${item.titulo||"Sem título"}” está sem anunciante cadastrado.`);
+      else if (advertiser?.ativo===false) issues.push(`A campanha “${item.titulo||"Sem título"}” usa um anunciante desativado.`);
+      if (!item.imagemDesktop) issues.push(`A campanha “${item.titulo||"Sem título"}” não possui peça desktop.`);
+    });
+    const activeBanners=(state.content.banners||[]).filter(item=>item.ativo!==false && bannerStatusValue(item)==="ativo");
+    activeBanners.filter(item=>!item.imagemDesktop).forEach(item=>issues.push(`O banner “${item.titulo||"Sem título"}” não possui imagem desktop.`));
+    ["Após o cabeçalho","Após o player","Antes de notícias","Entre seções","Antes do rodapé"].forEach(position=>{
+      const total=commercialSlotItems(position).length;
+      if (total>2) issues.push(`${total} peças concorrem na posição “${position}”; a prévia mostra as 2 de maior prioridade.`);
+    });
+    const internal=activeBanners.filter(item=>normalizedBannerPosition(item.posicao)==="Página interna").length;
+    if (internal>1) issues.push(`${internal} banners concorrem em “Página interna”; a prévia mostra o de maior prioridade.`);
+    const activePopups=(state.content.popups||[]).filter(item=>item.ativo!==false && popupStatusValue(item)==="ativo");
+    const desktop=activePopups.filter(item=>popupMatchesDevice(item,"desktop")).length;
+    const mobile=activePopups.filter(item=>popupMatchesDevice(item,"mobile")).length;
+    if (desktop>1) issues.push(`${desktop} popups estão elegíveis no desktop; será exibido o de maior prioridade.`);
+    if (mobile>1) issues.push(`${mobile} popups estão elegíveis no celular; será exibido o de maior prioridade.`);
+    return issues;
+  }
+
+  function commercialAuditHTML() {
+    const issues=commercialAuditIssues();
+    if (!issues.length) return `<div class="commercial-audit ok"><strong>Auditoria comercial integrada</strong><span>Nenhum conflito ativo encontrado entre campanhas, banners e popups.</span></div>`;
+    return `<div class="commercial-audit warning"><strong>Auditoria comercial integrada</strong><span>${issues.length} ponto${issues.length===1?"":"s"} para revisão:</span><ul>${issues.slice(0,6).map(issue=>`<li>${escapeHTML(issue)}</li>`).join("")}</ul>${issues.length>6?`<small>Mais ${issues.length-6} ocorrência${issues.length-6===1?"":"s"} não exibida${issues.length-6===1?"":"s"}.</small>`:""}</div>`;
+  }
 
   function pageHeader(title, description, actions = "") {
     return `<div class="page-header"><div><h2>${escapeHTML(title)}</h2><p>${escapeHTML(description)}</p></div><div class="page-actions">${actions}</div></div>`;
@@ -522,7 +553,7 @@
         <article class="kpi-card"><span>Imagens armazenadas</span><strong>${mediaCount}</strong><small>arquivos vinculados ao site</small></article>
         <article class="kpi-card"><span>Faturas em aberto</span><strong>${openInvoices.length}</strong><small>${contract ? `Contrato ${escapeHTML(contract.numero || "ativo")}` : "Nenhum contrato"}</small></article>
       </div>
-      <section class="card" style="margin-bottom:18px"><header class="card-header"><div><h3>Comercial v2.4.0 — Etapa 2</h3><p>Publicidade, banners, parceiros e popups integrados ao rascunho e à prévia responsiva.</p></div><span class="badge active">Parceiros e popups</span></header><div class="card-body"><div class="module-health">${[["anunciantes","Anunciantes",state.content.anunciantes.length],["publicidade","Campanhas",state.content.publicidade.length],["banners","Banners",state.content.banners.length],["parceiros","Parceiros",state.content.parceiros.length],["popups","Popups",state.content.popups.length]].map(([id,label,total])=>`<div class="health-row"><div><strong><span class="health-dot"></span>${label}</strong><span>${total} registro${total===1?"":"s"} no rascunho</span></div><button class="button small secondary" data-go="${id}" type="button">Revisar</button></div>`).join("")}</div><div class="notice" style="margin-top:14px">A prévia demonstra parceiros e popups sem registrar impressão, clique ou frequência real. A frequência pública deve ser aplicada pelo Portal Público/Worker.</div></div></section>
+      <section class="card" style="margin-bottom:18px"><header class="card-header"><div><h3>Comercial v2.4.0 — Final Consolidada</h3><p>Publicidade, banners, parceiros e popups integrados, com posições reais, prioridades e auditoria de conflitos.</p></div><span class="badge active">Consolidada</span></header><div class="card-body"><div class="module-health">${[["anunciantes","Anunciantes",state.content.anunciantes.length],["publicidade","Campanhas",state.content.publicidade.length],["banners","Banners",state.content.banners.length],["parceiros","Parceiros",state.content.parceiros.length],["popups","Popups",state.content.popups.length]].map(([id,label,total])=>`<div class="health-row"><div><strong><span class="health-dot"></span>${label}</strong><span>${total} registro${total===1?"":"s"} no rascunho</span></div><button class="button small secondary" data-go="${id}" type="button">Revisar</button></div>`).join("")}</div>${commercialAuditHTML()}<div class="notice" style="margin-top:14px">A prévia respeita posições e prioridades, mas não registra impressão, clique ou frequência real. A coleta e a frequência pública permanecem sob responsabilidade do Portal Público/Worker.</div></div></section>
       <div class="grid-2">
         <section class="card"><header class="card-header"><div><h3>Estrutura do site</h3><p>Módulos ativados no editor visual.</p></div><button class="button small secondary" data-go="editor" type="button">Organizar</button></header><div class="card-body"><div class="module-health">${activeModules().slice(0,10).map(module => `<div class="health-row"><div><strong><span class="health-dot"></span>${escapeHTML(module.label)}</strong><span>${escapeHTML(module.description)}</span></div><span class="badge active">Ativo</span></div>`).join("") || `<div class="empty-state"><strong>Nenhum módulo ativo</strong></div>`}</div></div></section>
         <section class="card"><header class="card-header"><div><h3>Publicação e versões</h3><p>Situação real do site no Worker.</p></div><button class="button small secondary" data-go="publicacao" type="button">Gerenciar</button></header><div class="card-body"><div class="activity-list">
@@ -533,7 +564,7 @@
       </div>
       <div class="grid-2 equal" style="margin-top:18px">
         <section class="card"><header class="card-header"><div><h3>Dados reais, sem números inventados</h3><p>Audiência e ouvintes.</p></div></header><div class="card-body"><div class="notice">O painel não exibe audiência fictícia. O número de ouvintes só será mostrado quando existir uma fonte técnica confiável do streaming.</div></div></section>
-        <section class="card"><header class="card-header"><div><h3>Integração ativa</h3><p>Ambiente utilizado nesta instalação.</p></div></header><div class="card-body"><div class="code-box">Portal: ${escapeHTML(CONFIG.VERSION || "2.4.0-etapa-2")}\nWorker: ${escapeHTML(CONFIG.WORKER_URL || "—")}\nPersistência: Cloudflare D1\nMídias: API do site\nPublicação: supervisionada pela Central</div></div></section>
+        <section class="card"><header class="card-header"><div><h3>Integração ativa</h3><p>Ambiente utilizado nesta instalação.</p></div></header><div class="card-body"><div class="code-box">Portal: ${escapeHTML(CONFIG.VERSION || "2.4.0-final")}\nWorker: ${escapeHTML(CONFIG.WORKER_URL || "—")}\nPersistência: Cloudflare D1\nMídias: API do site\nPublicação: supervisionada pela Central</div></div></section>
       </div>`;
     bindGoButtons(root);
   }
@@ -1030,6 +1061,7 @@
       if (key === "publicidade") {
         const advertiser=(state.content.anunciantes||[]).find(ad=>String(ad.id)===String(item.anuncianteId));
         if (!advertiser && !String(item.anuncianteId||"").startsWith("legacy:")) return "Selecione um anunciante cadastrado e ativo.";
+        if (advertiser?.ativo === false && item.ativo !== false && !["Pausada","Cancelada"].includes(item.situacao)) return "Ative o anunciante ou pause a campanha antes de publicá-la.";
         item.anunciante=advertiser?.nome || item.anunciante || String(item.anuncianteId||"").replace(/^legacy:/,"");
         item.metricas=item.metricas && typeof item.metricas === "object" ? item.metricas : {impressoes:0,cliques:0,fonte:""};
       }
@@ -1100,7 +1132,12 @@
 
   function deleteItem(key,id) {
     const item = state.content[key].find(entry => entry.id === id);
-    if (!item || !confirm(`Excluir “${item.titulo || item.nome || "este registro"}”?`)) return;
+    if (!item) return;
+    if (key === "anunciantes") {
+      const linked=(state.content.publicidade||[]).filter(campaign=>String(campaign.anuncianteId||"")===String(id));
+      if (linked.length) return notify(`Este anunciante está vinculado a ${linked.length} campanha${linked.length===1?"":"s"}. Remova ou altere o vínculo antes de excluir.`,"error");
+    }
+    if (!confirm(`Excluir “${item.titulo || item.nome || "este registro"}”?`)) return;
     state.content[key] = state.content[key].filter(entry => entry.id !== id);
     persist(false); renderPage(); notify("Registro excluído.", "success");
   }
@@ -1223,7 +1260,7 @@
         <section class="card"><div class="card-body"><h3>Exportar JSON</h3><p class="field-help">Baixa configurações, módulos, temas e conteúdos.</p><button class="button primary" id="export-backup" type="button">Baixar backup</button></div></section>
         <section class="card"><div class="card-body"><h3>Importar JSON</h3><p class="field-help">Carrega o arquivo no editor; clique em Salvar rascunho para gravar no D1.</p><button class="button secondary" id="import-backup" type="button">Selecionar arquivo</button></div></section>
         <section class="card"><div class="card-body"><h3>Recarregar do servidor</h3><p class="field-help">Descarta alterações ainda não salvas e recarrega o último rascunho do servidor.</p><button class="button danger" id="reset-demo" type="button">Recarregar dados</button></div></section>
-      </div><section class="card" style="margin-top:18px"><header class="card-header"><div><h3>Sobre esta instalação</h3><p>Informações técnicas.</p></div></header><div class="card-body"><div class="code-box">Modo: produção integrada\nVersão: ${CONFIG.VERSION || "2.4.0-etapa-2"}\nPersistência: Cloudflare D1\nAPI: ${CONFIG.WORKER_URL || "não configurada"}\nÚltima alteração: ${formatDateTime(state.updatedAt)}</div></div></section>`;
+      </div><section class="card" style="margin-top:18px"><header class="card-header"><div><h3>Sobre esta instalação</h3><p>Informações técnicas.</p></div></header><div class="card-body"><div class="code-box">Modo: produção integrada\nVersão: ${CONFIG.VERSION || "2.4.0-final"}\nPersistência: Cloudflare D1\nAPI: ${CONFIG.WORKER_URL || "não configurada"}\nÚltima alteração: ${formatDateTime(state.updatedAt)}</div></div></section>`;
     $("#export-backup").addEventListener("click",exportBackup);
     $("#import-backup").addEventListener("click",()=>$("#backup-import").click());
     $("#reset-demo").addEventListener("click",()=>{if(confirm("Descartar alterações não salvas e recarregar o rascunho do servidor?")) loadAll();});
@@ -1289,7 +1326,7 @@
     const enabled = new Set(activeModules().map(m=>m.id));
     const ordered = activeModules().map(m=>m.id);
     const sections = {
-      hero: () => siteHero(r), player: () => sitePlayer(r), programacao: () => siteProgramming(), noticias: () => siteNews(), promocoes: () => sitePromotions(), podcasts: () => sitePodcasts(), videos: () => siteVideos(), equipe: () => siteTeam(), galeria: () => siteGallery(), eventos: () => siteEvents(), publicidade: () => siteAdvertising(), parceiros: () => sitePartners(), aplicativo: () => siteApp(), contato: () => siteContact()
+      hero: () => siteHero(r), player: () => sitePlayer(r), programacao: () => siteProgramming(), noticias: () => siteNews(), promocoes: () => sitePromotions(), podcasts: () => sitePodcasts(), videos: () => siteVideos(), equipe: () => siteTeam(), galeria: () => siteGallery(), eventos: () => siteEvents(), publicidade: () => "", parceiros: () => sitePartners(), aplicativo: () => siteApp(), contato: () => siteContact()
     };
     const section=(id)=>enabled.has(id)&&sections[id]?sections[id]():"";
     const rest=(skip)=>ordered.filter(id=>!skip.has(id)&&enabled.has(id)&&sections[id]).map(id=>sections[id]()).join("");
@@ -1300,17 +1337,35 @@
     else if (state.selectedTheme === "young") body=`${siteHeader(r)}<div class="theme-stage theme-stage-young">${section("player")}${section("hero")}</div><div class="theme-young-featured">${section("promocoes")}${section("videos")}</div>${rest(new Set(["hero","player","promocoes","videos"]))}`;
     else if (state.selectedTheme === "custom") body=`${siteHeader(r)}<div class="theme-stage theme-stage-clean">${section("hero")}${section("player")}</div>${rest(new Set(["hero","player"]))}`;
     else body=`${siteHeader(r)}${ordered.filter(id=>enabled.has(id)&&sections[id]).map(id=>sections[id]()).join("")}`;
-    const headerBanner=siteBannerSlot("Após o cabeçalho");
-    const beforeNewsBanner=siteBannerSlot("Antes de notícias");
-    const betweenBanner=siteBannerSlot("Entre seções");
-    const footerBanner=siteBannerSlot("Antes do rodapé");
-    if (headerBanner) body=body.replace("</header>",`</header>${headerBanner}`);
-    if (beforeNewsBanner) body=body.replace(/(<section class="site-section[^>]*data-site-section="noticias")/,`${beforeNewsBanner}$1`);
-    if (betweenBanner) body+=betweenBanner;
-    container.innerHTML = `<div class="site-preview theme-${state.selectedTheme}" data-site-section="inicio" style="${customStyle}${r.hero ? `--hero-image:url('${escapeHTML(r.hero)}')` : ""}">${body}${footerBanner}${siteFooter(r)}</div>`;
+
+    const topSlot=siteCommercialSlot("Após o cabeçalho");
+    const afterPlayerSlot=siteCommercialSlot("Após o player");
+    const beforeNewsSlot=siteCommercialSlot("Antes de notícias");
+    const betweenSlot=siteCommercialSlot("Entre seções");
+    const footerSlot=siteCommercialSlot("Antes do rodapé");
+    if (topSlot) body=body.replace("</header>",`</header>${topSlot}`);
+    if (afterPlayerSlot) body=insertAfterSiteSection(body,"player",afterPlayerSlot);
+    if (beforeNewsSlot) body=insertBeforeSiteSection(body,"noticias",beforeNewsSlot);
+    if (betweenSlot) {
+      const anchor=body.includes('data-site-section="programacao"') ? "programacao" : (body.includes('data-site-section="noticias"') ? "noticias" : "player");
+      body=insertAfterSiteSection(body,anchor,betweenSlot);
+    }
+    container.innerHTML = `<div class="site-preview theme-${state.selectedTheme}" data-site-section="inicio" style="${customStyle}${r.hero ? `--hero-image:url('${escapeHTML(r.hero)}')` : ""}">${body}${footerSlot}${siteFooter(r)}</div>`;
     bindSitePreviewInteractions(container);
     schedulePreviewPopup(container);
     syncAudioButtons();
+  }
+
+  function insertBeforeSiteSection(html,sectionId,fragment) {
+    if (!fragment) return html;
+    const pattern=new RegExp(`(<section\\b[^>]*data-site-section=["']${sectionId}["'][^>]*>)`);
+    return pattern.test(html) ? html.replace(pattern,`${fragment}$1`) : `${html}${fragment}`;
+  }
+
+  function insertAfterSiteSection(html,sectionId,fragment) {
+    if (!fragment) return html;
+    const pattern=new RegExp(`(<section\\b[^>]*data-site-section=["']${sectionId}["'][^>]*>[\\s\\S]*?<\\/section>)`);
+    return pattern.test(html) ? html.replace(pattern,`$1${fragment}`) : `${html}${fragment}`;
   }
 
   function partnerSocialLinks(item) {
@@ -1344,17 +1399,28 @@
     if (!container || !item || !$(".site-preview",container)) return;
     closePreviewPopup(container,{restoreFocus:false});
     const link=safeExternalURL(item.link);
+    const safeId=String(item.id||"preview").replace(/[^a-zA-Z0-9_-]/g,"-");
+    const titleId=`site-popup-title-${safeId}`, descriptionId=`site-popup-description-${safeId}`;
     const layer=document.createElement("div");
     layer.className="site-popup-layer";
     layer.dataset.popupId=String(item.id||"");
     layer.setAttribute("role","presentation");
-    layer.innerHTML=`<section class="site-popup-card" role="dialog" aria-modal="true" aria-labelledby="site-popup-title"><button class="site-popup-close" type="button" aria-label="Fechar popup">×</button>${item.imagem?`<img class="site-popup-image" src="${escapeHTML(item.imagem)}" alt="">`:""}<div class="site-popup-copy"><span>Mensagem da rádio</span><h2 id="site-popup-title">${escapeHTML(item.titulo||"Aviso")}</h2><p>${escapeHTML(item.mensagem||"")}</p><small>Prévia: ${escapeHTML(item.frequencia||"Frequência não definida")} • não registra exibição real</small>${link&&item.textoBotao?`<a class="site-popup-action" href="${escapeHTML(link)}" target="_blank" rel="noopener noreferrer">${escapeHTML(item.textoBotao)}</a>`:""}</div></section>`;
+    layer.innerHTML=`<section class="site-popup-card" role="dialog" aria-modal="true" aria-labelledby="${titleId}" aria-describedby="${descriptionId}"><button class="site-popup-close" type="button" aria-label="Fechar popup">×</button>${item.imagem?`<img class="site-popup-image" src="${escapeHTML(item.imagem)}" alt="">`:""}<div class="site-popup-copy"><span>Mensagem da rádio</span><h2 id="${titleId}">${escapeHTML(item.titulo||"Aviso")}</h2><p id="${descriptionId}">${escapeHTML(item.mensagem||"")}</p><small>Prévia: ${escapeHTML(item.frequencia||"Frequência não definida")} • não registra exibição real</small>${link&&item.textoBotao?`<a class="site-popup-action" href="${escapeHTML(link)}" target="_blank" rel="noopener noreferrer">${escapeHTML(item.textoBotao)}</a>`:""}</div></section>`;
     $(".site-preview",container).appendChild(layer);
     previewPopupReturnFocus=document.activeElement;
     const close=$(".site-popup-close",layer); close?.focus();
     close?.addEventListener("click",()=>closePreviewPopup(container));
     layer.addEventListener("click",event=>{if(event.target===layer)closePreviewPopup(container);});
+    layer.addEventListener("keydown",event=>{
+      if(event.key!=="Tab")return;
+      const focusable=$$('button:not([disabled]),a[href],input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])',layer).filter(element=>element.offsetParent!==null);
+      if(!focusable.length){event.preventDefault();return;}
+      const first=focusable[0],last=focusable[focusable.length-1];
+      if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}
+      else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}
+    });
   }
+
   function schedulePreviewPopup(container) {
     clearPreviewPopupTimer();
     closePreviewPopup(container,{restoreFocus:false});
@@ -1414,17 +1480,46 @@
     return `<picture>${mobile?`<source media="(max-width:640px)" srcset="${escapeHTML(mobile)}">`:""}<img src="${escapeHTML(desktop)}" alt="${escapeHTML(alt)}"></picture>`;
   }
   function siteAdvertising() {
-    const item=sortCampaignItems((state.content.publicidade||[]).filter(i=>i.ativo!==false && campaignStatusValue(i)==="ativa"))[0];
-    if(!item)return "";
-    const link=safeExternalURL(item.link), tag=link?"a":"button", attrs=link?`href="${escapeHTML(link)}" target="_blank" rel="noopener noreferrer"`:`data-site-open="publicidade" data-site-id="${escapeHTML(item.id)}" type="button"`;
-    return `<section class="site-section site-commercial-section" data-site-section="publicidade"><span class="site-ad-disclosure">Publicidade</span><${tag} class="site-responsive-commercial site-ad-link format-${slugify(item.formato||"banner")}" ${attrs} data-campaign-id="${escapeHTML(item.id)}" data-ad-position="${escapeHTML(item.posicao||"")}" aria-label="Abrir publicidade ${escapeHTML(item.titulo||advertiserName(item))}">${responsiveCommercialImage(item,`Publicidade ${item.titulo||advertiserName(item)}`)}${item.textoBotao?`<span class="site-commercial-cta">${escapeHTML(item.textoBotao)}</span>`:""}</${tag}></section>`;
+    return siteCommercialSlot("Entre seções");
   }
-  function normalizedBannerPosition(value) { return ({"Banner principal":"Após o cabeçalho","Antes de notícias":"Antes de notícias","Antes do rodapé":"Antes do rodapé","Página interna":"Página interna"})[value] || value || "Após o cabeçalho"; }
-  function siteBannerSlot(position) {
-    const items=sortBannerItems((state.content.banners||[]).filter(item=>item.ativo!==false && bannerStatusValue(item)==="ativo" && normalizedBannerPosition(item.posicao)===position)).slice(0,2);
+
+  function normalizedBannerPosition(value) {
+    return ({"Banner principal":"Após o cabeçalho","Antes de notícias":"Antes de notícias","Antes do rodapé":"Antes do rodapé","Página interna":"Página interna"})[value] || value || "Após o cabeçalho";
+  }
+
+  function normalizedCampaignPosition(value) {
+    return ({"Topo do site":"Após o cabeçalho","Após o player":"Após o player","Player":"Após o player","Entre programação e notícias":"Antes de notícias","Entre seções":"Entre seções","Antes do rodapé":"Antes do rodapé"})[value] || value || "Entre seções";
+  }
+
+  function commercialSlotItems(position) {
+    if (!isModuleEnabled("publicidade")) return [];
+    const campaigns=sortCampaignItems((state.content.publicidade||[]).filter(item=>item.ativo!==false && campaignStatusValue(item)==="ativa" && normalizedCampaignPosition(item.posicao)===position)).map(item=>({kind:"campaign",item}));
+    const banners=sortBannerItems((state.content.banners||[]).filter(item=>item.ativo!==false && bannerStatusValue(item)==="ativo" && normalizedBannerPosition(item.posicao)===position)).map(item=>({kind:"banner",item}));
+    return [...campaigns,...banners].sort((a,b)=>Number(b.item.prioridade||0)-Number(a.item.prioridade||0) || (a.kind===b.kind?0:(a.kind==="campaign"?-1:1)) || String(a.item.titulo||"").localeCompare(String(b.item.titulo||""),"pt-BR"));
+  }
+
+  function commercialCreativeHTML(entry) {
+    const {kind,item}=entry;
+    const link=safeExternalURL(item.link), collection=kind==="campaign"?"publicidade":"banners";
+    const tag=link?"a":"button";
+    const attrs=link?`href="${escapeHTML(link)}" target="_blank" rel="noopener noreferrer"`:`data-site-open="${collection}" data-site-id="${escapeHTML(item.id)}" type="button"`;
+    const label=kind==="campaign"?"Publicidade":(item.tipo||"Banner");
+    const title=item.titulo || (kind==="campaign"?advertiserName(item):"Banner");
+    const format=kind==="campaign"?` format-${slugify(item.formato||"banner")}`:"";
+    const data=kind==="campaign"?` data-campaign-id="${escapeHTML(item.id)}" data-ad-position="${escapeHTML(item.posicao||"")}"`:` data-banner-id="${escapeHTML(item.id)}"`;
+    return `<div class="site-commercial-entry kind-${kind}"><span class="site-ad-disclosure">${escapeHTML(label)}</span><${tag} class="site-responsive-commercial ${kind==="campaign"?"site-ad-link":"site-banner-link"}${format}" ${attrs}${data} aria-label="Abrir ${escapeHTML(label.toLowerCase())} ${escapeHTML(title)}">${responsiveCommercialImage(item,`${label} ${title}`)}${item.textoBotao?`<span class="site-commercial-cta">${escapeHTML(item.textoBotao)}</span>`:""}</${tag}></div>`;
+  }
+
+  function siteCommercialSlot(position,{limit=2}={}) {
+    const items=commercialSlotItems(position).slice(0,limit);
     if (!items.length) return "";
-    return `<section class="site-banner-slot position-${slugify(position)}" data-site-section="banners" data-banner-position="${escapeHTML(position)}">${items.map(item=>{const link=safeExternalURL(item.link),tag=link?"a":"button",attrs=link?`href="${escapeHTML(link)}" target="_blank" rel="noopener noreferrer"`:`data-site-open="banners" data-site-id="${escapeHTML(item.id)}" type="button"`;return `<${tag} class="site-responsive-commercial site-banner-link" ${attrs} aria-label="Abrir banner ${escapeHTML(item.titulo||"")}">${responsiveCommercialImage(item,item.titulo||"Banner")}${item.textoBotao?`<span class="site-commercial-cta">${escapeHTML(item.textoBotao)}</span>`:""}</${tag}>`;}).join("")}</section>`;
+    return `<section class="site-banner-slot site-commercial-slot position-${slugify(position)}" data-site-section="publicidade" data-commercial-position="${escapeHTML(position)}">${items.map(commercialCreativeHTML).join("")}</section>`;
   }
+
+  function siteBannerSlot(position) {
+    return siteCommercialSlot(position);
+  }
+
   function sitePartners() { const items=sortPartnerItems(state.content.parceiros.filter(i=>i.ativo!==false)).slice(0,8); if(!items.length)return ""; return `<section class="site-section alt" data-site-section="parceiros"><div class="site-section-head"><div><span>Apoio</span><h2>Parceiros e patrocinadores</h2><p>Marcas que apoiam a rádio e seus projetos.</p></div><button class="site-section-link" data-site-list="parceiros" type="button">Ver todos →</button></div><div class="site-partner-grid">${items.map(i=>`<button class="site-partner-card ${i.destaque?"featured":""}" data-site-open="parceiros" data-site-id="${escapeHTML(i.id)}" type="button" aria-label="Abrir parceiro ${escapeHTML(i.nome)}"><span class="site-partner-logo">${i.logo?`<img src="${escapeHTML(i.logo)}" alt="Logomarca de ${escapeHTML(i.nome)}">`:`${escapeHTML(initials(i.nome))}`}</span><strong>${escapeHTML(i.nome)}</strong><small>${escapeHTML(i.categoria||"Parceiro")}</small>${i.destaque?`<em>Destaque</em>`:""}</button>`).join("")}</div></section>`; }
   function siteApp() { return `<section class="site-section dark" data-site-section="aplicativo"><div class="site-section-head"><div><span>Leve a rádio com você</span><h2>Baixe nosso aplicativo</h2><p>Ouça a programação no celular e receba novidades.</p></div><button class="site-live-button" data-site-action="app" type="button">Baixar aplicativo</button></div></section>`; }
   function siteContact() { return `<section class="site-section" data-site-section="contato"><div class="site-section-head"><div><span>Fale com a rádio</span><h2>Contato e participação</h2><p>WhatsApp, pedidos de música, comercial e jornalismo.</p></div><button class="site-wa-button" data-site-action="whatsapp" type="button">Abrir WhatsApp</button></div></section>`; }
@@ -1691,7 +1786,7 @@
     const title=item.titulo || item.nome || schemas[key]?.singular || "Conteúdo";
     $("#site-content-eyebrow").textContent=schemas[key]?.title || "Conteúdo";
     $("#site-content-title").textContent=title;
-    $("#site-content-body").innerHTML=siteDetailContent(key,item);
+    $("#site-content-body").innerHTML=`${siteCommercialSlot("Página interna",{limit:1})}${siteDetailContent(key,item)}`;
     $("#site-content-dialog").showModal();
   }
 
@@ -1714,12 +1809,14 @@
     const title=key === "programacao"?"Grade completa":schemas[key]?.title || "Conteúdos";
     $("#site-content-eyebrow").textContent="Visualização completa";
     $("#site-content-title").textContent=title;
-    $("#site-content-body").innerHTML=items.length?`<div class="site-detail-collection">${items.map(item=>`<button class="site-detail-item" data-site-open="${escapeHTML(item._collection||key)}" data-site-id="${escapeHTML(item.id)}" type="button"><strong>${escapeHTML(item.titulo||item.nome||"Sem título")}</strong><span>${escapeHTML(schemas[item._collection||key]?.summary?.(item) || item.descricao || item.resumo || "Abrir conteúdo")}</span></button>`).join("")}</div>`:`<div class="site-detail-notice">Nenhum conteúdo publicado nesta seção.</div>`;
+    const collection=items.length?`<div class="site-detail-collection">${items.map(item=>`<button class="site-detail-item" data-site-open="${escapeHTML(item._collection||key)}" data-site-id="${escapeHTML(item.id)}" type="button"><strong>${escapeHTML(item.titulo||item.nome||"Sem título")}</strong><span>${escapeHTML(schemas[item._collection||key]?.summary?.(item) || item.descricao || item.resumo || "Abrir conteúdo")}</span></button>`).join("")}</div>`:`<div class="site-detail-notice">Nenhum conteúdo publicado nesta seção.</div>`;
+    $("#site-content-body").innerHTML=`${siteCommercialSlot("Página interna",{limit:1})}${collection}`;
     $("#site-content-dialog").showModal();
   }
 
   let audio = null;
   let previewThemeOverride = null;
+
   function syncAudioButtons(playing=Boolean(audio && !audio.paused)) {
     $$('[data-site-play]').forEach(button=>{
       if (!button.dataset.idleHtml) button.dataset.idleHtml=button.innerHTML;
@@ -1758,8 +1855,9 @@
 
   function openPreview(themeId=null) {
     previewThemeOverride=themeId || null;
+    const dialog=$("#preview-dialog");
+    if (!dialog.open) dialog.showModal();
     renderPreviewDialog();
-    $("#preview-dialog").showModal();
   }
 
   function bindGoButtons(root=document) {
@@ -1824,7 +1922,7 @@
 
   function mapRemoteToState(site,dashboard) {
     const fresh=defaultState(), content=site.conteudoRascunho || site.conteudoPublicado || {}, texts=content.textos_institucionais || {}, cms=texts.cms_v2 || {}, contacts=content.contatos || {}, whats=typeof content.whatsapp === "string" ? {numero:content.whatsapp} : (content.whatsapp || {}), colors=content.cores || {}, apps=content.links_aplicativos || {}, banners=content.banners || {};
-    fresh.version="2.4.0-etapa-2"; fresh.updatedAt=versions[0]?.criado_em || new Date().toISOString(); fresh.status=site.status_publicacao || "sem_rascunho"; fresh.selectedTheme=cms.selectedTheme || "morada";
+    fresh.version="2.4.0-final"; fresh.updatedAt=versions[0]?.criado_em || new Date().toISOString(); fresh.status=site.status_publicacao || "sem_rascunho"; fresh.selectedTheme=cms.selectedTheme || "morada";
     fresh.radio={...fresh.radio,nome:content.nome || site.nome_site || dashboard?.cliente?.nome_radio || "Minha rádio",slogan:content.slogan || "",descricao:content.descricao || texts.sobre || "",cidade:contacts.cidade || dashboard?.cliente?.cidade || "",estado:contacts.estado || dashboard?.cliente?.estado || "",email:contacts.email || dashboard?.cliente?.email || "",telefone:contacts.telefone || "",whatsapp:whats.numero || "",endereco:contacts.endereco || "",streamUrl:site.stream_url || "",musicaAtual:texts.player?.titulo || "Transmissão ao vivo",locutorAtual:texts.player?.subtitulo || "Programação da rádio",logo:content.logo || "",hero:content.capa || "",playerImage:texts.player?.imagem || "",cores:{primaria:colors.primaria || "#e31c45",secundaria:colors.secundaria || "#121d31",destaque:colors.destaque || "#f1a11a",fundo:colors.fundo || "#f4f6f9"},listenersEnabled:false};
     const moduleValues=texts.modulos || {}; const savedModules=safeArray(cms.modules);
     fresh.modules=modulesCatalog.map(([id,label,description],index)=>{const saved=savedModules.find(m=>m.id===id);return{id,label,description,enabled:saved? saved.enabled!==false : moduleValues[id]!==false,order:Number(saved?.order ?? index)};});
@@ -1868,7 +1966,7 @@
     if(can("patrocinadores"))content.patrocinadores=state.content.parceiros.map(i=>({...i,site:i.link}));
     if(can("banners"))content.banners={...(content.banners||{}),destaques:state.content.banners,publicidades:state.content.publicidade};
     if(can("links_aplicativos"))content.links_aplicativos={...(content.links_aplicativos||{}),android:state.integrations.aplicativo.android,ios:state.integrations.aplicativo.ios,pwa:state.integrations.aplicativo.pwa,qr:state.integrations.aplicativo.qrcode};
-    if(can("textos_institucionais"))content.textos_institucionais={...texts,sobre:state.radio.descricao,player:{...(texts.player||{}),titulo:state.radio.musicaAtual,subtitulo:state.radio.locutorAtual,imagem:state.radio.playerImage},seo:state.integrations.seo,podcasts:state.content.podcasts,videos:state.content.videos,promocoes:state.content.promocoes,galeria:state.content.galeria,eventos:state.content.eventos,modulos:Object.fromEntries(state.modules.map(m=>[m.id,m.enabled])),pedidosMusica:{...(texts.pedidosMusica||{}),ativo:state.integrations.whatsapp.pedidos},acessibilidade:{...(texts.acessibilidade||{}),leitorTela:state.integrations.configuracoes.acessibilidade},cms_v2:{...cms,schemaVersion:7,selectedTheme:state.selectedTheme,modules:state.modules,content:{equipe:state.content.equipe,popups:state.content.popups,anunciantes:state.content.anunciantes},aplicativo:{icone:state.integrations.aplicativo.icone},configuracoes:state.integrations.configuracoes,updatedAt:new Date().toISOString()}};
+    if(can("textos_institucionais"))content.textos_institucionais={...texts,sobre:state.radio.descricao,player:{...(texts.player||{}),titulo:state.radio.musicaAtual,subtitulo:state.radio.locutorAtual,imagem:state.radio.playerImage},seo:state.integrations.seo,podcasts:state.content.podcasts,videos:state.content.videos,promocoes:state.content.promocoes,galeria:state.content.galeria,eventos:state.content.eventos,modulos:Object.fromEntries(state.modules.map(m=>[m.id,m.enabled])),pedidosMusica:{...(texts.pedidosMusica||{}),ativo:state.integrations.whatsapp.pedidos},acessibilidade:{...(texts.acessibilidade||{}),leitorTela:state.integrations.configuracoes.acessibilidade},cms_v2:{...cms,schemaVersion:7,release:"2.4.0-final",selectedTheme:state.selectedTheme,modules:state.modules,content:{equipe:state.content.equipe,popups:state.content.popups,anunciantes:state.content.anunciantes},aplicativo:{icone:state.integrations.aplicativo.icone},configuracoes:state.integrations.configuracoes,updatedAt:new Date().toISOString()}};
     return content;
   }
 

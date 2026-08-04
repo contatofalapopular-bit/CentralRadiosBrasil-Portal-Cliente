@@ -1,0 +1,499 @@
+{
+  "summary": {
+    "passed": 98,
+    "total": 98,
+    "failed": []
+  },
+  "results": [
+    {
+      "name": "Versão final exibida",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Dashboard consolidado",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Auditoria comercial sem conflitos",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "29 áreas no menu",
+      "ok": true,
+      "detail": "29"
+    },
+    {
+      "name": "Abrir área ⌂\nDashboard",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Abrir área ◉\nMinha Rádio",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Abrir área ▦\nEditor Visual\nNovo",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Abrir área ◈\nTemas",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Abrir área ◷\nProgramação",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Abrir área ♟\nLocutores",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Abrir área ▤\nNotícias",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Abrir área ◉\nPodcasts",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Abrir área ▶\nVídeos",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Abrir área ★\nPromoções",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Abrir área ▧\nGaleria",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Abrir área ◫\nEventos",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Abrir área ♣\nEquipe",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Abrir área ▥\nAnunciantes",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Abrir área ▰\nCampanhas",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Abrir área ◇\nParceiros",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Abrir área ▱\nBanners",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Abrir área ▣\nPopups",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Abrir área ◍\nWhatsApp",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Abrir área ◎\nRedes Sociais",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Abrir área ⌕\nSEO",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Abrir área ⌁\nDomínio",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Abrir área ▯\nAplicativo",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Abrir área ⚙\nConfigurações",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Abrir área ♙\nUsuários e acesso",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Abrir área ✓\nPublicação",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Abrir área $\nFaturas",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Abrir área ▤\nContrato",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Abrir área ↻\nBackup",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Popup abriu na prévia",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Popup tem diálogo acessível",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Foco no fechar popup",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Popup fecha com Esc",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Posição comercial Após o cabeçalho",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "name": "Posição comercial Após o player",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "name": "Posição comercial Antes de notícias",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "name": "Posição comercial Entre seções",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "name": "Posição comercial Antes do rodapé",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "name": "Ordem afterPlayer",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Ordem beforeNews",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Ordem betweenAfterProg",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Ordem beforeFooter",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Banner de página interna",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Notícia completa abriu",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Tema morada renderizado",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Tema morada em desktop",
+      "ok": true,
+      "detail": "preview-canvas desktop"
+    },
+    {
+      "name": "Comercial preservado morada/desktop",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Tema morada em tablet",
+      "ok": true,
+      "detail": "preview-canvas tablet"
+    },
+    {
+      "name": "Comercial preservado morada/tablet",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Tema morada em mobile",
+      "ok": true,
+      "detail": "preview-canvas mobile"
+    },
+    {
+      "name": "Comercial preservado morada/mobile",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Tema spotify renderizado",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Tema spotify em desktop",
+      "ok": true,
+      "detail": "preview-canvas desktop"
+    },
+    {
+      "name": "Comercial preservado spotify/desktop",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Tema spotify em tablet",
+      "ok": true,
+      "detail": "preview-canvas tablet"
+    },
+    {
+      "name": "Comercial preservado spotify/tablet",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Tema spotify em mobile",
+      "ok": true,
+      "detail": "preview-canvas mobile"
+    },
+    {
+      "name": "Comercial preservado spotify/mobile",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Tema news renderizado",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Tema news em desktop",
+      "ok": true,
+      "detail": "preview-canvas desktop"
+    },
+    {
+      "name": "Comercial preservado news/desktop",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Tema news em tablet",
+      "ok": true,
+      "detail": "preview-canvas tablet"
+    },
+    {
+      "name": "Comercial preservado news/tablet",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Tema news em mobile",
+      "ok": true,
+      "detail": "preview-canvas mobile"
+    },
+    {
+      "name": "Comercial preservado news/mobile",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Tema gospel renderizado",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Tema gospel em desktop",
+      "ok": true,
+      "detail": "preview-canvas desktop"
+    },
+    {
+      "name": "Comercial preservado gospel/desktop",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Tema gospel em tablet",
+      "ok": true,
+      "detail": "preview-canvas tablet"
+    },
+    {
+      "name": "Comercial preservado gospel/tablet",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Tema gospel em mobile",
+      "ok": true,
+      "detail": "preview-canvas mobile"
+    },
+    {
+      "name": "Comercial preservado gospel/mobile",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Tema young renderizado",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Tema young em desktop",
+      "ok": true,
+      "detail": "preview-canvas desktop"
+    },
+    {
+      "name": "Comercial preservado young/desktop",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Tema young em tablet",
+      "ok": true,
+      "detail": "preview-canvas tablet"
+    },
+    {
+      "name": "Comercial preservado young/tablet",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Tema young em mobile",
+      "ok": true,
+      "detail": "preview-canvas mobile"
+    },
+    {
+      "name": "Comercial preservado young/mobile",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Tema custom renderizado",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Tema custom em desktop",
+      "ok": true,
+      "detail": "preview-canvas desktop"
+    },
+    {
+      "name": "Comercial preservado custom/desktop",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Tema custom em tablet",
+      "ok": true,
+      "detail": "preview-canvas tablet"
+    },
+    {
+      "name": "Comercial preservado custom/tablet",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Tema custom em mobile",
+      "ok": true,
+      "detail": "preview-canvas mobile"
+    },
+    {
+      "name": "Comercial preservado custom/mobile",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Proteção de anunciante vinculado",
+      "ok": true,
+      "detail": "Este anunciante está vinculado a 5 campanhas. Remova ou altere o vínculo antes de excluir."
+    },
+    {
+      "name": "Anunciante não excluído",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Rascunho enviado ao Worker simulado",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "name": "Release final persistida",
+      "ok": true,
+      "detail": "2.4.0-final"
+    },
+    {
+      "name": "Schema 7 preservado",
+      "ok": true,
+      "detail": "7"
+    },
+    {
+      "name": "Botões sem nome acessível",
+      "ok": true,
+      "detail": "0"
+    },
+    {
+      "name": "Sem exceções JavaScript",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Sem erros de console",
+      "ok": true,
+      "detail": ""
+    }
+  ]
+}

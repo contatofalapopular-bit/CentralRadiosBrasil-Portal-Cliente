@@ -1,0 +1,112 @@
+{
+  "total": 21,
+  "passed": 21,
+  "failed": 0,
+  "checks": [
+    {
+      "name": "Arquivos principais presentes",
+      "status": "pass",
+      "details": "index.html, app.js, styles.css, config.js, manifest.webmanifest"
+    },
+    {
+      "name": "JavaScript válido",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "name": "Versão v3 configurada",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "name": "Schema 13 configurado",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "name": "WORKER_URL preservada",
+      "status": "pass",
+      "details": "https://broken-bar-45e2.contatofalapopular.workers.dev"
+    },
+    {
+      "name": "Nove endpoints preservados",
+      "status": "pass",
+      "details": "['/api/cliente/dashboard', '/api/cliente/login', '/api/cliente/logout', '/api/cliente/sessao', '/api/cliente/site', '/api/cliente/site/midias', '/api/cliente/site/rascunho', '/api/cliente/site/solicitar-publicacao', '/api/cliente/trocar-senha']"
+    },
+    {
+      "name": "Nenhum endpoint novo",
+      "status": "pass",
+      "details": "set()"
+    },
+    {
+      "name": "Nenhuma biblioteca externa adicionada",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "name": "Nenhum SQL incluído",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "name": "Nenhum código do Worker incluído",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "name": "Página de pré-produção registrada",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "name": "Análise diferencia Portal e servidor",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "name": "Bloqueio local antes de publicação",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "name": "Resultado salvo no mesmo cms_v2",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "name": "Monitor de conexão presente",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "name": "Captura de falhas do navegador",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "name": "Validação de imagens preservada",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "name": "Editor visual e seis temas preservados",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "name": "IDs HTML únicos",
+      "status": "pass",
+      "details": "[]"
+    },
+    {
+      "name": "Manifesto v3 válido",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "name": "Política de referência adicionada",
+      "status": "pass",
+      "details": ""
+    }
+  ]
+}

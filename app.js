@@ -14,6 +14,7 @@
   let previewPopupReturnFocus = null;
   let saveQueue = Promise.resolve();
   let isLoading = false;
+  let workerReachable = null;
   const activeImageProcesses = new Set();
 
   const imageProfiles = {
@@ -69,6 +70,7 @@
     { id: "configuracoes", label: "Configurações", icon: "⚙" },
     { id: "usuarios", label: "Usuários e acesso", icon: "♙" },
     { id: "auditoria", label: "Auditoria", icon: "◫" },
+    { id: "producao", label: "Pré-produção", icon: "◆", badge: "v3" },
     { id: "publicacao", label: "Publicação", icon: "✓" },
     { id: "faturas", label: "Faturas", icon: "$" },
     { id: "contrato", label: "Contrato", icon: "▤" },
@@ -420,7 +422,7 @@
   function defaultState() {
     const today = new Date().toISOString().slice(0, 10);
     return {
-      version: "2.6.0-final",
+      version: "3.0.0-stage1",
       updatedAt: new Date().toISOString(),
       status: "rascunho",
       selectedTheme: "morada",
@@ -716,7 +718,7 @@
       </div>
       <div class="grid-2 equal" style="margin-top:18px">
         <section class="card"><header class="card-header"><div><h3>Dados reais, sem números inventados</h3><p>Audiência e ouvintes.</p></div></header><div class="card-body"><div class="notice">O painel não exibe audiência fictícia. O número de ouvintes só será mostrado quando existir uma fonte técnica confiável do streaming.</div></div></section>
-        <section class="card"><header class="card-header"><div><h3>Integração ativa</h3><p>Ambiente utilizado nesta instalação.</p></div></header><div class="card-body"><div class="code-box">Portal: ${escapeHTML(CONFIG.VERSION || "2.6.0-final")}\nWorker: ${escapeHTML(CONFIG.WORKER_URL || "—")}\nPersistência: Cloudflare D1\nMídias: API do site\nPublicação: supervisionada pela Central</div></div></section>
+        <section class="card"><header class="card-header"><div><h3>Integração ativa</h3><p>Ambiente utilizado nesta instalação.</p></div></header><div class="card-body"><div class="code-box">Portal: ${escapeHTML(CONFIG.VERSION || "3.0.0-stage1")}\nWorker: ${escapeHTML(CONFIG.WORKER_URL || "—")}\nPersistência: Cloudflare D1\nMídias: API do site\nPublicação: supervisionada pela Central</div></div></section>
       </div>`;
     bindGoButtons(root);
   }
@@ -1066,7 +1068,7 @@
   function renderVisualEditor(root) {
     ensureV260EditorState();
     root.innerHTML = `
-      <section class="editor-stage-note editor-stage-toolbar"><div><span>v2.6.0 • Final Consolidada</span><h3>Editor visual pronto para validação final</h3><p>Modelos, blocos, cores, imagens e prévia em tempo real reunidos em uma única base estável.</p></div><div class="editor-stage-actions"><strong>Mesmo rascunho atual<br>Sem mudança no Worker</strong><button class="button primary" data-preview type="button">Prévia em tela cheia</button></div></section>
+      <section class="editor-stage-note editor-stage-toolbar"><div><span>v3.0.0 • Etapa 1 — Pré-produção</span><h3>Editor visual pronto para validação final</h3><p>Modelos, blocos, cores, imagens e prévia em tempo real reunidos em uma única base estável.</p></div><div class="editor-stage-actions"><strong>Mesmo rascunho atual<br>Sem mudança no Worker</strong><button class="button primary" data-preview type="button">Prévia em tela cheia</button></div></section>
       <div class="editor-layout editor-layout-v260">
         <aside class="editor-sidebar">
           <section class="card"><header class="card-header"><div><h3>Modelo ativo</h3><p>As opções abaixo pertencem somente a ele.</p></div></header><div class="card-body"><select id="quick-theme">${themes.map(theme => `<option value="${theme.id}" ${theme.id === state.selectedTheme ? "selected" : ""}>${escapeHTML(theme.name)}</option>`).join("")}</select><button class="button secondary" data-go="themes" type="button" style="width:100%;margin-top:10px">Ver todos os modelos</button></div></section>
@@ -1123,7 +1125,7 @@
 
   function renderThemes(root) {
     root.innerHTML = `${pageHeader("Temas", "Modelos construídos em HTML, CSS e JavaScript. O conteúdo é compartilhado, mas a experiência visual muda de verdade.")}
-      <section class="theme-release-note"><div><span>v2.6.0 • Final Consolidada</span><h3>Seis modelos e editor visual consolidados</h3><p>Layouts distintos, opções por bloco, cores independentes, validação obrigatória de imagens e prévias responsivas reunidos na versão final.</p></div><strong>Mesmo rascunho do Portal<br>Sem mudanças no Worker</strong></section>
+      <section class="theme-release-note"><div><span>v3.0.0 • Etapa 1 — Pré-produção</span><h3>Seis modelos e editor visual consolidados</h3><p>Layouts distintos, opções por bloco, cores independentes, validação obrigatória de imagens e prévias responsivas reunidos na versão final.</p></div><strong>Mesmo rascunho do Portal<br>Sem mudanças no Worker</strong></section>
       <div class="theme-grid">${themes.map(theme => {
         const [accent,dark,highlight,bg] = theme.colors;
         return `<article class="theme-card ${theme.id === state.selectedTheme ? "selected" : ""}" data-theme-card="${theme.id}">${theme.id === state.selectedTheme ? `<span class="theme-selected-tag">Tema ativo</span>` : ""}<div class="theme-shot" style="--shot-bg:${bg};--shot-dark:${dark};--shot-accent:${accent};--shot-highlight:${highlight};--shot-muted:${highlight}22">${themeShotMarkup(theme)}</div><div class="theme-meta"><span class="theme-layout-label">Composição ${escapeHTML(themeLayoutLabel(theme.layout))}</span><h3>${escapeHTML(theme.name)}</h3><small class="theme-audience">${escapeHTML(theme.audience || "")}</small><p>${escapeHTML(theme.description)}</p><button class="button ${theme.id === state.selectedTheme ? "secondary" : "primary"} small" data-select-theme="${theme.id}" type="button">${theme.id === state.selectedTheme ? "Selecionado" : "Usar este tema"}</button> <button class="button ghost small" data-theme-preview="${theme.id}" type="button">Visualizar</button></div></article>`;
@@ -1591,7 +1593,7 @@
         <section class="card"><div class="card-body"><h3>Exportar JSON</h3><p class="field-help">Baixa configurações, módulos, temas e conteúdos.</p><button class="button primary" id="export-backup" type="button">Baixar backup</button></div></section>
         <section class="card"><div class="card-body"><h3>Importar JSON</h3><p class="field-help">Carrega o arquivo no editor; clique em Salvar rascunho para gravar no D1.</p><button class="button secondary" id="import-backup" type="button">Selecionar arquivo</button></div></section>
         <section class="card"><div class="card-body"><h3>Recarregar do servidor</h3><p class="field-help">Descarta alterações ainda não salvas e recarrega o último rascunho do servidor.</p><button class="button danger" id="reset-demo" type="button">Recarregar dados</button></div></section>
-      </div><section class="card" style="margin-top:18px"><header class="card-header"><div><h3>Sobre esta instalação</h3><p>Informações técnicas.</p></div></header><div class="card-body"><div class="code-box">Modo: produção integrada\nVersão: ${CONFIG.VERSION || "2.6.0-final"}\nPersistência: Cloudflare D1\nAPI: ${CONFIG.WORKER_URL || "não configurada"}\nÚltima alteração: ${formatDateTime(state.updatedAt)}</div></div></section>`;
+      </div><section class="card" style="margin-top:18px"><header class="card-header"><div><h3>Sobre esta instalação</h3><p>Informações técnicas.</p></div></header><div class="card-body"><div class="code-box">Modo: produção integrada\nVersão: ${CONFIG.VERSION || "3.0.0-stage1"}\nPersistência: Cloudflare D1\nAPI: ${CONFIG.WORKER_URL || "não configurada"}\nÚltima alteração: ${formatDateTime(state.updatedAt)}</div></div></section>`;
     $("#export-backup").addEventListener("click",exportBackup);
     $("#import-backup").addEventListener("click",()=>$("#backup-import").click());
     $("#reset-demo").addEventListener("click",()=>{if(confirm("Descartar alterações não salvas e recarregar o rascunho do servidor?")) loadAll();});
@@ -2260,7 +2262,24 @@
     $$('[data-go]',root).forEach(button=>button.addEventListener("click",()=>navigate(button.dataset.go)));
   }
 
+  function updateConnectionStatus() {
+    const chip=$("#connection-chip");if(!chip)return;
+    const online=navigator.onLine!==false;
+    const status=!online?"offline":workerReachable===true?"online":workerReachable===false?"error":"checking";
+    const label=status==="online"?"Worker conectado":status==="offline"?"Sem internet":status==="error"?"Worker indisponível":"Verificando conexão";
+    chip.className=`connection-chip ${status}`;const text=$("strong",chip);if(text)text.textContent=label;
+  }
+
+  function captureClientIssue(type,message,source="") {
+    try{
+      ensureV250State();
+      state.production.clientErrors.unshift({id:uid("client-error"),timestamp:new Date().toISOString(),type:String(type||"erro"),message:String(message||"Erro não identificado").slice(0,500),source:String(source||"").slice(0,300)});
+      state.production.clientErrors=state.production.clientErrors.slice(0,50);
+    }catch{}
+  }
+
   async function api(path, options = {}) {
+    if(navigator.onLine===false){workerReachable=false;updateConnectionStatus();throw new Error("Você está sem conexão com a internet.");}
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), CONFIG.REQUEST_TIMEOUT_MS || 20000);
     const headers = { "Content-Type":"application/json", ...(options.headers || {}) };
@@ -2269,8 +2288,10 @@
       const response = await fetch(`${CONFIG.WORKER_URL}${path}`, { ...options, headers, signal: controller.signal, cache:"no-store" });
       const data = await response.json().catch(() => ({}));
       if (!response.ok) { const error = new Error(data.erro || data.mensagem || `Falha ${response.status}`); error.status = response.status; throw error; }
+      workerReachable=true;updateConnectionStatus();
       return data;
     } catch (error) {
+      if(error.name === "AbortError" || error instanceof TypeError){workerReachable=false;updateConnectionStatus();captureClientIssue("api",error.message,path);}
       if (error.name === "AbortError") throw new Error("A comunicação demorou demais. Tente novamente.");
       if (error.status === 401 && path !== "/api/cliente/login") showLogin("Sua sessão terminou. Entre novamente.");
       throw error;
@@ -2292,7 +2313,7 @@
 
   async function logout() { try { await api("/api/cliente/logout",{method:"POST"}); } catch {} resetAudio(); authToken=""; sessionStorage.removeItem(CONFIG.TOKEN_KEY); showLogin(); }
   function showLogin(message="") { $("#app-shell").classList.add("hidden"); $("#login-view").classList.remove("hidden"); if(message)showLoginMessage(message,"error"); }
-  function showApp() { $("#login-view").classList.add("hidden"); $("#app-shell").classList.remove("hidden"); renderNav(); updateChrome(); renderPage(); }
+  function showApp() { $("#login-view").classList.add("hidden"); $("#app-shell").classList.remove("hidden"); updateConnectionStatus();renderNav(); updateChrome(); renderPage(); }
   function showLoginMessage(message,type="") { const box=$("#login-message"); box.textContent=message; box.className=`global-message ${type} ${message?"":"hidden"}`; }
 
   async function loadAll() {
@@ -2318,7 +2339,7 @@
 
   function mapRemoteToState(site,dashboard) {
     const fresh=defaultState(), content=site.conteudoRascunho || site.conteudoPublicado || {}, texts=content.textos_institucionais || {}, cms=texts.cms_v2 || {}, contacts=content.contatos || {}, whats=typeof content.whatsapp === "string" ? {numero:content.whatsapp} : (content.whatsapp || {}), colors=content.cores || {}, apps=content.links_aplicativos || {}, banners=content.banners || {};
-    fresh.version="2.6.0-final"; fresh.updatedAt=versions[0]?.criado_em || new Date().toISOString(); fresh.status=site.status_publicacao || "sem_rascunho"; fresh.selectedTheme=cms.selectedTheme || "morada"; fresh.editor=normalizeEditorState(cms.editor||{});
+    fresh.version="3.0.0-stage1"; fresh.updatedAt=versions[0]?.criado_em || new Date().toISOString(); fresh.status=site.status_publicacao || "sem_rascunho"; fresh.selectedTheme=cms.selectedTheme || "morada"; fresh.editor=normalizeEditorState(cms.editor||{});
     fresh.radio={...fresh.radio,nome:content.nome || site.nome_site || dashboard?.cliente?.nome_radio || "Minha rádio",slogan:content.slogan || "",descricao:content.descricao || texts.sobre || "",cidade:contacts.cidade || dashboard?.cliente?.cidade || "",estado:contacts.estado || dashboard?.cliente?.estado || "",email:contacts.email || dashboard?.cliente?.email || "",telefone:contacts.telefone || "",whatsapp:whats.numero || "",endereco:contacts.endereco || "",streamUrl:site.stream_url || "",musicaAtual:texts.player?.titulo || "Transmissão ao vivo",locutorAtual:texts.player?.subtitulo || "Programação da rádio",logo:content.logo || "",hero:content.capa || "",playerImage:texts.player?.imagem || "",cores:{primaria:colors.primaria || "#e31c45",secundaria:colors.secundaria || "#121d31",destaque:colors.destaque || "#f1a11a",fundo:colors.fundo || "#f4f6f9"},listenersEnabled:false};
     const moduleValues=texts.modulos || {}; const savedModules=safeArray(cms.modules);
     fresh.modules=modulesCatalog.map(([id,label,description],index)=>{const saved=savedModules.find(m=>m.id===id);return{id,label,description,enabled:saved? saved.enabled!==false : moduleValues[id]!==false,order:Number(saved?.order ?? index)};});
@@ -2349,6 +2370,7 @@
     fresh.security=cms.security || fresh.security;
     fresh.audit=cms.audit || fresh.audit;
     fresh.backup=cms.backup || fresh.backup;
+    fresh.production=cms.production || fresh.production;
     return fresh;
   }
 
@@ -2365,7 +2387,7 @@
     if(can("patrocinadores"))content.patrocinadores=state.content.parceiros.map(i=>({...i,site:i.link}));
     if(can("banners"))content.banners={...(content.banners||{}),destaques:state.content.banners,publicidades:state.content.publicidade};
     if(can("links_aplicativos"))content.links_aplicativos={...(content.links_aplicativos||{}),android:state.integrations.aplicativo.android,ios:state.integrations.aplicativo.ios,pwa:state.integrations.aplicativo.pwa,qr:state.integrations.aplicativo.qrcode};
-    if(can("textos_institucionais"))content.textos_institucionais={...texts,sobre:state.radio.descricao,player:{...(texts.player||{}),titulo:state.radio.musicaAtual,subtitulo:state.radio.locutorAtual,imagem:state.radio.playerImage},seo:state.integrations.seo,podcasts:state.content.podcasts,videos:state.content.videos,promocoes:state.content.promocoes,galeria:state.content.galeria,eventos:state.content.eventos,modulos:Object.fromEntries(state.modules.map(m=>[m.id,m.enabled])),pedidosMusica:{...(texts.pedidosMusica||{}),ativo:state.integrations.whatsapp.pedidos},acessibilidade:{...(texts.acessibilidade||{}),leitorTela:state.integrations.configuracoes.acessibilidade},cms_v2:{...cms,schemaVersion:12,release:"2.6.0-final",editor:state.editor,security:state.security,audit:{entries:(state.audit?.entries||[]).slice(0,500),functionalRuns:(state.audit?.functionalRuns||[]).slice(0,10)},backup:{settings:state.backup?.settings||{},snapshots:(state.backup?.snapshots||[]).slice(0,5)},selectedTheme:state.selectedTheme,modules:state.modules,content:{equipe:state.content.equipe,popups:state.content.popups,anunciantes:state.content.anunciantes},aplicativo:{icone:state.integrations.aplicativo.icone},configuracoes:state.integrations.configuracoes,updatedAt:new Date().toISOString()}};
+    if(can("textos_institucionais"))content.textos_institucionais={...texts,sobre:state.radio.descricao,player:{...(texts.player||{}),titulo:state.radio.musicaAtual,subtitulo:state.radio.locutorAtual,imagem:state.radio.playerImage},seo:state.integrations.seo,podcasts:state.content.podcasts,videos:state.content.videos,promocoes:state.content.promocoes,galeria:state.content.galeria,eventos:state.content.eventos,modulos:Object.fromEntries(state.modules.map(m=>[m.id,m.enabled])),pedidosMusica:{...(texts.pedidosMusica||{}),ativo:state.integrations.whatsapp.pedidos},acessibilidade:{...(texts.acessibilidade||{}),leitorTela:state.integrations.configuracoes.acessibilidade},cms_v2:{...cms,schemaVersion:13,release:"3.0.0-stage1",editor:state.editor,security:state.security,production:state.production,audit:{entries:(state.audit?.entries||[]).slice(0,500),functionalRuns:(state.audit?.functionalRuns||[]).slice(0,10)},backup:{settings:state.backup?.settings||{},snapshots:(state.backup?.snapshots||[]).slice(0,5)},selectedTheme:state.selectedTheme,modules:state.modules,content:{equipe:state.content.equipe,popups:state.content.popups,anunciantes:state.content.anunciantes},aplicativo:{icone:state.integrations.aplicativo.icone},configuracoes:state.integrations.configuracoes,updatedAt:new Date().toISOString()}};
     return content;
   }
 
@@ -2387,7 +2409,7 @@
     programacao:"conteudo", locutores:"conteudo", noticias:"conteudo", podcasts:"conteudo", videos:"conteudo", promocoes:"conteudo", galeria:"conteudo", eventos:"conteudo", equipe:"conteudo",
     anunciantes:"comercial", publicidade:"comercial", parceiros:"comercial", banners:"comercial", popups:"comercial",
     whatsapp:"integracoes", redes:"integracoes", seo:"integracoes", dominio:"integracoes", aplicativo:"integracoes",
-    configuracoes:"sistema", usuarios:"usuarios", auditoria:"auditoria", publicacao:"publicacao", faturas:"financeiro", contrato:"financeiro", backup:"backup"
+    configuracoes:"sistema", usuarios:"usuarios", auditoria:"auditoria", producao:"auditoria", publicacao:"publicacao", faturas:"financeiro", contrato:"financeiro", backup:"backup"
   });
 
   let accessEditingId = null;
@@ -2396,7 +2418,7 @@
   function ensureV250State() {
     if (!state || typeof state !== "object") state=defaultState();
     state.editor=normalizeEditorState(state.editor||{});
-    state.version="2.6.0-final";
+    state.version="3.0.0-stage1";
     const client=dashboardData?.cliente || {};
     const ownerEmail=String(client.email || state.radio?.email || "cliente@exemplo.com.br").trim().toLowerCase();
     const ownerName=client.nome || client.nome_radio || state.radio?.nome || "Administrador do cliente";
@@ -2428,6 +2450,12 @@
     state.backup.settings={autoBeforeImport:true,autoBeforePublication:true,maxSnapshots:5,...(state.backup.settings||{})};
     state.backup.settings.maxSnapshots=Math.max(1,Math.min(10,Number(state.backup.settings.maxSnapshots||5)));
     state.backup.snapshots=safeArray(state.backup.snapshots).slice(0,state.backup.settings.maxSnapshots);
+
+    state.production=state.production && typeof state.production === "object" ? state.production : {};
+    state.production.stage="pre-production";
+    state.production.runs=safeArray(state.production.runs).slice(0,10);
+    state.production.clientErrors=safeArray(state.production.clientErrors).slice(0,50);
+    state.production.manualReviews={legacyImages:false,serverPermissions:false,tenantIsolation:false,serverMediaValidation:false,...(state.production.manualReviews||{})};
     if (state.content) state.content.usuarios=[];
     return state;
   }
@@ -2521,7 +2549,7 @@
     $("#page-title").textContent=item?.label||"Painel"; $("#page-eyebrow").textContent=pageEyebrow(currentPage);
     const root=$("#page-root");
     if(currentPage==="dashboard")renderDashboard(root); else if(currentPage==="radio")renderRadio(root); else if(currentPage==="editor")renderVisualEditor(root); else if(currentPage==="themes")renderThemes(root);
-    else if(currentPage==="usuarios")renderUsers(root); else if(currentPage==="auditoria")renderAudit(root); else if(currentPage==="publicacao")renderPublication(root);
+    else if(currentPage==="usuarios")renderUsers(root); else if(currentPage==="auditoria")renderAudit(root); else if(currentPage==="producao")renderProductionReadiness(root); else if(currentPage==="publicacao")renderPublication(root);
     else if(currentPage==="faturas")renderInvoices(root); else if(currentPage==="contrato")renderContract(root); else if(schemas[currentPage])renderCollection(root,currentPage); else renderIntegration(root,currentPage);
     applyPermissionState(root,currentPage); bindGoButtons(root);
   }
@@ -2532,6 +2560,7 @@
     if(["anunciantes","publicidade","parceiros","banners","popups"].includes(page))return"Comercial e monetização";
     if(["whatsapp","redes","seo","dominio","aplicativo"].includes(page))return"Integrações";
     if(page==="auditoria")return"Conformidade e rastreabilidade";
+    if(page==="producao")return"Preparação para lançamento";
     if(page==="backup")return"Proteção e recuperação";
     return"Configuração do sistema";
   }
@@ -2672,8 +2701,8 @@
     ensureV250State();const data=stableBackupData(),json=JSON.stringify(data),snapshot={id:uid("snapshot"),label,source,createdAt:new Date().toISOString(),checksum:checksumText(json),size:json.length,counts:contentCounts(data),data:json};state.backup.snapshots.unshift(snapshot);state.backup.snapshots=state.backup.snapshots.slice(0,state.backup.settings.maxSnapshots);recordAudit("backup.criado","backup","snapshot",`${label} • ${source}`);return snapshot;
   }
   function downloadBlob(filename,content,type="application/json") { const blob=new Blob([content],{type}),a=document.createElement("a"),url=URL.createObjectURL(blob);a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),0); }
-  function backupEnvelope(data=stableBackupData()) { const payload=JSON.stringify(data);return{format:"crb-cms-backup",version:"2.6.0-final",schemaVersion:12,generatedAt:new Date().toISOString(),checksum:checksumText(payload),counts:contentCounts(data),data}; }
-  function exportBackup() { if(!requirePermission("export","backup"))return;const envelope=backupEnvelope();downloadBlob(`crb-cms-backup-v2.6.0-${new Date().toISOString().slice(0,10)}.json`,JSON.stringify(envelope,null,2));recordAudit("backup.exportado","backup","arquivo",envelope.checksum);notify("Backup completo gerado.","success"); }
+  function backupEnvelope(data=stableBackupData()) { const payload=JSON.stringify(data);return{format:"crb-cms-backup",version:"3.0.0-stage1",schemaVersion:13,generatedAt:new Date().toISOString(),checksum:checksumText(payload),counts:contentCounts(data),data}; }
+  function exportBackup() { if(!requirePermission("export","backup"))return;const envelope=backupEnvelope();downloadBlob(`crb-cms-backup-v3.0.0-${new Date().toISOString().slice(0,10)}.json`,JSON.stringify(envelope,null,2));recordAudit("backup.exportado","backup","arquivo",envelope.checksum);notify("Backup completo gerado.","success"); }
   function downloadSnapshot(id) { if(!requirePermission("export","backup"))return;const snapshot=state.backup.snapshots.find(item=>item.id===id);if(!snapshot)return;const data=JSON.parse(snapshot.data);downloadBlob(`crb-ponto-${slugify(snapshot.label)}-${snapshot.createdAt.slice(0,10)}.json`,JSON.stringify(backupEnvelope(data),null,2));recordAudit("backup.snapshot_exportado","backup","snapshot",snapshot.label); }
   function restoreSnapshot(id) { if(!requirePermission("backup","backup"))return;const snapshot=state.backup.snapshots.find(item=>item.id===id);if(!snapshot)return;if(checksumText(snapshot.data)!==snapshot.checksum)return notify("Este ponto de restauração está corrompido.","error");if(!confirm(`Restaurar “${snapshot.label}”? O estado atual será preservado em um novo ponto.`))return;const existing=[...state.backup.snapshots];createSnapshot("Antes da restauração","automático");const preserved=[...state.backup.snapshots];state=deepMerge(defaultState(),JSON.parse(snapshot.data));ensureV250State();state.backup.snapshots=preserved;recordAudit("backup.restaurado","backup","snapshot",snapshot.label);persist(false);renderPage();notify("Ponto de restauração carregado. Salve o rascunho para confirmar no servidor.","success"); }
   function deleteSnapshot(id) { if(!requirePermission("backup","backup"))return;const snapshot=state.backup.snapshots.find(item=>item.id===id);if(!snapshot)return;if(!confirm(`Excluir o ponto “${snapshot.label}”?`))return;state.backup.snapshots=state.backup.snapshots.filter(item=>item.id!==id);recordAudit("backup.excluido","backup","snapshot",snapshot.label);persist(false);renderBackup($("#page-root")); }
@@ -2684,11 +2713,11 @@
   function renderBackup(root) {
     ensureV250State();const snapshots=state.backup.snapshots,totalSize=snapshots.reduce((sum,item)=>sum+Number(item.size||0),0);
     root.innerHTML=`${pageHeader("Backup e recuperação","Exporte, valide, crie pontos de restauração e recupere o CMS com segurança.",canAccess("backup","backup")?`<button class="button primary" id="create-snapshot" type="button">Criar ponto agora</button>`:"")}
-      <div class="editorial-kpis"><article><span>Pontos disponíveis</span><strong>${snapshots.length}</strong></article><article><span>Limite configurado</span><strong>${state.backup.settings.maxSnapshots}</strong></article><article><span>Espaço estimado</span><strong>${Math.ceil(totalSize/1024)} KB</strong></article><article><span>Schema</span><strong>11</strong></article></div>
+      <div class="editorial-kpis"><article><span>Pontos disponíveis</span><strong>${snapshots.length}</strong></article><article><span>Limite configurado</span><strong>${state.backup.settings.maxSnapshots}</strong></article><article><span>Espaço estimado</span><strong>${Math.ceil(totalSize/1024)} KB</strong></article><article><span>Schema</span><strong>13</strong></article></div>
       <div class="grid-3"><section class="card"><div class="card-body"><h3>Exportar backup completo</h3><p class="field-help">Arquivo com metadados, contagens e checksum de integridade.</p><button class="button primary" id="export-backup" type="button">Baixar backup</button></div></section><section class="card"><div class="card-body"><h3>Importar e validar</h3><p class="field-help">Confere estrutura e checksum antes de carregar os dados.</p><button class="button secondary" id="import-backup" type="button">Selecionar arquivo</button></div></section><section class="card"><div class="card-body"><h3>Recarregar do servidor</h3><p class="field-help">Descarta alterações locais e recupera o último rascunho do D1.</p><button class="button danger" id="reset-demo" type="button">Recarregar dados</button></div></section></div>
       <section class="card" style="margin-top:18px"><header class="card-header"><div><h3>Automação de segurança</h3><p>Proteções antes de operações críticas.</p></div></header><div class="card-body"><form id="backup-settings" class="form-grid"><div class="field full"><div class="toggle-row"><div><strong>Ponto automático antes de importar</strong><small>Preserva o estado atual antes de substituir dados.</small></div><label class="switch"><input type="checkbox" name="autoBeforeImport" ${state.backup.settings.autoBeforeImport?"checked":""}><span></span></label></div><div class="toggle-row"><div><strong>Ponto automático antes de publicar</strong><small>Cria uma referência antes de enviar para revisão.</small></div><label class="switch"><input type="checkbox" name="autoBeforePublication" ${state.backup.settings.autoBeforePublication?"checked":""}><span></span></label></div></div><div class="field"><label for="max-snapshots">Máximo de pontos</label><input id="max-snapshots" name="maxSnapshots" type="number" min="1" max="10" value="${state.backup.settings.maxSnapshots}"></div><div class="field"><button class="button secondary" type="submit">Salvar automação</button></div></form></div></section>
       <section class="table-card" style="margin-top:18px"><div class="table-toolbar"><div><strong>Pontos de restauração</strong><small>O conteúdo atual é preservado antes de restaurar outro ponto.</small></div><span class="badge info">${snapshots.length}</span></div>${snapshots.length?`<div class="table-scroll"><table class="data-table"><thead><tr><th>Ponto</th><th>Origem</th><th>Conteúdo</th><th>Integridade</th><th style="text-align:right">Ações</th></tr></thead><tbody>${snapshots.map(item=>`<tr><td><strong>${escapeHTML(item.label)}</strong><small>${formatDateTime(item.createdAt)}</small></td><td>${escapeHTML(item.source)}</td><td><small>${Object.values(item.counts||{}).reduce((a,b)=>a+Number(b||0),0)} registros • ${Math.ceil(Number(item.size||0)/1024)} KB</small></td><td><span class="badge ${checksumText(item.data||"")===item.checksum?"active":"inactive"}">${checksumText(item.data||"")===item.checksum?"Íntegro":"Corrompido"}</span></td><td><div class="row-actions"><button class="button small primary" data-snapshot-restore="${item.id}" type="button">Restaurar</button><button class="button small secondary" data-snapshot-download="${item.id}" type="button">Baixar</button><button class="button small danger" data-snapshot-delete="${item.id}" type="button">Excluir</button></div></td></tr>`).join("")}</tbody></table></div>`:`<div class="empty-state"><strong>Nenhum ponto criado</strong><span>Crie um ponto antes de grandes alterações.</span></div>`}</section>
-      <section class="card" style="margin-top:18px"><header class="card-header"><div><h3>Sobre esta instalação</h3><p>Informações técnicas.</p></div></header><div class="card-body"><div class="code-box">Modo: produção integrada\nVersão: ${CONFIG.VERSION||"2.6.0-final"}\nSchema: 12\nPersistência: Cloudflare D1\nAPI: ${CONFIG.WORKER_URL||"não configurada"}\nÚltima alteração: ${formatDateTime(state.updatedAt)}</div></div></section>`;
+      <section class="card" style="margin-top:18px"><header class="card-header"><div><h3>Sobre esta instalação</h3><p>Informações técnicas.</p></div></header><div class="card-body"><div class="code-box">Modo: produção integrada\nVersão: ${CONFIG.VERSION||"3.0.0-stage1"}\nSchema: 13\nPersistência: Cloudflare D1\nAPI: ${CONFIG.WORKER_URL||"não configurada"}\nÚltima alteração: ${formatDateTime(state.updatedAt)}</div></div></section>`;
     $("#create-snapshot")?.addEventListener("click",()=>{createSnapshot("Ponto manual","manual");persist(false);renderBackup(root);notify("Ponto de restauração criado.","success");});$("#export-backup")?.addEventListener("click",exportBackup);$("#import-backup")?.addEventListener("click",()=>$("#backup-import").click());$("#reset-demo")?.addEventListener("click",()=>{if(confirm("Descartar alterações não salvas e recarregar o rascunho do servidor?")){createSnapshot("Antes de recarregar servidor","automático");recordAudit("servidor.recarregado","backup","site","Recarga solicitada");loadAll();}});
     $("#backup-settings")?.addEventListener("submit",event=>{event.preventDefault();if(!requirePermission("backup","backup"))return;const form=new FormData(event.currentTarget);state.backup.settings.autoBeforeImport=form.has("autoBeforeImport");state.backup.settings.autoBeforePublication=form.has("autoBeforePublication");state.backup.settings.maxSnapshots=Math.max(1,Math.min(10,Number(form.get("maxSnapshots")||5)));state.backup.snapshots=state.backup.snapshots.slice(0,state.backup.settings.maxSnapshots);recordAudit("backup.configurado","backup","configuracao",`Máximo ${state.backup.settings.maxSnapshots}`);persist(false);renderBackup(root);notify("Automação de backup atualizada.","success");});
     $$('[data-snapshot-restore]',root).forEach(button=>button.addEventListener("click",()=>restoreSnapshot(button.dataset.snapshotRestore)));$$('[data-snapshot-download]',root).forEach(button=>button.addEventListener("click",()=>downloadSnapshot(button.dataset.snapshotDownload)));$$('[data-snapshot-delete]',root).forEach(button=>button.addEventListener("click",()=>deleteSnapshot(button.dataset.snapshotDelete)));applyPermissionState(root,"backup");
@@ -2698,9 +2727,9 @@
   function duplicateValues(values) { const seen=new Set(),duplicates=new Set();values.filter(Boolean).forEach(value=>{const key=String(value).trim().toLowerCase();if(seen.has(key))duplicates.add(key);seen.add(key);});return [...duplicates]; }
   function runFunctionalAudit({save=true}={}) {
     ensureV250State();const checks=[];
-    const requiredDom=["login-view","app-shell","sidebar-nav","page-root","editor-modal","preview-dialog","site-content-dialog","access-user-modal","backup-import"];requiredDom.forEach(id=>checks.push(auditCheck(`dom-${id}`,`Componente #${id}`,document.getElementById(id)?"pass":"fail",document.getElementById(id)?"Disponível":"Elemento ausente")));
+    const requiredDom=["login-view","app-shell","sidebar-nav","page-root","editor-modal","preview-dialog","site-content-dialog","access-user-modal","backup-import","connection-chip"];requiredDom.forEach(id=>checks.push(auditCheck(`dom-${id}`,`Componente #${id}`,document.getElementById(id)?"pass":"fail",document.getElementById(id)?"Disponível":"Elemento ausente")));
     const navIds=navItems.filter(item=>item.id).map(item=>item.id),navDup=duplicateValues(navIds);checks.push(auditCheck("nav-unique","Rotas do menu sem duplicidade",navDup.length?"fail":"pass",navDup.length?navDup.join(", "):`${navIds.length} áreas registradas`));
-    navIds.forEach(id=>checks.push(auditCheck(`route-${id}`,`Rota ${id}`,(["dashboard","radio","editor","themes","usuarios","auditoria","publicacao","faturas","contrato"].includes(id)||schemas[id]||["whatsapp","redes","seo","dominio","aplicativo","configuracoes","backup"].includes(id))?"pass":"fail","Renderizador disponível")));
+    navIds.forEach(id=>checks.push(auditCheck(`route-${id}`,`Rota ${id}`,(["dashboard","radio","editor","themes","usuarios","auditoria","producao","publicacao","faturas","contrato"].includes(id)||schemas[id]||["whatsapp","redes","seo","dominio","aplicativo","configuracoes","backup"].includes(id))?"pass":"fail","Renderizador disponível")));
     Object.entries(state.content||{}).forEach(([key,items])=>{if(!Array.isArray(items))return;const ids=items.map(item=>item.id),dups=duplicateValues(ids);checks.push(auditCheck(`ids-${key}`,`${schemas[key]?.title||key}: identificadores únicos`,dups.length?"fail":"pass",`${items.length} registro(s)`));const missing=items.filter(item=>!String(item.titulo||item.nome||"").trim());checks.push(auditCheck(`title-${key}`,`${schemas[key]?.title||key}: conteúdo nomeado`,missing.length?"warning":"pass",missing.length?`${missing.length} sem título/nome`:"Todos identificados"));});
     const moduleDup=duplicateValues(state.modules.map(item=>item.id));checks.push(auditCheck("modules","Blocos do editor visual",moduleDup.length?"fail":"pass",`${state.modules.length} blocos, ${activeModules().length} ativos`));
     ensureV260EditorState();
@@ -2726,7 +2755,7 @@
     const strictProfiles=Object.values(workerImageSpecs).filter(spec=>Number(spec.width)>0&&Number(spec.height)>0&&Number(spec.maxKB)>0);
     checks.push(auditCheck("image-strict-profiles","Imagens: padrões obrigatórios configurados",strictProfiles.length===Object.keys(workerImageSpecs).length?"pass":"fail",`${strictProfiles.length}/${Object.keys(workerImageSpecs).length} perfis com largura, altura e peso máximo`));
     checks.push(auditCheck("image-client-validation","Imagens: validação antes do envio","pass","Formato, peso e dimensões exatas são conferidos no Portal antes da chamada de mídia"));
-    const totals={pass:checks.filter(c=>c.status==="pass").length,warning:checks.filter(c=>c.status==="warning").length,fail:checks.filter(c=>c.status==="fail").length};const run={id:uid("run"),timestamp:new Date().toISOString(),version:"2.6.0-final",checks,totals};
+    const totals={pass:checks.filter(c=>c.status==="pass").length,warning:checks.filter(c=>c.status==="warning").length,fail:checks.filter(c=>c.status==="fail").length};const run={id:uid("run"),timestamp:new Date().toISOString(),version:"3.0.0-stage1",checks,totals};
     if(save){state.audit.functionalRuns.unshift(run);state.audit.functionalRuns=state.audit.functionalRuns.slice(0,10);recordAudit("auditoria.executada","auditoria","sistema",`${totals.pass} aprovadas, ${totals.warning} alertas, ${totals.fail} falhas`,totals.fail?"error":totals.warning?"warning":"success");persist(false);}return run;
   }
   function exportAuditCSV() { if(!requirePermission("export","auditoria"))return;const rows=[["Data/hora","Resultado","Ação","Área","Alvo","Usuário","Detalhes"],...state.audit.entries.map(item=>[item.timestamp,item.result,item.action,item.area,item.target,item.actor?.email||item.actor?.nome||"",item.details])];const csv=rows.map(row=>row.map(value=>`"${String(value??"").replaceAll('"','""')}"`).join(";")).join("\n");downloadBlob(`crb-auditoria-${new Date().toISOString().slice(0,10)}.csv`,`\ufeff${csv}`,"text/csv;charset=utf-8");recordAudit("auditoria.exportada","auditoria","csv",`${state.audit.entries.length} eventos`); }
@@ -2739,6 +2768,118 @@
     $("#run-audit")?.addEventListener("click",()=>{if(!requirePermission("audit","auditoria"))return;runFunctionalAudit();renderAudit(root);notify("Auditoria completa concluída.","success");});$("#export-audit")?.addEventListener("click",exportAuditCSV);$("#audit-filter")?.addEventListener("change",event=>{auditFilter=event.target.value;renderAudit(root);});$("#clear-audit")?.addEventListener("click",()=>{if(!confirm("Limpar o histórico de auditoria?"))return;state.audit.entries=[];recordAudit("auditoria.historico_limpo","auditoria","historico","Histórico reiniciado");persist(false);renderAudit(root);});applyPermissionState(root,"auditoria");
   }
 
+
+  function productionCheck(id,label,status,details,group="portal",blocking=false) {
+    return {id,label,status,details,group,blocking:Boolean(blocking)};
+  }
+
+  function countImageReferences(value, seen=new Set()) {
+    if (!value || typeof value !== "object" || seen.has(value)) return 0;
+    seen.add(value); let total=0;
+    Object.entries(value).forEach(([key,item])=>{
+      if (["imagem","foto","logo","capa","hero","playerImage","imagemDesktop","imagemMobile","icone","qrcode"].includes(key) && typeof item === "string" && item.trim()) total++;
+      else if (item && typeof item === "object") total+=countImageReferences(item,seen);
+    });
+    return total;
+  }
+
+  function validEmail(value="") { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value).trim()); }
+  function validHttpURL(value="") { try { const url=new URL(String(value));return ["http:","https:"].includes(url.protocol); } catch { return false; } }
+
+  function buildProductionAnalysis() {
+    ensureV250State();
+    const checks=[];
+    const workerURL=String(CONFIG.WORKER_URL||"");
+    const pageProtocol=location.protocol;
+    const enabledModules=state.modules.filter(item=>item.enabled!==false).length;
+    const lastAudit=state.audit.functionalRuns[0]||null;
+    const owner=state.security.users.find(user=>user.owner);
+    const imageRefs=countImageReferences({radio:state.radio,content:state.content,integrations:state.integrations});
+    const domain=state.integrations.dominio.proprio || state.integrations.dominio.atual;
+
+    checks.push(productionCheck("portal-https","Portal servido por HTTPS",pageProtocol==="https:"?"pass":(["file:","about:"].includes(pageProtocol)||((location.hostname==="localhost"||location.hostname==="127.0.0.1")&&pageProtocol==="http:")?"warning":"fail"),pageProtocol==="https:"?"Conexão segura ativa.":`Protocolo atual: ${pageProtocol}. No ambiente público, use HTTPS.`,"portal",true));
+    checks.push(productionCheck("worker-url","URL do Worker segura",workerURL.startsWith("https://")?"pass":"fail",workerURL||"WORKER_URL não configurada.","portal",true));
+    checks.push(productionCheck("worker-reachable","Comunicação com o Worker",workerReachable===true?"pass":workerReachable===false?"fail":"warning",workerReachable===true?"Últimas chamadas respondidas.":workerReachable===false?"Falha de comunicação detectada.":"Aguardando uma chamada à API.","portal",true));
+    checks.push(productionCheck("session","Sessão autenticada",authToken?"pass":"fail",authToken?"Token mantido apenas na sessão do navegador.":"Nenhuma sessão ativa.","portal",true));
+    checks.push(productionCheck("site-loaded","Rascunho do site carregado",remoteSite?"pass":"fail",remoteSite?`Site ${remoteSite.id||"carregado"}.`:"O Worker não retornou um site editável.","portal",true));
+    checks.push(productionCheck("identity-name","Nome da emissora",state.radio.nome.trim()?"pass":"fail",state.radio.nome.trim()||"Nome não informado.","conteudo",true));
+    checks.push(productionCheck("identity-email","E-mail de contato",validEmail(state.radio.email)?"pass":"fail",state.radio.email||"E-mail não informado.","conteudo",true));
+    checks.push(productionCheck("identity-location","Cidade e estado",state.radio.cidade.trim()&&state.radio.estado.trim()?"pass":"warning",state.radio.cidade&&state.radio.estado?`${state.radio.cidade}/${state.radio.estado}`:"Complete a localização pública.","conteudo",false));
+    checks.push(productionCheck("stream","Stream da rádio",validHttpURL(state.radio.streamUrl)?"pass":"fail",state.radio.streamUrl||"URL do stream não informada.","conteudo",true));
+    checks.push(productionCheck("domain","Domínio ou subdomínio",domain?"pass":"warning",domain||"Nenhum domínio apresentado pelo Worker.","conteudo",false));
+    checks.push(productionCheck("theme","Modelo visual selecionado",themes.some(theme=>theme.id===state.selectedTheme)?"pass":"fail",themeById(state.selectedTheme).name,"conteudo",true));
+    checks.push(productionCheck("modules","Blocos ativos",enabledModules>0?"pass":"fail",`${enabledModules} de ${state.modules.length} blocos ativos.`,"conteudo",true));
+    checks.push(productionCheck("image-client-validation","Validação preventiva de novas imagens","pass","Dimensões, formato e peso são verificados antes do envio.","conteudo",false));
+    checks.push(productionCheck("legacy-images","Imagens já cadastradas",imageRefs?"warning":"pass",imageRefs?`${imageRefs} referência(s) existente(s) exigem revisão visual; o navegador não consegue garantir dimensões de arquivos remotos antigos.`:"Nenhuma imagem legada pendente.","conteudo",false));
+    checks.push(productionCheck("functional-audit","Auditoria funcional do CMS",!lastAudit?"warning":lastAudit.totals.fail?"fail":"pass",!lastAudit?"Execute a Auditoria integrada.":`${lastAudit.totals.pass} aprovadas, ${lastAudit.totals.warning} alertas e ${lastAudit.totals.fail} falhas.`,"qualidade",Boolean(lastAudit?.totals.fail)));
+    checks.push(productionCheck("backup","Ponto de restauração",state.backup.snapshots.length?"pass":"warning",state.backup.snapshots.length?`${state.backup.snapshots.length} ponto(s) disponível(is).`:"Crie um ponto antes do piloto.","qualidade",false));
+    checks.push(productionCheck("owner","Administrador principal protegido",owner&&owner.ativo&&owner.perfil==="Administrador"?"pass":"fail",owner?`${owner.nome} • ${owner.email}`:"Administrador principal não encontrado.","qualidade",true));
+    checks.push(productionCheck("client-errors","Erros capturados nesta sessão",state.production.clientErrors.length?"warning":"pass",state.production.clientErrors.length?`${state.production.clientErrors.length} ocorrência(s) registrada(s).`:"Nenhum erro de cliente registrado.","qualidade",false));
+
+    checks.push(productionCheck("server-permissions","Permissões validadas pelo servidor","pending","A interface restringe ações, mas cada endpoint precisa confirmar a permissão no Worker.","servidor",true));
+    checks.push(productionCheck("tenant-isolation","Isolamento entre emissoras","pending","É necessário auditar consultas e gravações por cliente/site no Worker e D1.","servidor",true));
+    checks.push(productionCheck("server-media","Validação de mídias no servidor","pending","A validação atual é preventiva no navegador e pode ser contornada fora da interface.","servidor",true));
+    checks.push(productionCheck("session-policy","Sessões, expiração e revogação","pending","Confirmar duração real, revogação, troca de senha e invalidação de tokens no servidor.","servidor",true));
+    checks.push(productionCheck("rate-limit","Proteção contra abuso e tentativas de login","pending","Confirmar rate limiting, bloqueios temporários e registros de tentativas no Worker.","servidor",true));
+    checks.push(productionCheck("cors","CORS restrito aos domínios autorizados","pending","Revisar origens permitidas antes de liberar múltiplos clientes.","servidor",true));
+    checks.push(productionCheck("server-backup","Backup e restauração em ambiente real","pending","Validar recuperação do D1 e das mídias fora do backup local do CMS.","servidor",true));
+
+    const totals={
+      pass:checks.filter(item=>item.status==="pass").length,
+      warning:checks.filter(item=>item.status==="warning").length,
+      fail:checks.filter(item=>item.status==="fail").length,
+      pending:checks.filter(item=>item.status==="pending").length
+    };
+    const localBlockers=checks.filter(item=>item.group!=="servidor"&&item.blocking&&item.status==="fail");
+    const launchBlockers=checks.filter(item=>item.blocking&&["fail","pending"].includes(item.status));
+    return {id:uid("production-run"),timestamp:new Date().toISOString(),version:"3.0.0-stage1",schemaVersion:13,checks,totals,portalReady:localBlockers.length===0,productionReady:launchBlockers.length===0,localBlockers:localBlockers.map(item=>item.id),launchBlockers:launchBlockers.map(item=>item.id)};
+  }
+
+  function runProductionAnalysis({save=true,silent=false}={}) {
+    const run=buildProductionAnalysis();
+    if(save){
+      state.production.runs.unshift(run);state.production.runs=state.production.runs.slice(0,10);
+      recordAudit("producao.analisada","auditoria","pre-producao",`${run.totals.pass} aprovadas, ${run.totals.warning} alertas, ${run.totals.fail} falhas e ${run.totals.pending} pendências`,run.portalReady?"warning":"error");
+      persist(false);
+    }
+    if(!silent)notify(run.portalReady?"Análise concluída. O Portal pode seguir para piloto controlado; a liberação geral ainda depende da auditoria do servidor.":"Análise concluída com bloqueios locais. Corrija-os antes do piloto.",run.portalReady?"success":"error");
+    return run;
+  }
+
+  function productionStatusLabel(status){return status==="pass"?"Aprovado":status==="warning"?"Atenção":status==="pending"?"Pendente":"Falha";}
+  function productionStatusIcon(status){return status==="pass"?"✓":status==="warning"?"!":status==="pending"?"…":"×";}
+
+  function exportProductionReport() {
+    if(!requirePermission("export","producao"))return;
+    const run=state.production.runs[0]||buildProductionAnalysis();
+    const report={produto:"Central Rádios Brasil — Portal do Cliente",stage:"v3.0.0 Etapa 1 — Pré-produção",generatedAt:new Date().toISOString(),workerURL:CONFIG.WORKER_URL,portalReady:run.portalReady,productionReady:run.productionReady,totals:run.totals,checks:run.checks,note:"Este relatório não comprova controles internos do Worker/D1. As pendências de servidor exigem análise separada antes do lançamento geral."};
+    downloadBlob(`crb-pre-producao-${new Date().toISOString().slice(0,10)}.json`,JSON.stringify(report,null,2),"application/json;charset=utf-8");
+    recordAudit("producao.relatorio_exportado","auditoria","pre-producao","Relatório JSON exportado");
+  }
+
+  function renderProductionReadiness(root) {
+    ensureV250State();
+    const run=state.production.runs[0]||buildProductionAnalysis();
+    const groups=[
+      ["portal","Portal e conexão"],
+      ["conteudo","Identidade e conteúdo"],
+      ["qualidade","Qualidade e recuperação"],
+      ["servidor","Pendências externas — análise obrigatória, sem alterações nesta etapa"]
+    ];
+    const blockers=run.checks.filter(item=>item.blocking&&["fail","pending"].includes(item.status));
+    root.innerHTML=`${pageHeader("Pré-produção v3.0.0","Diagnóstico de lançamento, riscos e dependências. Esta etapa não altera Worker, D1 ou outros repositórios.",`<button class="button secondary" id="export-production" type="button">Exportar relatório</button><button class="button primary" id="run-production" type="button">Executar análise</button>`)}
+      <section class="production-hero ${run.portalReady?"pilot-ready":"blocked"}"><div><span class="overline">Etapa 1 — preparação segura</span><h2>${run.portalReady?"Portal apto para piloto controlado":"Existem bloqueios locais antes do piloto"}</h2><p>${run.productionReady?"Os requisitos verificados estão aprovados.":"A liberação para vários clientes permanece bloqueada até a análise e validação do servidor."}</p></div><div class="production-status-pills"><span class="production-pill ${run.portalReady?"pass":"fail"}">Portal: ${run.portalReady?"piloto possível":"corrigir"}</span><span class="production-pill ${run.productionReady?"pass":"pending"}">Produção geral: ${run.productionReady?"apta":"pendente"}</span></div></section>
+      <div class="editorial-kpis production-kpis"><article><span>Aprovadas</span><strong>${run.totals.pass}</strong></article><article><span>Alertas</span><strong>${run.totals.warning}</strong></article><article><span>Falhas locais</span><strong>${run.totals.fail}</strong></article><article><span>Pendências externas</span><strong>${run.totals.pending}</strong></article></div>
+      <section class="production-actions card"><div class="card-body"><div><h3>Antes de um piloto</h3><p>Crie um ponto de restauração, execute a auditoria completa e revise a publicação. A liberação geral só poderá ocorrer após a análise do Worker/D1.</p></div><div class="page-actions"><button class="button secondary" id="production-snapshot" type="button">Criar ponto de segurança</button><button class="button secondary" data-go="auditoria" type="button">Abrir auditoria</button><button class="button primary" data-go="publicacao" type="button">Revisar publicação</button></div></div></section>
+      ${blockers.length?`<section class="production-blockers"><strong>Bloqueadores e pendências para o lançamento geral</strong><div>${blockers.map(item=>`<span>${escapeHTML(item.label)}</span>`).join("")}</div></section>`:""}
+      <div class="production-groups">${groups.map(([id,title])=>{const items=run.checks.filter(item=>item.group===id);return`<section class="card production-group"><header class="card-header"><div><h3>${escapeHTML(title)}</h3><p>${id==="servidor"?"Somente análise documental nesta entrega; nenhuma mudança será realizada fora do Portal do Cliente.":`${items.length} verificações`}</p></div></header><div class="card-body"><div class="production-check-list">${items.map(item=>`<article class="production-check ${item.status}"><span aria-hidden="true">${productionStatusIcon(item.status)}</span><div><strong>${escapeHTML(item.label)}</strong><small>${escapeHTML(item.details)}</small></div><em>${productionStatusLabel(item.status)}</em></article>`).join("")}</div></div></section>`;}).join("")}</div>
+      <section class="card production-history"><header class="card-header"><div><h3>Histórico das análises</h3><p>Últimas execuções gravadas no mesmo rascunho do CMS.</p></div><span class="badge info">${state.production.runs.length}</span></header><div class="card-body">${state.production.runs.length?`<div class="activity-list">${state.production.runs.map(item=>`<div class="activity-item"><span class="activity-dot"></span><div><strong>${item.portalReady?"Piloto possível":"Correção necessária"}</strong><p>${item.totals.pass} aprovadas • ${item.totals.warning} alertas • ${item.totals.fail} falhas • ${item.totals.pending} pendências</p></div><span class="activity-time">${formatDateTime(item.timestamp)}</span></div>`).join("")}</div>`:`<div class="empty-state"><strong>Nenhuma análise gravada</strong></div>`}</div></section>`;
+    $("#run-production")?.addEventListener("click",()=>{if(!requirePermission("audit","producao"))return;runProductionAnalysis();renderProductionReadiness(root);});
+    $("#export-production")?.addEventListener("click",exportProductionReport);
+    $("#production-snapshot")?.addEventListener("click",()=>{if(!requirePermission("backup","backup"))return;createSnapshot("Pré-lançamento v3.0.0","manual");persist(false);renderProductionReadiness(root);notify("Ponto de segurança criado.","success");});
+    bindGoButtons(root);applyPermissionState(root,"producao");
+  }
+
   function renderPublication(root) {
     const status=remoteSite?.status_publicacao||state.status,canPublish=canAccess("publish","publicacao");
     root.innerHTML=`${pageHeader("Publicação","Revise a prévia, gere um ponto de segurança e envie o rascunho para aprovação da Central.",`<button class="button secondary" data-preview type="button">Abrir prévia</button>`)}<div class="grid-2"><section class="card"><header class="card-header"><div><h3>Situação atual</h3><p>Fluxo real de publicação.</p></div></header><div class="card-body"><div class="status-list"><div class="health-row"><div><strong>${escapeHTML(statusLabel(status))}</strong><span>${remoteSite?.solicitacao_publicacao_em?`Solicitado em ${formatDateTime(remoteSite.solicitacao_publicacao_em)}`:remoteSite?.ultima_publicacao_em?`Publicado em ${formatDateTime(remoteSite.ultima_publicacao_em)}`:"Ainda não publicado"}</span></div><span class="badge ${status==="publicado"?"active":"info"}">${escapeHTML(statusLabel(status))}</span></div><div class="notice">Salvar o rascunho não altera o site público. A publicação é revisada pela Central Rádios Brasil.</div>${state.backup.settings.autoBeforePublication?`<div class="notice" style="margin-top:10px">Um ponto de restauração será criado automaticamente antes da solicitação.</div>`:""}</div></div><footer class="card-footer"><div class="page-actions"><button class="button secondary" id="publication-save" type="button">Salvar rascunho</button><button class="button primary" id="publication-request" type="button" ${status==="aguardando_publicacao"||!canPublish?"disabled":""}>Solicitar publicação</button></div></footer></section><section class="card"><header class="card-header"><div><h3>Histórico de versões</h3><p>Últimas versões registradas no D1.</p></div></header><div class="card-body"><div class="activity-list">${versions.slice(0,12).map(v=>`<div class="activity-item"><span class="activity-dot"></span><div><strong>Versão ${Number(v.numero)}</strong><p>${escapeHTML(statusLabel(v.status))} • ${escapeHTML(statusLabel(v.autor_tipo))}</p></div><span class="activity-time">${formatDateTime(v.criado_em)}</span></div>`).join("")||`<div class="empty-state"><strong>Nenhuma versão registrada</strong></div>`}</div></div></section></div>`;
@@ -2746,7 +2887,10 @@
   }
   async function requestPublication() {
     if(activeImageProcesses.size)return notify("Aguarde a validação da imagem antes de solicitar publicação.","error");
-    if(!requirePermission("publish","publicacao"))return;if(!remoteSite)return;if(!confirm("Enviar o rascunho atual para revisão e publicação pela Central Rádios Brasil?"))return;
+    if(!requirePermission("publish","publicacao"))return;if(!remoteSite)return;
+    const readiness=runProductionAnalysis({save:false,silent:true});
+    if(readiness.localBlockers.length){currentPage="producao";renderNav();renderPage();return notify("A publicação foi bloqueada por falhas locais na análise de pré-produção.","error");}
+    if(!confirm("Enviar o rascunho atual para revisão e publicação pela Central Rádios Brasil?"))return;
     try{if(state.backup.settings.autoBeforePublication)createSnapshot("Antes da solicitação de publicação","automático");await queueRemoteSave(false);const result=await api("/api/cliente/site/solicitar-publicacao",{method:"POST",body:"{}"});remoteSite.status_publicacao=result.statusPublicacao||"aguardando_publicacao";remoteSite.solicitacao_publicacao_em=new Date().toISOString();state.status=remoteSite.status_publicacao;recordAudit("publicacao.solicitada","publicacao","site",result.mensagem||"Solicitação enviada");renderPage();updateChrome();notify(result.mensagem||"Solicitação enviada.","success");}catch(error){recordAudit("publicacao.falha","publicacao","site",error.message,"error");notify(error.message,"error");}
   }
 
@@ -2778,6 +2922,11 @@
     $$('#editor-modal [value="cancel"]').forEach(button=>button.addEventListener("click",event=>{event.preventDefault();editing=null;$("#editor-modal").close();}));
     $("#backup-import").addEventListener("change",event=>{const file=event.target.files?.[0];if(file)importBackup(file);event.target.value="";});
     document.addEventListener("keydown",event=>{if(event.key!=="Escape")return;const previewCanvas=$("#preview-canvas");if($(".site-popup-layer",previewCanvas)){event.preventDefault();return closePreviewPopup(previewCanvas);}if($("#site-content-dialog").open)$("#site-content-dialog").close();else if($("#preview-dialog").open){clearPreviewPopupTimer();previewThemeOverride=null;$("#preview-dialog").close();}});
+    window.addEventListener("online",()=>{workerReachable=null;updateConnectionStatus();});
+    window.addEventListener("offline",()=>{workerReachable=false;updateConnectionStatus();notify("Conexão perdida. Evite fechar a página até a internet voltar.","error");});
+    window.addEventListener("error",event=>captureClientIssue("javascript",event.message,event.filename||""));
+    window.addEventListener("unhandledrejection",event=>captureClientIssue("promise",event.reason?.message||String(event.reason||"Rejeição não tratada"),"unhandledrejection"));
+    updateConnectionStatus();
     resumeSession();
   }
 

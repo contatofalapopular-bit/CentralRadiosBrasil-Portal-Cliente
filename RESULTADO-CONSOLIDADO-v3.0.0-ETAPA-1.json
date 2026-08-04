@@ -1,0 +1,31 @@
+{
+  "version": "3.0.0-stage1",
+  "schemaVersion": 13,
+  "parts": [
+    {
+      "arquivo": "RESULTADOS-REGRESSAO-v3.0.0-ETAPA-1.json",
+      "total": 46,
+      "passed": 46,
+      "failed": 0
+    },
+    {
+      "arquivo": "RESULTADOS-PRE-PRODUCAO-v3.0.0-ETAPA-1.json",
+      "total": 20,
+      "passed": 20,
+      "failed": 0
+    },
+    {
+      "arquivo": "RESULTADOS-ISOLAMENTO-v3.0.0-ETAPA-1.json",
+      "total": 21,
+      "passed": 21,
+      "failed": 0
+    }
+  ],
+  "total": 87,
+  "passed": 87,
+  "failed": 0,
+  "javascriptErrors": 0,
+  "relevantConsoleErrors": 0,
+  "endpointsAdded": 0,
+  "endpointsRemoved": 0
+}

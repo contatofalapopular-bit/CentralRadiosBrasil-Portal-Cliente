@@ -4,7 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#111827">
-  <meta name="description" content="Portal do Cliente da Central Rádios Brasil — CMS multitema integrado.">
+  <meta name="description" content="Portal do Cliente da Central Rádios Brasil — preparação para produção e lançamento.">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>Portal do Cliente — Central Rádios Brasil</title>
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -22,7 +23,7 @@
         <button class="button primary" id="login-button" type="submit">Entrar</button>
       </form>
       <div class="global-message hidden" id="login-message" role="alert"></div>
-      <small class="login-version">Portal v2.6.0 • Final Consolidada</small>
+      <small class="login-version">Portal v3.0.0 • Pré-produção</small>
     </div>
   </section>
 
@@ -39,7 +40,7 @@
       </div>
       <nav class="sidebar-nav" id="sidebar-nav"></nav>
       <div class="sidebar-footer">
-        <span>Portal v2.6.0 • Final</span>
+        <span>Portal v3.0.0 • Etapa 1</span>
         <small>Dados reais • Worker + D1</small>
       </div>
     </aside>
@@ -53,6 +54,7 @@
         <div class="topbar-actions">
           <button class="button secondary" id="preview-top-button" type="button">Visualizar site</button>
           <button class="button primary" id="save-button" type="button">Salvar rascunho</button>
+          <div class="connection-chip checking" id="connection-chip" role="status" aria-live="polite"><span aria-hidden="true"></span><strong>Verificando conexão</strong></div>
           <div class="account-chip"><span class="avatar" id="account-avatar">CR</span><div><strong id="account-name">Cliente</strong><small id="account-role">Acesso autorizado</small></div></div>
           <button class="button ghost small" id="logout-button" type="button">Sair</button>
         </div>

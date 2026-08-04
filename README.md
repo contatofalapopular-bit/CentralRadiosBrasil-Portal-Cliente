@@ -1,45 +1,56 @@
 # Central Rádios Brasil — Portal do Cliente
 
-## v2.6.0 — Final Consolidada
+## v3.0.0 — Etapa 1: Pré-produção e lançamento seguro
 
-Esta versão encerra a fase **Editor Visual e temas consolidados**. Ela reúne, em uma única base estável do Portal do Cliente:
+Esta entrega inicia a preparação real do CMS para uso por clientes. Ela foi construída exclusivamente sobre a **v2.6.0 Final Consolidada** e não modifica Worker, D1, Portal Público/PWA, Painel Administrativo, firmware ou qualquer outro repositório.
 
-- seis modelos de site, com estruturas visuais distintas;
-- modelo Jovem preservado por padrão;
-- opções específicas por modelo;
-- 14 blocos ativáveis, reordenáveis e configuráveis;
-- configurações independentes por modelo e bloco;
-- cores próprias de fundo, títulos, textos, chamadas e botões;
-- verificação automática de contraste;
-- prévia em tempo real para desktop, tablet e celular;
-- validação obrigatória de formato, peso e dimensões das imagens antes do envio;
-- Editor Visual reorganizado, sem rolagem horizontal geral nas resoluções auditadas;
-- usuários, permissões, auditoria e backup preservados;
-- todos os módulos editoriais e comerciais das versões anteriores.
+### O que foi adicionado
 
-### Correção encontrada na consolidação
+- nova área **Pré-produção** no menu do Portal;
+- análise separada entre requisitos comprováveis no navegador e requisitos que dependem do servidor;
+- classificação independente:
+  - Portal apto ou não para piloto controlado;
+  - lançamento geral apto ou pendente;
+- diagnóstico de conexão com o Worker;
+- indicador visual de conexão na barra superior;
+- validação de identidade, e-mail, localização, stream, domínio, tema e blocos;
+- verificação de auditoria, backup e administrador principal;
+- registro de falhas JavaScript e promessas não tratadas na sessão;
+- exportação do relatório de pré-produção em JSON;
+- criação de ponto de restauração antes do piloto;
+- pré-checagem local antes de solicitar publicação;
+- histórico das análises salvo no mesmo rascunho atual.
 
-A auditoria final identificou que os blocos montados no trecho complementar de alguns modelos eram exibidos, mas não recebiam integralmente o título, composição e cores escolhidos no Editor Visual. A montagem foi unificada para que **todos os blocos**, inclusive os posicionados automaticamente no restante da página, passem pelo mesmo mecanismo de apresentação.
+### Limites desta etapa
+
+O Portal não afirma que os controles abaixo já existem no servidor. Eles aparecem como **pendências externas obrigatórias**:
+
+- permissões validadas em cada endpoint;
+- isolamento entre emissoras;
+- validação de mídias no servidor;
+- expiração e revogação de sessões;
+- rate limiting e proteção contra tentativas de login;
+- CORS restrito aos domínios autorizados;
+- backup e recuperação reais do D1 e das mídias.
+
+Nenhuma dessas pendências foi alterada nesta entrega. Elas deverão ser analisadas antes de qualquer mudança no Worker.
 
 ### Identificação técnica
 
-- Release interna: `2.6.0-final`
-- Schema interno: `12`
+- Release interna: `3.0.0-stage1`
+- Schema interno: `13`
 - Endpoint de rascunho: `/api/cliente/site/rascunho`
+- Endpoints existentes: `9`
+- Endpoints novos: `0`
 - Migração SQL: não necessária
 
-### Isolamento
+### Auditoria
 
-Esta entrega modifica somente arquivos do **Portal do Cliente**. Não houve alteração no Worker, D1, Portal Público/PWA, Painel Administrativo, firmware ou outro repositório. A URL do Worker e os nove endpoints existentes foram preservados.
+- regressão funcional da v2.6.0: **46/46**;
+- testes específicos de pré-produção: **20/20**;
+- verificações estáticas e de isolamento: **21/21**;
+- total desta entrega: **87/87 aprovadas**;
+- exceções JavaScript: `0`;
+- erros relevantes de console: `0`.
 
-### Auditoria final
-
-- verificações em Chromium: 46/46;
-- verificações estáticas e de isolamento: 20/20;
-- total da consolidação: **66/66 aprovadas**;
-- exceções JavaScript: 0;
-- erros relevantes de console: 0;
-- endpoints adicionados: 0;
-- endpoints removidos: 0.
-
-Consulte `RELATORIO-CONSOLIDACAO-v2.6.0-FINAL.md` e `RESULTADOS-AUDITORIA-v2.6.0-FINAL.json`.
+Consulte os relatórios incluídos no pacote antes de avançar para a análise do Worker e do D1.

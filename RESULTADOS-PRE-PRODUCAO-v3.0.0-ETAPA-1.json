@@ -1,0 +1,107 @@
+{
+  "total": 20,
+  "passed": 20,
+  "failed": 0,
+  "checks": [
+    {
+      "name": "Conexão do Worker indicada",
+      "status": "pass",
+      "details": "Worker conectado"
+    },
+    {
+      "name": "Menu de pré-produção disponível",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "name": "Página de pré-produção abre",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "name": "Isolamento explicitado",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "name": "Pendências externas exibidas",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "name": "Portal classificado para piloto",
+      "status": "pass",
+      "details": "Pré-produção v3.0.0\n\nDiagnóstico de lançamento, riscos e dependências. Esta etapa não altera Worker, D1 ou outros repositórios.\n\nExportar relatório\nExecutar análise\nETAPA 1 — PREPARAÇÃO SEGURA\nPortal apto para piloto controlado\n\nA liberação para vários clientes permanece bloqueada até a análise e validação do servidor.\n\nPortal: piloto possível\nProdução geral: pendente\nAPROVADAS\n15\nALERTAS\n3\nFALHAS LOCAIS\n0\nPENDÊNCIAS EXTERNAS\n7\nAntes de um piloto\n\nCrie um ponto de restauração, execute a auditori"
+    },
+    {
+      "name": "Produção geral permanece pendente",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "name": "Análise gravada",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "name": "Rascunho salvo após análise",
+      "status": "pass",
+      "details": "1"
+    },
+    {
+      "name": "Resultado persistido no mesmo CMS",
+      "status": "pass",
+      "details": "dict_keys(['stage', 'runs', 'clientErrors', 'manualReviews'])"
+    },
+    {
+      "name": "Schema 13 persistido",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "name": "Release v3 persistida",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "name": "Relatório de pré-produção exportado",
+      "status": "pass",
+      "details": "crb-pre-producao-2026-08-04.json"
+    },
+    {
+      "name": "Ponto de segurança pode ser criado",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "name": "Atalho abre Auditoria",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "name": "Atalho abre Publicação",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "name": "Pré-checagem não bloqueia site piloto válido",
+      "status": "pass",
+      "details": "[('GET', '/api/cliente/site/midias'), ('PUT', '/api/cliente/site/rascunho'), ('PUT', '/api/cliente/site/rascunho'), ('POST', '/api/cliente/site/solicitar-publicacao'), ('PUT', '/api/cliente/site/rascunho')]"
+    },
+    {
+      "name": "Nenhum endpoint novo",
+      "status": "pass",
+      "details": "set()"
+    },
+    {
+      "name": "Sem exceções JavaScript",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "name": "Sem erros relevantes no console",
+      "status": "pass",
+      "details": ""
+    }
+  ]
+}
